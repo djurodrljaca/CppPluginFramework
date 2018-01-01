@@ -1,0 +1,2 @@
+# CppPluginFramework
+C++ Plugin framework
