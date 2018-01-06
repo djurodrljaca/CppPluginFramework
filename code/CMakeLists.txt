@@ -20,7 +20,13 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5Core)
 
-set(HEADERS
+# --------------------------------------------------------------------------------------------------
+# CppPluginFramework library
+# --------------------------------------------------------------------------------------------------
+
+include_directories(inc)
+
+set(CppPluginFramework_HEADERS
     inc/CppPluginFramework/AbstractPlugin.hpp
     inc/CppPluginFramework/ConfigFile.hpp
     inc/CppPluginFramework/IPlugin.hpp
@@ -32,7 +38,7 @@ set(HEADERS
     inc/CppPluginFramework/Validation.hpp
     )
 
-set(SOURCES
+set(CppPluginFramework_SOURCES
     src/AbstractPlugin.cpp
     src/ConfigFile.cpp
     src/Plugin.cpp
@@ -42,12 +48,18 @@ set(SOURCES
     src/Validation.cpp
     )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
-target_include_directories(${PROJECT_NAME} PUBLIC inc)
-target_link_libraries(${PROJECT_NAME} Qt5::Core)
-target_compile_definitions(${PROJECT_NAME} PUBLIC CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
-set_target_properties(${PROJECT_NAME} PROPERTIES
+add_library(CppPluginFramework SHARED ${CppPluginFramework_SOURCES} ${CppPluginFramework_HEADERS})
+target_link_libraries(CppPluginFramework Qt5::Core)
+target_compile_definitions(CppPluginFramework PUBLIC CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
+set_target_properties(CppPluginFramework PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
+
+# --------------------------------------------------------------------------------------------------
+# Tests
+# --------------------------------------------------------------------------------------------------
+
+enable_testing()
+add_subdirectory(tests)
