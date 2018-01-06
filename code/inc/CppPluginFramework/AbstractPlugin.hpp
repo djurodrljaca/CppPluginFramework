@@ -46,7 +46,7 @@ namespace CppPluginFramework
  * - Started state of the plugin (is started or not)
  * - Starting and stopping of the plugin
  */
-class AbstractPlugin : public IPlugin
+class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT AbstractPlugin : public IPlugin
 {
 public:
     /*!

@@ -22,6 +22,7 @@
 #define CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/PluginSharedExport.hpp>
 
 // Qt includes
 #include <QtCore/QJsonObject>
@@ -39,7 +40,7 @@ namespace CppPluginFramework
 /*!
  * This class holds a plugin's instance config
  */
-class PluginInstanceConfig
+class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginInstanceConfig
 {
 public:
     /*!

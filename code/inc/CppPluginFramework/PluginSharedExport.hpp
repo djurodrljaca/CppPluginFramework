@@ -40,14 +40,31 @@ class IPlugin;
 // Macros
 
 /*!
- * \def CPPPLUGINFRAMEWORK_SHARED_EXPORT
+ * \def CPPPLUGINFRAMEWORK_EXPORT
  *
- * Macro used for importing and exporting plugin libraries
+ * Macro used for importing and exporting the C++ Plugin Framework library symbols
+ *
+ * \note    To successfully build the C++ Plugin Framework library the symbol
+ *          CPPPLUGINFRAMEWORK_BUILD_LIBRARY needs to be defined!
  */
-#if defined(CPPPLUGINFRAMEWORK_PLUGIN)
-#  define CPPPLUGINFRAMEWORK_SHARED_EXPORT Q_DECL_EXPORT
+#if defined(CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
+#  define CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Q_DECL_EXPORT
 #else
-#  define CPPPLUGINFRAMEWORK_SHARED_EXPORT Q_DECL_IMPORT
+#  define CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Q_DECL_IMPORT
+#endif
+
+/*!
+ * \def CPPPLUGINFRAMEWORK_PLUGIN_EXPORT
+ *
+ * Macro used for importing and exporting plugin libraries symbols
+ *
+ * \note    To successfully build a plugin library the symbol CPPPLUGINFRAMEWORK_BUILD_PLUGIN needs
+ *          to be defined!
+ */
+#if defined(CPPPLUGINFRAMEWORK_BUILD_PLUGIN)
+#  define CPPPLUGINFRAMEWORK_PLUGIN_EXPORT Q_DECL_EXPORT
+#else
+#  define CPPPLUGINFRAMEWORK_PLUGIN_EXPORT Q_DECL_IMPORT
 #endif
 
 extern "C"
@@ -58,7 +75,7 @@ extern "C"
  *
  * \return  Plugin version
  */
-CPPPLUGINFRAMEWORK_SHARED_EXPORT const char *readPluginVersion();
+CPPPLUGINFRAMEWORK_PLUGIN_EXPORT const char *readPluginVersion();
 
 /*!
  * Function prototype for creating a plugin instance
@@ -67,7 +84,7 @@ CPPPLUGINFRAMEWORK_SHARED_EXPORT const char *readPluginVersion();
  *
  * \return  Pointer to a plugin instance or a null pointer on failure
  */
-CPPPLUGINFRAMEWORK_SHARED_EXPORT
+CPPPLUGINFRAMEWORK_PLUGIN_EXPORT
 CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName);
 
 }

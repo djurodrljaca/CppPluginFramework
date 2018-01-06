@@ -41,7 +41,7 @@ namespace CppPluginFramework
 /*!
  * This class can be used to manage plugins
  */
-class PluginManager
+class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginManager
 {
 public:
     /*!

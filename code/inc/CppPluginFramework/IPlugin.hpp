@@ -22,6 +22,7 @@
 #define CPPPLUGINFRAMEWORK_IPLUGIN_HPP
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/PluginSharedExport.hpp>
 
 // Qt includes
 #include <QtCore/QJsonObject>
@@ -57,7 +58,7 @@ namespace CppPluginFramework
 /*!
  * This is a base class for all plugins
  */
-class IPlugin
+class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT IPlugin
 {
 public:
     /*!

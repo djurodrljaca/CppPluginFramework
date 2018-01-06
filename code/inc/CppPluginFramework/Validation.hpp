@@ -22,6 +22,7 @@
 #define CPPPLUGINFRAMEWORK_VALIDATION_HPP
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/PluginSharedExport.hpp>
 
 // Qt includes
 #include <QtCore/QSet>
@@ -45,7 +46,7 @@ namespace Validation
  * \retval  true    Plugin's instance name is valid
  * \retval  false   Plugin's instance name is not valid
  */
-bool validatePluginInstanceName(const QString &name);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validatePluginInstanceName(const QString &name);
 
 /*!
  * Validates plugin's version
@@ -55,7 +56,7 @@ bool validatePluginInstanceName(const QString &name);
  * \retval  true    Plugin's version is valid
  * \retval  false   Plugin's version is not valid
  */
-bool validateVersion(const QString &version);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateVersion(const QString &version);
 
 /*!
  * Validates plugin's version range
@@ -66,7 +67,8 @@ bool validateVersion(const QString &version);
  * \retval  true    Plugin's version range is valid
  * \retval  false   Plugin's version range is not valid
  */
-bool validateVersionRange(const QString &minVersion, const QString &maxVersion);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateVersionRange(const QString &minVersion,
+                                                            const QString &maxVersion);
 
 /*!
  * Checks if specified version is in version range
@@ -78,7 +80,9 @@ bool validateVersionRange(const QString &minVersion, const QString &maxVersion);
  * \retval  true    Version is in range
  * \retval  false   Version is in not range
  */
-bool isVersionInRange(const QString &version, const QString &minVersion, const QString &maxVersion);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool isVersionInRange(const QString &version,
+                                                        const QString &minVersion,
+                                                        const QString &maxVersion);
 
 /*!
  * Validates plugin's interface name
@@ -88,7 +92,7 @@ bool isVersionInRange(const QString &version, const QString &minVersion, const Q
  * \retval  true    Plugin's interface name is valid
  * \retval  false   Plugin's interface name is not valid
  */
-bool validateInterfaceName(const QString &name);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateInterfaceName(const QString &name);
 
 /*!
  * Validates plugin's exported interfaces
@@ -100,6 +104,7 @@ bool validateInterfaceName(const QString &name);
  *
  * This method checks if at least one interface is exported and if the interface names are valid.
  */
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT
 bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces);
 
 /*!
@@ -110,7 +115,7 @@ bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces);
  * \retval  true    Valid
  * \retval  false   Invalid
  */
-bool validateEnvironmentVariableName(const QString &name);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateEnvironmentVariableName(const QString &name);
 
 /*!
  * Validates file path
@@ -120,7 +125,7 @@ bool validateEnvironmentVariableName(const QString &name);
  * \retval  true    Valid
  * \retval  false   Invalid
  */
-bool validateFilePath(const QString &filePath);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateFilePath(const QString &filePath);
 
 }
 }
