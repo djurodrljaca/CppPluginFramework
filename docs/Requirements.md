@@ -5,12 +5,12 @@
 
 Each plugin shall expose the following metadata:
 
-* Name
+* Instance Name
 * Description
 * Version
 * Exported Interfaces
 
-For *Name* see [[R2] Plugin Name](#r2-plugin-name).
+For *Instance Name* see [[R2] Plugin Instance Name](#r2-plugin-instance-name).
 
 *Description* is an optional text that describes the purpose of the plugin and/or any other information about the plugin.
 
@@ -19,9 +19,9 @@ For *Version* see [[R3] Plugin Version](#r3-plugin-version).
 For *Exported Interfaces* see [[R4] Exported Interfaces](#r4-exported-interfaces).
 
 
-## [R2] Plugin Name
+## [R2] Plugin Instance Name
 
-Represents the name of plugin. Allowed characters are:
+Represents the name of plugin instance. Allowed characters are:
 
 * All letters of the English alphabet (A-Z, a-z)
 * Numbers (0-9)
@@ -29,7 +29,7 @@ Represents the name of plugin. Allowed characters are:
 * Hyphen character (U+002D)
 * Underscore character (U+005F)
 
-The name shall always start with a letter.
+The plugin instance name shall always start with a letter.
 
 
 ## [R3] Plugin Version
@@ -97,17 +97,17 @@ Loading of plugins shall done according to its configuration which shall be stor
 * List of plugins
 
     * Plugin file path
-    * Description
     * Version requirements
+    * Comment
     * List of plugin instances
     
         * Plugin instance name
-        * Description
-        * Configuration file path
+        * Configuration
+        * Comment
         * Plugin dependencies
     
             * Plugin name
-            * Description
+            * Comment
 
 
 ### List of custom environment variables
@@ -122,7 +122,7 @@ Allowed characters for the environment variable names are:
 
 The name shall only start with a letter or underscore!
 
-The value can be any character and it can also contain system environment variables and the other environment variables defined in this list, as long as it is defined before it in the list.
+The value can be any string and it can also contain references to system environment variables and other custom environment variables defined in this list.
 
 Format for referencing a system environment variables or the ones from this list shall be: `${VARIABLE_NAME}`
 
@@ -133,21 +133,22 @@ This part of the configuration shall be used to specify which plugins need to be
 
 *Plugin file path* shall point to plugin file (dynamic library). It shall be either an absolute or relative path and it shall be possible to reference any system or custom environment variable.
 
-*Description* is optional and it can be used to explain the purpose of this plugin to the reader of the configuration file.
-
 *Version requirements* shall specify either a specific version or a version range of the plugin which needs to be loaded. For more details about versioning see [[R3] Plugin Version](#r3-plugin-version).
 
-In case a version range is defined then the folowing formula shall be used: `min_version ≤ version < max_version`
+*Comment* is optional and it can for example be used to explain the purpose of this plugin to the reader of the configuration file.
+
+In case a version range is defined then the following formula shall be used: `min_version ≤ version < max_version`
+
 
 #### List of plugin instances
 
 A plugin shall define at least one plugin instance to be created.
 
-*Plugin name* shall define the name of the plugin instance. See [[R2] Plugin Name](#r2-plugin-name).
+*Plugin name* shall define the name of the plugin instance. See [[R2] Plugin Instance Name](#r2-plugin-instance-name).
 
-*Description* is optional and it can be used to explain the purpose of this plugin instance to the reader of the configuration file.
+*Configuration* is optional and if it is needed it shall either point to a configuration file for this plugin instance or it shall contain the configuration in JSON format. The configuration file path shall be either an absolute or relative path and it shall be possible to reference any system or custom environment variable.
 
-*Configuration file path* is optional and if it is needed it shall point to configuration file for this plugin instance. It shall be either an absolute or relative path and it shall be possible to reference any system or custom environment variable.
+*Comment* is optional and it can for example be used to explain the purpose of this plugin instance to the reader of the configuration file.
 
 
 ##### Plugin instance dependencies
@@ -156,7 +157,7 @@ A plugin instance shall optionally define its dependencies to other plugins.
 
 *Plugin name* shall reference another plugin's instance name.
 
-*Description* is optional and it can be used to explain the purpose of this dependency to the reader of the configuration file.
+*Comment* is optional and it can for example be used to explain the purpose of this dependency to the reader of the configuration file.
 
 
 ## [R8] Plugin Startup
