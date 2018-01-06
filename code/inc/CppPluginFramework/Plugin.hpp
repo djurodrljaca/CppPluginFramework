@@ -40,7 +40,7 @@ namespace CppPluginFramework
 /*!
  * This class enables loading of a plugin from a library
  */
-class Plugin
+class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Plugin
 {
 public:
     /*!

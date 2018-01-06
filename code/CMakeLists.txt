@@ -45,7 +45,7 @@ set(SOURCES
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC inc)
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
-target_compile_definitions(${PROJECT_NAME} PUBLIC CPPPLUGINFRAMEWORK_PLUGIN)
+target_compile_definitions(${PROJECT_NAME} PUBLIC CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED YES

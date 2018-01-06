@@ -39,7 +39,7 @@ namespace CppPluginFramework
 /*!
  * This class holds a plugin's config
  */
-class PluginConfig
+class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginConfig
 {
 public:
     /*!
