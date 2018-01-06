@@ -319,7 +319,10 @@ bool isVersionInRange(const QString &version, const QString &minVersion, const Q
 
 bool validateInterfaceName(const QString &name)
 {
-    return validatePluginInstanceName(name);
+    QRegularExpression regex("^[a-zA-Z][a-zA-Z0-9]*(::[a-zA-Z][a-zA-Z0-9]*)*$");
+    auto match = regex.match(name);
+
+    return match.hasMatch();
 }
 
 bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces)
