@@ -15,29 +15,26 @@
 /*!
  * \file
  *
- * Contains macros and declarations needed for creation and loading of plugins
+ * Contains macros needed for building C++ Plugin Framework library
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINSHAREDEXPORT_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINSHAREDEXPORT_HPP
+#ifndef CPPPLUGINFRAMEWORK_LIBRARYEXPORT_HPP
+#define CPPPLUGINFRAMEWORK_LIBRARYEXPORT_HPP
 
 // C++ Plugin Framework includes
 
 // Qt includes
-#include <QtCore/QString>
+#include <QtCore/QtGlobal>
 
 // System includes
 
 // Forward declarations
 
-namespace CppPluginFramework
-{
-
-class IPlugin;
-
-}
-
 // Macros
+
+#if defined(CPPPLUGINFRAMEWORK_BUILD_LIBRARY) && defined(CPPPLUGINFRAMEWORK_BUILD_PLUGIN)
+#  error    You are only allowed to define one of the symbols: CPPPLUGINFRAMEWORK_BUILD_LIBRARY or CPPPLUGINFRAMEWORK_BUILD_PLUGIN
+#endif
 
 /*!
  * \def CPPPLUGINFRAMEWORK_EXPORT
@@ -53,40 +50,4 @@ class IPlugin;
 #  define CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Q_DECL_IMPORT
 #endif
 
-/*!
- * \def CPPPLUGINFRAMEWORK_PLUGIN_EXPORT
- *
- * Macro used for importing and exporting plugin libraries symbols
- *
- * \note    To successfully build a plugin library the symbol CPPPLUGINFRAMEWORK_BUILD_PLUGIN needs
- *          to be defined!
- */
-#if defined(CPPPLUGINFRAMEWORK_BUILD_PLUGIN)
-#  define CPPPLUGINFRAMEWORK_PLUGIN_EXPORT Q_DECL_EXPORT
-#else
-#  define CPPPLUGINFRAMEWORK_PLUGIN_EXPORT Q_DECL_IMPORT
-#endif
-
-extern "C"
-{
-
-/*!
- * Function prototype for reading the plugin version
- *
- * \return  Plugin version
- */
-CPPPLUGINFRAMEWORK_PLUGIN_EXPORT const char *readPluginVersion();
-
-/*!
- * Function prototype for creating a plugin instance
- *
- * \param   instanceName    Name of the plugin instance
- *
- * \return  Pointer to a plugin instance or a null pointer on failure
- */
-CPPPLUGINFRAMEWORK_PLUGIN_EXPORT
-CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName);
-
-}
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINSHAREDEXPORT_HPP
+#endif // CPPPLUGINFRAMEWORK_LIBRARYEXPORT_HPP

@@ -23,6 +23,7 @@
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginInstanceConfig.hpp>
+#include <CppPluginFramework/VersionInfo.hpp>
 
 // Qt includes
 #include <QtCore/QList>
@@ -53,7 +54,7 @@ public:
      * \param   filePath        Path to the plugin's library
      * \param   version         Required plugin version
      */
-    PluginConfig(const QString &filePath, const QString &version);
+    PluginConfig(const QString &filePath, const VersionInfo &version);
 
     /*!
      * Constructor
@@ -62,7 +63,9 @@ public:
      * \param   minVersion      Minimum required plugin version
      * \param   maxVersion      Maximum required plugin version
      */
-    PluginConfig(const QString &filePath, const QString &minVersion, const QString &maxVersion);
+    PluginConfig(const QString &filePath,
+                 const VersionInfo &minVersion,
+                 const VersionInfo &maxVersion);
 
     /*!
      * Checks if plugin config is valid
@@ -107,42 +110,42 @@ public:
      *
      * \return  Plugin's required version
      */
-    QString version() const;
+    VersionInfo version() const;
 
     /*!
      * Sets plugin's required version
      *
      * \param   version     Plugin's required version
      */
-    void setVersion(const QString &version);
+    void setVersion(const VersionInfo &version);
 
     /*!
      * Returns plugin's required minimum version
      *
      * \return  Plugin's required minimum version
      */
-    QString minVersion() const;
+    VersionInfo minVersion() const;
 
     /*!
      * Sets plugin's required minimum version
      *
      * \param   minVersion  Plugin's required minimum version
      */
-    void setMinVersion(const QString &minVersion);
+    void setMinVersion(const VersionInfo &minVersion);
 
     /*!
      * Returns plugin's required maximum version
      *
      * \return  Plugin's required maximum version
      */
-    QString maxVersion() const;
+    VersionInfo maxVersion() const;
 
     /*!
      * Sets plugin's required maximum version
      *
      * \param   minVersion  Plugin's required maximum version
      */
-    void setMaxVersion(const QString &maxVersion);
+    void setMaxVersion(const VersionInfo &maxVersion);
 
     /*!
      * Returns list of plugin's instance configs
@@ -167,17 +170,17 @@ private:
     /*!
      * Holds the plugin's required version
      */
-    QString m_version;
+    VersionInfo m_version;
 
     /*!
      * Holds the plugin's minimum required version
      */
-    QString m_minVersion;
+    VersionInfo m_minVersion;
 
     /*!
      * Holds the plugin's maximum required version
      */
-    QString m_maxVersion;
+    VersionInfo m_maxVersion;
 
     /*!
      * Holds the list of plugin's instance configs

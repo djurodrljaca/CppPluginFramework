@@ -62,7 +62,7 @@ struct PluginManager::Impl
     void unloadPlugins();
 
     /*!
-     * Injects dependencies for all specified plugins
+     * Injects dependencies to all specified plugins
      *
      * \param   pluginConfigs   List of plugin configs
      *
@@ -70,6 +70,17 @@ struct PluginManager::Impl
      * \retval  false   Injection of at least one dependency failed
      */
     bool injectDependencies(const QList<PluginConfig> &pluginConfigs);
+
+    /*!
+     * Injects dependencies to the specified instance
+     *
+     * \param   instanceName    Name of the plugin instance to inject dependencies to
+     * \param   dependencies    Names of the needed dependencies
+     *
+     * \retval  true    All dependencies were injected
+     * \retval  false   Injection of at least one dependency failed
+     */
+    bool injectDependencies(const QString &instanceName, const QSet<QString> &dependencies);
 
     /*!
      * Ejects all injected dependencies
@@ -190,50 +201,12 @@ bool PluginManager::Impl::injectDependencies(const QList<PluginConfig> &pluginCo
 
             if (!dependencies.isEmpty())
             {
-                IPlugin *instance = pluginInstance(pluginInstanceConfig.name());
+                success = injectDependencies(pluginInstanceConfig.name(), dependencies);
 
-                if (instance != nullptr)
+                if (!success)
                 {
-                    for (const QString &dependencyName : dependencies)
-                    {
-                        IPlugin *dependency = pluginInstance(dependencyName);
-
-                        if (dependency != nullptr)
-                        {
-                            success = instance->injectDependency(dependency);
-
-                            if (!success)
-                            {
-                                qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
-                                            "Error: failed to find inject dependency:"
-                                         << dependencyName << "-->" << pluginInstanceConfig.name();
-                            }
-                        }
-                        else
-                        {
-                            qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
-                                        "Error: failed to find dependency:" << dependencyName;
-                            success = false;
-                        }
-
-                        if (!success)
-                        {
-                            break;
-                        }
-                    }
+                    break;
                 }
-                else
-                {
-                    qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies:"
-                                "Error: failed to find plugin instance:"
-                             << pluginInstanceConfig.name();
-                    success = false;
-                }
-            }
-
-            if (!success)
-            {
-                break;
             }
         }
 
@@ -241,6 +214,51 @@ bool PluginManager::Impl::injectDependencies(const QList<PluginConfig> &pluginCo
         {
             break;
         }
+    }
+
+    return success;
+}
+
+bool PluginManager::Impl::injectDependencies(const QString &instanceName,
+                                             const QSet<QString> &dependencies)
+{
+    bool success = false;
+    IPlugin *instance = pluginInstance(instanceName);
+
+    if (instance != nullptr)
+    {
+        for (const QString &dependencyName : dependencies)
+        {
+            IPlugin *dependency = pluginInstance(dependencyName);
+
+            if (dependency != nullptr)
+            {
+                success = instance->injectDependency(dependency);
+
+                if (!success)
+                {
+                    qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
+                                "Error: failed to find inject dependency:"
+                             << dependencyName << "-->" << instanceName;
+                }
+            }
+            else
+            {
+                qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
+                            "Error: failed to find dependency:" << dependencyName;
+                success = false;
+            }
+
+            if (!success)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies:"
+                    "Error: failed to find plugin instance:" << instanceName;
     }
 
     return success;

@@ -90,7 +90,7 @@ struct Plugin::Impl
     /*!
      * Holds the plugin version
      */
-    QString m_version;
+    VersionInfo m_version;
 
     /*!
      * Holds the plugin instances
@@ -106,9 +106,10 @@ bool Plugin::Impl::readPluginVersion()
 
     if (readPluginVersionFunction != nullptr)
     {
-        const QString version(readPluginVersionFunction());
+        const QString versionString = QString::fromUtf8(readPluginVersionFunction());
+        const VersionInfo version(versionString);
 
-        if (Validation::validateVersion(version))
+        if (version.isValid())
         {
             m_version = version;
             success = true;
@@ -116,7 +117,7 @@ bool Plugin::Impl::readPluginVersion()
         else
         {
             qDebug() << "CppPluginFramework::Plugin::Impl::readPluginVersion: "
-                        "Error: Invalid plugin version:" << version;
+                        "Error: Invalid plugin version:" << versionString;
         }
     }
     else
@@ -138,9 +139,9 @@ bool Plugin::Impl::checkPluginVersion(const PluginConfig &pluginConfig) const
     }
     else
     {
-        success = Validation::isVersionInRange(m_version,
-                                                     pluginConfig.minVersion(),
-                                                     pluginConfig.maxVersion());
+        success = VersionInfo::isVersionInRange(m_version,
+                                                pluginConfig.minVersion(),
+                                                pluginConfig.maxVersion());
     }
 
     return success;
@@ -168,7 +169,7 @@ bool Plugin::Impl::createPluginInstances(const PluginConfig &pluginConfig)
                             "Created plugin instance:"
                          << endl << "- Name:" << pluginInstance->name()
                          << endl << "- Description:" << pluginInstance->description()
-                         << endl << "- Version:" << pluginInstance->version()
+                         << endl << "- Version:" << pluginInstance->version().toString()
                          << endl << "- Exported interfaces:"
                          << pluginInstance->exportedInterfaces();
 
@@ -251,7 +252,7 @@ bool Plugin::isValid() const
         for (IPlugin *item : m_impl->m_pluginInstances)
         {
             valid = Validation::validatePluginInstanceName(item->name()) &&
-                    Validation::validateVersion(item->version()) &&
+                    item->version().isValid() &&
                     Validation::validateExportedInterfaces(item->exportedInterfaces());
 
             if (!valid)
@@ -264,7 +265,7 @@ bool Plugin::isValid() const
     return valid;
 }
 
-QString Plugin::version() const
+VersionInfo Plugin::version() const
 {
     return m_impl->m_version;
 }
@@ -308,7 +309,7 @@ std::unique_ptr<Plugin> Plugin::loadPlugin(const PluginConfig &pluginConfig)
         {
             success = true;
             qDebug() << "CppPluginFramework::Plugin::loadPlugin: version:"
-                     << plugin->m_impl->m_version;
+                     << plugin->m_impl->m_version.toString();
         }
         else
         {

@@ -69,7 +69,7 @@ public:
      *
      * \return  Plugin's version
      */
-    QString version() const;
+    VersionInfo version() const;
 
     /*!
      * Gets all instances of this plugin

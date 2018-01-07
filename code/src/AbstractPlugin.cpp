@@ -55,7 +55,7 @@ struct AbstractPlugin::Impl
     /*!
      * Holds the version of the plugin
      */
-    QString m_version;
+    VersionInfo m_version;
 
     /*!
      * Holds the list of exported interfaces of the plugin
@@ -84,7 +84,7 @@ QString AbstractPlugin::description() const
     return m_impl->m_description;
 }
 
-QString AbstractPlugin::version() const
+VersionInfo AbstractPlugin::version() const
 {
     return m_impl->m_version;
 }
@@ -104,7 +104,7 @@ void AbstractPlugin::setDescription(const QString &description)
     m_impl->m_description = description;
 }
 
-void AbstractPlugin::setVersion(const QString &version)
+void AbstractPlugin::setVersion(const VersionInfo &version)
 {
     m_impl->m_version = version;
 }
