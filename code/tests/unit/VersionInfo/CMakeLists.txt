@@ -11,18 +11,4 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-# --------------------------------------------------------------------------------------------------
-# Helper methods
-# --------------------------------------------------------------------------------------------------
-function(CppPluginFramework_AddSimpleUnitTest testName)
-    add_executable(${testName} ${testName}.cpp)
-    target_link_libraries(${testName} CppPluginFramework Qt5::Test)
-    add_test(${testName} ${testName})
-endfunction()
-
-
-# --------------------------------------------------------------------------------------------------
-# Unit tests
-# --------------------------------------------------------------------------------------------------
-add_subdirectory(Validation)
-add_subdirectory(VersionInfo)
+CppPluginFramework_AddSimpleUnitTest(testVersionInfo)

@@ -21,6 +21,7 @@
 // C++ Plugin Framework includes
 #include <CppPluginFramework/ConfigFile.hpp>
 #include <CppPluginFramework/Validation.hpp>
+#include <CppPluginFramework/VersionInfo.hpp>
 
 // Qt includes
 #include <QtCore/QFile>
@@ -337,9 +338,8 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
             // Parse required version
             if (config["version"].isString())
             {
-                const QString version = expandText(config["version"].toString());
-
-                success = Validation::validateVersion(version);
+                const VersionInfo version(config["version"].toString());
+                success = version.isValid();
 
                 if (success)
                 {
@@ -348,7 +348,7 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
                 else
                 {
                     qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
-                                "Error: invalid plugin version:" << version;
+                                "Error: invalid plugin version:" << config["version"];
                 }
             }
             else
@@ -366,10 +366,10 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
             if (config["minVersion"].isString() &&
                 config["maxVersion"].isString())
             {
-                const QString minVersion = config["minVersion"].toString();
-                const QString maxVersion = config["maxVersion"].toString();
+                const VersionInfo minVersion(config["minVersion"].toString());
+                const VersionInfo maxVersion(config["maxVersion"].toString());
 
-                success = Validation::validateVersionRange(minVersion, maxVersion);
+                success = VersionInfo::isRangeValid(minVersion, maxVersion);
 
                 if (success)
                 {
@@ -379,16 +379,16 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
                 else
                 {
                     qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
-                                "Error: invalid plugin version range: [" << minVersion << ","
-                             << maxVersion << "]";
+                                "Error: invalid plugin version range: "
+                                "[" << config["minVersion"] << "," << config["maxVersion"] << "]";
                 }
             }
             else
             {
                 success = false;
                 qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
-                            "Error: invalid plugin version range: [" << config["minVersion"] << ","
-                         << config["maxVersion"] << "]";
+                            "Error: invalid plugin version range: "
+                            "[" << config["minVersion"] << "," << config["maxVersion"] << "]";
             }
         }
         else

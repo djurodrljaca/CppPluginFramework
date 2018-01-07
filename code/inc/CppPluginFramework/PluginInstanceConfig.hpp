@@ -22,7 +22,7 @@
 #define CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/PluginSharedExport.hpp>
+#include <CppPluginFramework/LibraryExport.hpp>
 
 // Qt includes
 #include <QtCore/QJsonObject>

@@ -34,7 +34,7 @@
 namespace CppPluginFramework
 {
 
-PluginConfig::PluginConfig(const QString &filePath, const QString &version)
+PluginConfig::PluginConfig(const QString &filePath, const VersionInfo &version)
     : m_filePath(filePath),
       m_version(version),
       m_minVersion(),
@@ -44,8 +44,8 @@ PluginConfig::PluginConfig(const QString &filePath, const QString &version)
 }
 
 PluginConfig::PluginConfig(const QString &filePath,
-                           const QString &minVersion,
-                           const QString &maxVersion)
+                           const VersionInfo &minVersion,
+                           const VersionInfo &maxVersion)
     : m_filePath(filePath),
       m_version(),
       m_minVersion(minVersion),
@@ -64,11 +64,11 @@ bool PluginConfig::isValid() const
     {
         if (isExactVersion())
         {
-            valid = Validation::validateVersion(m_version);
+            valid = m_version.isValid();
         }
         else
         {
-            valid = Validation::validateVersionRange(m_minVersion, m_maxVersion);
+            valid = VersionInfo::isRangeValid(m_minVersion, m_maxVersion);
         }
     }
 
@@ -97,16 +97,12 @@ bool PluginConfig::isValid() const
 
 bool PluginConfig::isExactVersion() const
 {
-    return ((!m_version.isEmpty()) &&
-            m_minVersion.isEmpty() &&
-            m_maxVersion.isEmpty());
+    return ((!m_version.isNull()) && m_minVersion.isNull() && m_maxVersion.isNull());
 }
 
 bool PluginConfig::isVersionRange() const
 {
-    return (m_version.isEmpty() &&
-            (!m_minVersion.isEmpty()) &&
-            (!m_maxVersion.isEmpty()));
+    return (m_version.isNull() && (!m_minVersion.isNull()) && (!m_maxVersion.isNull()));
 }
 
 QString PluginConfig::filePath() const
@@ -119,32 +115,32 @@ void PluginConfig::setFilePath(const QString &filePath)
     m_filePath = filePath;
 }
 
-QString PluginConfig::version() const
+VersionInfo PluginConfig::version() const
 {
     return m_version;
 }
 
-void PluginConfig::setVersion(const QString &version)
+void PluginConfig::setVersion(const VersionInfo &version)
 {
     m_version = version;
 }
 
-QString PluginConfig::minVersion() const
+VersionInfo PluginConfig::minVersion() const
 {
     return m_minVersion;
 }
 
-void PluginConfig::setMinVersion(const QString &minVersion)
+void PluginConfig::setMinVersion(const VersionInfo &minVersion)
 {
     m_minVersion = minVersion;
 }
 
-QString PluginConfig::maxVersion() const
+VersionInfo PluginConfig::maxVersion() const
 {
     return m_maxVersion;
 }
 
-void PluginConfig::setMaxVersion(const QString &maxVersion)
+void PluginConfig::setMaxVersion(const VersionInfo &maxVersion)
 {
     m_maxVersion = maxVersion;
 }

@@ -22,7 +22,8 @@
 #define CPPPLUGINFRAMEWORK_IPLUGIN_HPP
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/PluginSharedExport.hpp>
+#include <CppPluginFramework/LibraryExport.hpp>
+#include <CppPluginFramework/VersionInfo.hpp>
 
 // Qt includes
 #include <QtCore/QJsonObject>
@@ -85,7 +86,7 @@ public:
      *
      * \return  Plugin's version
      */
-    virtual QString version() const = 0;
+    virtual VersionInfo version() const = 0;
 
     /*!
      * Checks if the specified interface is exported by this plugin

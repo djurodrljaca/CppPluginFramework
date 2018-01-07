@@ -22,7 +22,7 @@
 #define CPPPLUGINFRAMEWORK_VALIDATION_HPP
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/PluginSharedExport.hpp>
+#include <CppPluginFramework/LibraryExport.hpp>
 
 // Qt includes
 #include <QtCore/QSet>
@@ -47,42 +47,6 @@ namespace Validation
  * \retval  false   Plugin's instance name is not valid
  */
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validatePluginInstanceName(const QString &name);
-
-/*!
- * Validates plugin's version
- *
- * \param   version     Plugin's version
- *
- * \retval  true    Plugin's version is valid
- * \retval  false   Plugin's version is not valid
- */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateVersion(const QString &version);
-
-/*!
- * Validates plugin's version range
- *
- * \param   minVersion  Minimum version
- * \param   maxVersion  Maximum version
- *
- * \retval  true    Plugin's version range is valid
- * \retval  false   Plugin's version range is not valid
- */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateVersionRange(const QString &minVersion,
-                                                            const QString &maxVersion);
-
-/*!
- * Checks if specified version is in version range
- *
- * \param   version     Version to check
- * \param   minVersion  Minimum version
- * \param   maxVersion  Maximum version
- *
- * \retval  true    Version is in range
- * \retval  false   Version is in not range
- */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool isVersionInRange(const QString &version,
-                                                        const QString &minVersion,
-                                                        const QString &maxVersion);
 
 /*!
  * Validates plugin's interface name

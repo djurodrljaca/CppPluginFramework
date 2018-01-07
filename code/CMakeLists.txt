@@ -30,12 +30,14 @@ set(CppPluginFramework_HEADERS
     inc/CppPluginFramework/AbstractPlugin.hpp
     inc/CppPluginFramework/ConfigFile.hpp
     inc/CppPluginFramework/IPlugin.hpp
+    inc/CppPluginFramework/LibraryExport.hpp
     inc/CppPluginFramework/Plugin.hpp
     inc/CppPluginFramework/PluginConfig.hpp
+    inc/CppPluginFramework/PluginExport.hpp
     inc/CppPluginFramework/PluginInstanceConfig.hpp
     inc/CppPluginFramework/PluginManager.hpp
-    inc/CppPluginFramework/PluginSharedExport.hpp
     inc/CppPluginFramework/Validation.hpp
+    inc/CppPluginFramework/VersionInfo.hpp
     )
 
 set(CppPluginFramework_SOURCES
@@ -46,6 +48,7 @@ set(CppPluginFramework_SOURCES
     src/PluginInstanceConfig.cpp
     src/PluginManager.cpp
     src/Validation.cpp
+    src/VersionInfo.cpp
     )
 
 add_library(CppPluginFramework SHARED ${CppPluginFramework_SOURCES} ${CppPluginFramework_HEADERS})

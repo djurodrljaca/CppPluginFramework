@@ -74,7 +74,7 @@ public:
     /*!
      * \copydoc CppPluginFramework::IPlugin::version()
      */
-    virtual QString version() const override;
+    virtual VersionInfo version() const override;
 
     /*!
      * \copydoc CppPluginFramework::IPlugin::isInterfaceExported()
@@ -99,7 +99,7 @@ protected:
      *
      * \param   version     Plugin version
      */
-    void setVersion(const QString &version);
+    void setVersion(const VersionInfo &version);
 
     /*!
      * Sets the plugin's list of exported interfaces

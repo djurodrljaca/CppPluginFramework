@@ -36,9 +36,7 @@ The plugin instance name shall always start with a letter.
 
 Each plugin shall have a version which shall be in one of the following formats:
 
-* `MAJOR.MINOR`
 * `MAJOR.MINOR.PATCH`
-* `MAJOR.MINOR-DEV`
 * `MAJOR.MINOR.PATCH-DEV`
 
 
@@ -54,20 +52,14 @@ Each plugin shall have a version which shall be in one of the following formats:
 
 ### Patch Version
 
-`PATCH` optional part of the version shall be a non-negative integer. This part of the version shall be incremented every time when a new release is made and the API, ABI, and (intended) behavior of the plugin is not changed.
+`PATCH` part of the version shall be a non-negative integer. This part of the version shall be incremented every time when a new release is made and the API, ABI, and (intended) behavior of the plugin is not changed.
 
 This is generally meant for bug fix releases.
 
 
 ### Development Version
 
-`DEV` optional part of the version shall be a string that can be used for example to specify the type of and number of the release (`alpha3`, `beta1`, `RC5`, `bugfix-123`, `IntegrationTest-20180102-1` etc.). Allowed characters are:
-
-* All letters of the English alphabet (A-Z, a-z)
-* Numbers (0-9)
-* Period character (U+002E)
-* Hyphen character (U+002D)
-* Underscore character (U+005F)
+`DEV` optional part of the version shall be a string that can be used for example to specify the type of and number of the release (`alpha3`, `beta1`, `RC5`, `bugfix-123`, `IntegrationTest-20180102-1` etc.). All characters are allowed.
 
 
 ## [R4] Exported Interfaces
