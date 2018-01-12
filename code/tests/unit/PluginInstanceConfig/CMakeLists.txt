@@ -11,8 +11,4 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-find_package(Qt5Test)
-
-add_subdirectory(unit)
-
-# TODO: add integration tests
+CppPluginFramework_AddUnitTest(TEST_NAME testPluginInstanceConfig)

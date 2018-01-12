@@ -14,15 +14,32 @@
 # --------------------------------------------------------------------------------------------------
 # Helper methods
 # --------------------------------------------------------------------------------------------------
-function(CppPluginFramework_AddSimpleUnitTest testName)
-    add_executable(${testName} ${testName}.cpp)
-    target_link_libraries(${testName} CppPluginFramework Qt5::Test)
-    add_test(${testName} ${testName})
-endfunction()
+function(CppPluginFramework_AddUnitTest)
+    # Function parameters
+    set(options         DATA_DIR_ENABLED)
+    set(oneValueArgs    TEST_NAME)
+    set(multiValueArgs  LINKED_LIBS)
+    cmake_parse_arguments(PARAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
+    # Create test executable
+    add_executable(${PARAM_TEST_NAME} ${PARAM_TEST_NAME}.cpp)
+    target_link_libraries(${PARAM_TEST_NAME} CppPluginFramework Qt5::Test ${PARAM_LINKED_LIBS})
+    add_test(${PARAM_TEST_NAME} ${PARAM_TEST_NAME})
+
+    # Prepare a define for the test data directory path so that it can be used in the C++ code
+    if(PARAM_DATA_DIR_ENABLED)
+        get_filename_component(CURRENT_SOURCE_DIR_ABSOLUTE "${CURRENT_SOURCE_DIR}" ABSOLUTE)
+        target_compile_definitions(${PARAM_TEST_NAME} PUBLIC
+            TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data")
+    endif()
+endfunction()
 
 # --------------------------------------------------------------------------------------------------
 # Unit tests
 # --------------------------------------------------------------------------------------------------
+add_subdirectory(PluginConfig)
+add_subdirectory(PluginInstanceConfig)
 add_subdirectory(Validation)
 add_subdirectory(VersionInfo)
+
+# TODO: add unit tests for: ConfigFile

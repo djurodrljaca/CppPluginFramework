@@ -11,9 +11,4 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-CppPluginFramework_AddSimpleUnitTest(testValidation)
-
-# Prepare a define for the test data directory path
-get_filename_component(CURRENT_SOURCE_DIR_ABSOLUTE "${CURRENT_SOURCE_DIR}" ABSOLUTE)
-target_compile_definitions(testValidation PUBLIC
-    TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data")
+CppPluginFramework_AddUnitTest(TEST_NAME testValidation DATA_DIR_ENABLED)

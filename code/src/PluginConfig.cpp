@@ -23,7 +23,6 @@
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
-#include <QtCore/QFileInfo>
 
 // System includes
 
@@ -34,30 +33,33 @@
 namespace CppPluginFramework
 {
 
-PluginConfig::PluginConfig(const QString &filePath, const VersionInfo &version)
+PluginConfig::PluginConfig(const QString &filePath,
+                           const VersionInfo &version,
+                           const QList<PluginInstanceConfig> &instanceConfigs)
     : m_filePath(filePath),
       m_version(version),
       m_minVersion(),
       m_maxVersion(),
-      m_instanceConfigs()
+      m_instanceConfigs(instanceConfigs)
 {
 }
 
 PluginConfig::PluginConfig(const QString &filePath,
                            const VersionInfo &minVersion,
-                           const VersionInfo &maxVersion)
+                           const VersionInfo &maxVersion,
+                           const QList<PluginInstanceConfig> &instanceConfigs)
     : m_filePath(filePath),
       m_version(),
       m_minVersion(minVersion),
       m_maxVersion(maxVersion),
-      m_instanceConfigs()
+      m_instanceConfigs(instanceConfigs)
 {
 }
 
 bool PluginConfig::isValid() const
 {
     // Check file path
-    bool valid = QFileInfo(m_filePath).isFile();
+    bool valid = Validation::validateFilePath(m_filePath);
 
     // Check version info
     if (valid)
