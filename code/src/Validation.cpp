@@ -72,7 +72,7 @@ bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces)
 
 bool validateEnvironmentVariableName(const QString &name)
 {
-    QRegularExpression regex("^[a-zA-Z0-9_]+$");
+    QRegularExpression regex("^[a-zA-Z_][a-zA-Z0-9_]*$");
     auto match = regex.match(name);
 
     return match.hasMatch();
