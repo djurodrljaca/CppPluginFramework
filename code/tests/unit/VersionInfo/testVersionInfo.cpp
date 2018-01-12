@@ -100,6 +100,7 @@ void TestVersionInfo::testParseValidVersions()
 
     const VersionInfo version(versionString);
 
+    qDebug() << "versionString:" << versionString;
     QVERIFY(version.isValid());
     QCOMPARE(version, expectedVersion);
 }
@@ -134,6 +135,7 @@ void TestVersionInfo::testParseInvalidVersions()
 {
     QFETCH(QString, versionString);
 
+    qDebug() << "versionString:" << versionString;
     QVERIFY(!VersionInfo(versionString).isValid());
 }
 
@@ -202,6 +204,7 @@ void TestVersionInfo::testIsValid()
     QFETCH(VersionInfo, version);
     QFETCH(bool, result);
 
+    qDebug() << "version:" << version.toString();
     QCOMPARE(version.isValid(), result);
 }
 
@@ -231,6 +234,8 @@ void TestVersionInfo::testIsRangeValid()
     QFETCH(VersionInfo, maxVersion);
     QFETCH(bool, result);
 
+    qDebug() << "minVersion:" << minVersion.toString();
+    qDebug() << "maxVersion:" << maxVersion.toString();
     QCOMPARE(VersionInfo::isRangeValid(minVersion, maxVersion), result);
 }
 
@@ -292,6 +297,9 @@ void TestVersionInfo::testIsVersionInRange()
     QFETCH(VersionInfo, maxVersion);
     QFETCH(bool, result);
 
+    qDebug() << "version:" << version.toString();
+    qDebug() << "minVersion:" << minVersion.toString();
+    qDebug() << "maxVersion:" << maxVersion.toString();
     QCOMPARE(VersionInfo::isVersionInRange(version, minVersion, maxVersion), result);
 }
 
@@ -349,6 +357,7 @@ void TestVersionInfo::testToString()
     QFETCH(VersionInfo, version);
     QFETCH(QString, result);
 
+    qDebug() << "version:" << version.toString();
     QCOMPARE(version.toString(), result);
 }
 
