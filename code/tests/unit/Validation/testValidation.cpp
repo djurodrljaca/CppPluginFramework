@@ -23,8 +23,6 @@
 
 // Qt includes
 #include <QtCore/QDebug>
-#include <QtCore/QFileInfo>
-#include <QtCore/QRegularExpression>
 #include <QtTest/QTest>
 
 // System includes

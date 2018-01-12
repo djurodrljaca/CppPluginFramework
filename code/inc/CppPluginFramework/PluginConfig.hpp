@@ -53,8 +53,11 @@ public:
      *
      * \param   filePath        Path to the plugin's library
      * \param   version         Required plugin version
+     * \param   instanceConfigs List of plugin's instance configs
      */
-    PluginConfig(const QString &filePath, const VersionInfo &version);
+    PluginConfig(const QString &filePath,
+                 const VersionInfo &version,
+                 const QList<PluginInstanceConfig> &instanceConfigs = QList<PluginInstanceConfig>());
 
     /*!
      * Constructor
@@ -62,10 +65,12 @@ public:
      * \param   filePath        Path to the plugin's library
      * \param   minVersion      Minimum required plugin version
      * \param   maxVersion      Maximum required plugin version
+     * \param   instanceConfigs List of plugin's instance configs
      */
     PluginConfig(const QString &filePath,
                  const VersionInfo &minVersion,
-                 const VersionInfo &maxVersion);
+                 const VersionInfo &maxVersion,
+                 const QList<PluginInstanceConfig> &instanceConfigs = QList<PluginInstanceConfig>());
 
     /*!
      * Checks if plugin config is valid

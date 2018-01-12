@@ -23,8 +23,6 @@
 
 // Qt includes
 #include <QtCore/QDebug>
-#include <QtCore/QFileInfo>
-#include <QtCore/QRegularExpression>
 #include <QtTest/QTest>
 
 // System includes
@@ -35,7 +33,7 @@
 
 // Test class declaration --------------------------------------------------------------------------
 
-using CppPluginFramework::VersionInfo;
+using namespace CppPluginFramework;
 Q_DECLARE_METATYPE(VersionInfo)
 
 class TestVersionInfo : public QObject
