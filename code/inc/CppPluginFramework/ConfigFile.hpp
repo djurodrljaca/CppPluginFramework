@@ -49,29 +49,66 @@ public:
     ConfigFile();
 
     /*!
+     * Move constructor
+     *
+     * \param   other   Object to move
+     */
+    ConfigFile(ConfigFile &&other) = default;
+
+    /*!
+     * Copy constructor
+     *
+     * \param   other   Object to copy
+     */
+    ConfigFile(const ConfigFile &other);
+
+    /*!
+     * Destructor
+     */
+    ~ConfigFile();
+
+    /*!
+     * Assignment operator
+     *
+     * \param   rhs     Object to copy
+     */
+    ConfigFile &operator=(ConfigFile rhs);
+
+    /*!
      * Clears the object
      */
     void clear();
 
     /*!
+     * Reads the specified config object
+     *
+     * \param   config          Config object
+     * \param   workingDirPath  Working directory path
+     *
+     * \retval  true    Success
+     * \retval  true    Failure
+     *
+     * If the working directory path is set then it is used instead of the application's working
+     * directory.
+     *
+     * \note    All of the relative paths referenced in the config are relative to the set working
+     *          directory
+     */
+    bool read(const QJsonObject &config, const QString &workingDirPath = QString());
+
+    /*!
      * Reads the specified config file
      *
      * \param   configFilePath  Path to the config file
+     * \param   workingDirPath  Working directory path
      *
      * \retval  true    Success
      * \retval  true    Failure
-     */
-    bool read(const QString &configFilePath);
-
-    /*!
-     * Reads the specified config object
      *
-     * \param   config  Config object
-     *
-     * \retval  true    Success
-     * \retval  true    Failure
+     * \note    This is a convenience method which first reads the config file and then processes
+     *          the extracted config JSON object.
      */
-    bool read(const QJsonObject &config);
+    bool read(const QString &configFilePath, const QString &workingDirPath = QString());
 
     /*!
      * Gets custom environment variables that were read from the config file

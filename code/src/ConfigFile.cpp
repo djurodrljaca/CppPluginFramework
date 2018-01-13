@@ -24,6 +24,7 @@
 #include <CppPluginFramework/VersionInfo.hpp>
 
 // Qt includes
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -51,6 +52,25 @@ namespace CppPluginFramework
  */
 struct ConfigFile::Impl
 {
+    /*!
+     * Sets the working directory
+     *
+     * \param   workingDirPath  Working directory
+     *
+     * \retval  true    Success
+     * \retval  false   Failure
+     */
+    bool setWorkingDirPath(const QString &workingDirPath);
+
+    /*!
+     * Gets an absolute path for the specified file path
+     *
+     * \param   filePath    File path
+     *
+     * \return  Absolute file path
+     */
+    QString getAbsoluteFilePath(const QString &filePath) const;
+
     /*!
      * Parses custom environment variables from the config JSON object
      *
@@ -114,7 +134,7 @@ struct ConfigFile::Impl
      *
      * \return  Environment variable value or an empty string if the variable was not found
      *
-     * Environment variable is read primarily from custom environment variables. If it is not foundđ
+     * Environment variable is read primarily from custom environment variables. If it is not found
      * there then it attempts to read it from the system environment variables.
      */
     QString readEnvironmentVariable(const QString &variableName) const;
@@ -154,6 +174,11 @@ struct ConfigFile::Impl
     static bool readJsonObjectFromFile(const QString &filePath, QJsonObject *object);
 
     /*!
+     * Holds the working directory
+     */
+    QDir m_workingDir;
+
+    /*!
      * Holds the custom environment variables
      */
     QHash<QString, QString> m_customEnvironmentVariables;
@@ -163,6 +188,38 @@ struct ConfigFile::Impl
      */
     QList<PluginConfig> m_pluginConfigs;
 };
+
+bool ConfigFile::Impl::setWorkingDirPath(const QString &workingDirPath)
+{
+    const QDir workingDir(workingDirPath);
+    bool success = false;
+
+    if (workingDir.exists())
+    {
+        m_workingDir = workingDir;
+        success = true;
+    }
+
+    return success;
+}
+
+QString ConfigFile::Impl::getAbsoluteFilePath(const QString &filePath) const
+{
+    QString absoluteFilePath;
+
+    // Check if path is already absolute
+    if (QDir::isAbsolutePath(filePath))
+    {
+        absoluteFilePath = filePath;
+    }
+    else
+    {
+        // Make the path absolute relative to the working directory
+        absoluteFilePath = m_workingDir.absoluteFilePath(filePath);
+    }
+
+    return absoluteFilePath;
+}
 
 bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config)
 {
@@ -185,7 +242,8 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
                 if (m_customEnvironmentVariables.contains(name))
                 {
                     success = false;
-                    qDebug() << "CppPluginFramework::ConfigFile::parseCustomEnvironmentVariables: "
+                    qDebug() << "CppPluginFramework::ConfigFile::Impl::"
+                                "parseCustomEnvironmentVariables: "
                                 "Error: variable with the same name already exists:"
                              << endl << "- name:" << name
                              << endl << "- value:" << value;
@@ -198,7 +256,8 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
             else
             {
                 success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::parseCustomEnvironmentVariables: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::"
+                            "parseCustomEnvironmentVariables: "
                             "Error: invalid value:"
                          << endl << "- name:" << name
                          << endl << "- value:" << value;
@@ -207,7 +266,7 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
         else
         {
             success = false;
-            qDebug() << "CppPluginFramework::ConfigFile::parseCustomEnvironmentVariables: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parseCustomEnvironmentVariables: "
                         "Error: invalid name:" << name;
         }
 
@@ -245,8 +304,8 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
                 }
                 else
                 {
-                    qDebug() << "CppPluginFramework::ConfigFile::parseCustomEnvironmentVariables: "
-                                "Error: invalid name:" << name;
+                    qDebug() << "CppPluginFramework::ConfigFile::Impl::"
+                                "parseCustomEnvironmentVariables: Error: invalid name:" << name;
                     break;
                 }
             }
@@ -272,7 +331,7 @@ bool ConfigFile::Impl::parsePluginConfigs(const QJsonArray &config)
         // Make sure that the config item is a JSON object
         if (!item.isObject())
         {
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfigs: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfigs: "
                         "Error: invalid plugin config:" << item;
             m_pluginConfigs.clear();
             break;
@@ -283,7 +342,7 @@ bool ConfigFile::Impl::parsePluginConfigs(const QJsonArray &config)
 
         if (!parsedPluginConfig.isValid())
         {
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfigs: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfigs: "
                         "Error: failed to parse plugin config:" << item;
             m_pluginConfigs.clear();
             break;
@@ -307,24 +366,25 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
         if (config["pluginFilePath"].isString())
         {
             const QString filePath = expandText(config["pluginFilePath"].toString());
+            const QString absoluteFilePath = getAbsoluteFilePath(filePath);
 
-            success = Validation::validateFilePath(filePath);
+            success = Validation::validateFilePath(absoluteFilePath);
 
             if (success)
             {
-                pluginConfig.setFilePath(filePath);
+                pluginConfig.setFilePath(absoluteFilePath);
             }
         }
 
         if (!success)
         {
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                         "Error: invalid plugin file path:" << config["pluginFilePath"];
         }
     }
     else
     {
-        qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+        qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                     "Error: invalid plugin file path is missing:" << config;
     }
 
@@ -347,14 +407,14 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
                 }
                 else
                 {
-                    qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+                    qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                                 "Error: invalid plugin version:" << config["version"];
                 }
             }
             else
             {
                 success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                             "Error: invalid plugin version:" << config["version"];
             }
         }
@@ -378,7 +438,7 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
                 }
                 else
                 {
-                    qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+                    qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                                 "Error: invalid plugin version range: "
                                 "[" << config["minVersion"] << "," << config["maxVersion"] << "]";
                 }
@@ -386,7 +446,7 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
             else
             {
                 success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                             "Error: invalid plugin version range: "
                             "[" << config["minVersion"] << "," << config["maxVersion"] << "]";
             }
@@ -394,7 +454,7 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
         else
         {
             success = false;
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                         "Error: version requirement needs to be specified (either only "
                         "'version' or both 'minVersion' and 'maxVersion'):"
                      << config;
@@ -421,15 +481,14 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
                 else
                 {
                     success = false;
-                    qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
-                                "Error: failed to parse the plugins's instance configs:"
-                             << config;
+                    qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
+                                "Error: failed to parse the plugin instance configs:" << config;
                 }
             }
             else
             {
                 success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::parsePluginConfig: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
                             "Error: plugin configs have to be stored in a JSON array!";
             }
         }
@@ -447,7 +506,7 @@ QList<PluginInstanceConfig> ConfigFile::Impl::parsePluginInstanceConfigs(const Q
         // Make sure that the config item is a JSON object
         if (!item.isObject())
         {
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfigs: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfigs: "
                         "Error: invalid plugin instance config:" << item;
             pluginInstanceConfigs.clear();
             break;
@@ -459,7 +518,7 @@ QList<PluginInstanceConfig> ConfigFile::Impl::parsePluginInstanceConfigs(const Q
 
         if (!pluginInstanceConfig.isValid())
         {
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfigs: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfigs: "
                         "Error: failed to parse plugin instance config:" << item;
             pluginInstanceConfigs.clear();
             break;
@@ -493,13 +552,13 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
 
         if (!success)
         {
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                         "Error: invalid plugin instance name:" << config["instanceName"];
         }
     }
     else
     {
-        qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+        qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                     "Error: invalid plugin instance name is missing:" << config;
     }
 
@@ -511,22 +570,23 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
             if (config["configFilePath"].isString())
             {
                 const QString filePath = expandText(config["configFilePath"].toString());
+                const QString absoluteFilePath = getAbsoluteFilePath(filePath);
 
-                success = Validation::validateFilePath(filePath);
+                success = Validation::validateFilePath(absoluteFilePath);
 
                 if (success)
                 {
                     // Read config from file
                     QJsonObject configObject;
 
-                    if (readJsonObjectFromFile(filePath, &configObject))
+                    if (readJsonObjectFromFile(absoluteFilePath, &configObject))
                     {
                         pluginInstanceConfig.setConfig(configObject);
                     }
                     else
                     {
                         success = false;
-                        qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+                        qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                                     "Error: failed to parse the config parameter:" << config;
                     }
                 }
@@ -534,7 +594,7 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
 
             if (!success)
             {
-                qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                             "Error: invalid config file path:" << config["configFilePath"];
             }
         }
@@ -547,14 +607,14 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
             else
             {
                 success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                             "Error: config parameter must me a JSON object:" << config;
             }
         }
         else if (config.contains("config") && config.contains("configFilePath"))
         {
             success = false;
-            qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                         "Error: both config and config file path are set:" << config;
         }
         else
@@ -577,7 +637,7 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
                     // Make sure that the config item is a JSON object
                     if (!item.isObject())
                     {
-                        qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+                        qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                                     "Error: invalid dependency:" << item;
                         success = false;
                         break;
@@ -586,9 +646,9 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
                     // Parse dependency
                     const QString dependency = parseDependency(item.toObject());
 
-                    if (!dependency.isEmpty())
+                    if (dependency.isEmpty())
                     {
-                        qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+                        qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                                     "Error: invalid dependency:" << item;
                         success = false;
                         break;
@@ -596,11 +656,16 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
 
                     dependencies.insert(dependency);
                 }
+
+                if (success)
+                {
+                    pluginInstanceConfig.setDependencies(dependencies);
+                }
             }
             else
             {
                 success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::parsePluginInstanceConfig: "
+                qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
                             "Error: invalid config file path:" << config["configFilePath"];
             }
         }
@@ -619,11 +684,11 @@ QString ConfigFile::Impl::parseDependency(const QJsonObject &config)
 {
     QString dependency;
 
-    if (config.contains("pluginInstanceName"))
+    if (config.contains("instanceName"))
     {
-        if (config["pluginInstanceName"].isString())
+        if (config["instanceName"].isString())
         {
-            dependency = config["pluginInstanceName"].toString();
+            dependency = config["instanceName"].toString();
 
             if (!Validation::validatePluginInstanceName(dependency))
             {
@@ -634,7 +699,7 @@ QString ConfigFile::Impl::parseDependency(const QJsonObject &config)
 
     if (dependency.isEmpty())
     {
-        qDebug() << "CppPluginFramework::ConfigFile::parseDependency: "
+        qDebug() << "CppPluginFramework::ConfigFile::Impl::parseDependency: "
                     "Error: invalid dependency:" << config;
     }
 
@@ -669,7 +734,7 @@ bool ConfigFile::Impl::expandVariable(const QString &name,
         *expandedValue = value;
 
         // Expand all referenced environment variables (max 100 cycles)
-        QRegularExpression regex("\\${[a-zA-Z0-9_]+}");
+        QRegularExpression regex("\\${([a-zA-Z0-9_]+)}");
 
         for (int i = 0; i < 100; i++)
         {
@@ -689,7 +754,7 @@ bool ConfigFile::Impl::expandVariable(const QString &name,
                 else
                 {
                     success = false;
-                    qDebug() << "CppPluginFramework::ConfigFile::expandVariable: "
+                    qDebug() << "CppPluginFramework::ConfigFile::Impl::expandVariable: "
                                 "Error: variable value contains a reverence to itself:"
                              << endl << "- name:" << name
                              << endl << "- value:" << value;
@@ -713,7 +778,7 @@ QString ConfigFile::Impl::expandText(const QString &text) const
     QString expandedText = text;
 
     // Expand all referenced environment variables
-    QRegularExpression regex("\\${[a-zA-Z0-9_]+}");
+    QRegularExpression regex("\\${([a-zA-Z0-9_]+)}");
 
     auto it = regex.globalMatch(expandedText);
 
@@ -791,35 +856,34 @@ ConfigFile::ConfigFile()
 {
 }
 
+ConfigFile::ConfigFile(const ConfigFile &other)
+    : m_impl(std::make_unique<ConfigFile::Impl>(*(other.m_impl)))
+{
+}
+
+ConfigFile::~ConfigFile()
+{
+}
+
+ConfigFile &ConfigFile::operator=(ConfigFile rhs)
+{
+    m_impl = std::move(rhs.m_impl);
+
+    return *this;
+}
+
 void ConfigFile::clear()
 {
     m_impl->m_customEnvironmentVariables.clear();
     m_impl->m_pluginConfigs.clear();
 }
 
-bool ConfigFile::read(const QString &configFilePath)
+bool ConfigFile::read(const QJsonObject &config, const QString &workingDirPath)
 {
-    // Read config from file
-    QJsonObject config;
-    bool success = Impl::readJsonObjectFromFile(configFilePath, &config);
-
-    if (success)
-    {
-        success = read(config);
-    }
-    else
-    {
-        qDebug() << "CppPluginFramework::ConfigFile::read: Error: failed to read config file:"
-                 << configFilePath;
-    }
-
-    return success;
-}
-
-bool ConfigFile::read(const QJsonObject &config)
-{
-    bool success = true;
     clear();
+
+    // Apply the specified working directory
+    bool success = m_impl->setWorkingDirPath(workingDirPath);
 
     // Read custom environment variables
     if (config.contains("customEnvironmentVariables"))
@@ -862,6 +926,35 @@ bool ConfigFile::read(const QJsonObject &config)
     }
 
     return success;
+}
+
+bool ConfigFile::read(const QString &configFilePath, const QString &workingDirPath)
+{
+    // Read config from file
+    QJsonObject config;
+    bool success = Impl::readJsonObjectFromFile(configFilePath, &config);
+
+    if (success)
+    {
+        success = read(config, workingDirPath);
+    }
+    else
+    {
+        qDebug() << "CppPluginFramework::ConfigFile::read: Error: failed to read config file:"
+                 << configFilePath;
+    }
+
+    return success;
+}
+
+QHash<QString, QString> ConfigFile::customEnvironmentVariables() const
+{
+    return m_impl->m_customEnvironmentVariables;
+}
+
+QList<PluginConfig> ConfigFile::pluginConfigs() const
+{
+    return m_impl->m_pluginConfigs;
 }
 
 }
