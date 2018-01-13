@@ -12,10 +12,26 @@
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
 # --------------------------------------------------------------------------------------------------
+# Custom (meta) targets
+# --------------------------------------------------------------------------------------------------
+add_custom_target(all_unit_tests)
+
+# --------------------------------------------------------------------------------------------------
 # Helper methods
 # --------------------------------------------------------------------------------------------------
 function(CppPluginFramework_AddUnitTest)
+    # Function parameters
+    set(options)                        # Boolean parameters
+    set(oneValueParams      TEST_NAME)  # Parameters with one value
+    set(multiValueParams)               # Parameters with multiple values
+
+    cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
+
+    # Add test
     CppPluginFramework_AddTest(${ARGN} LABELS CPPPLUGINFRAMEWORK_UNITTESTS)
+
+    # Add test to target "all_unit_tests"
+    add_dependencies(all_unit_tests ${PARAM_TEST_NAME})
 endfunction()
 
 # --------------------------------------------------------------------------------------------------

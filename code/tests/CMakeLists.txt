@@ -14,6 +14,11 @@
 find_package(Qt5Test)
 
 # --------------------------------------------------------------------------------------------------
+# Custom (meta) targets
+# --------------------------------------------------------------------------------------------------
+add_custom_target(all_tests)
+
+# --------------------------------------------------------------------------------------------------
 # Helper methods
 # --------------------------------------------------------------------------------------------------
 function(CppPluginFramework_AddTest)
@@ -33,6 +38,9 @@ function(CppPluginFramework_AddTest)
         ${PARAM_TEST_NAME}.cpp ${PARAM_ADDITIONAL_SOURCES} ${PARAM_ADDITIONAL_HEADERS})
     target_link_libraries(${PARAM_TEST_NAME} CppPluginFramework Qt5::Test ${PARAM_ADDITIONAL_LIBS})
     add_test(${PARAM_TEST_NAME} ${PARAM_TEST_NAME})
+
+    # Add test to target "all_tests"
+    add_dependencies(all_tests ${PARAM_TEST_NAME})
 
     # Set test labels
     if (PARAM_LABELS)
