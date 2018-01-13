@@ -193,6 +193,19 @@ private:
     QList<PluginInstanceConfig> m_instanceConfigs;
 };
 
+/*!
+ * Checks if the two specified plugin configs are equal
+ *
+ * \param   left    Plugin config
+ * \param   right   Plugin config
+ *
+ * \retval  true    Plugin configs are equal
+ * \retval  false   Plugin configs are not equal
+ *
+ * \note    Result of the comparison is valid only if both plugin configs are valid!
+ */
+bool operator==(const PluginConfig &left, const PluginConfig &right);
+
 }
 
 #endif // CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP

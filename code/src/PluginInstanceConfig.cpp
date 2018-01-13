@@ -98,4 +98,11 @@ void PluginInstanceConfig::setDependencies(const QSet<QString> &dependencies)
     m_dependencies = dependencies;
 }
 
+bool operator==(const PluginInstanceConfig &left, const PluginInstanceConfig &right)
+{
+    return ((left.name() == right.name()) &&
+            (left.config() == right.config()) &&
+            (left.dependencies() == right.dependencies()));
+}
+
 }

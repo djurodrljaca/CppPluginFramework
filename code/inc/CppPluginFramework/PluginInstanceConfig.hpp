@@ -126,6 +126,19 @@ private:
     QSet<QString> m_dependencies;
 };
 
+/*!
+ * Checks if the two specified plugin instance configs are equal
+ *
+ * \param   left    Plugin instance config
+ * \param   right   Plugin instance config
+ *
+ * \retval  true    Plugin instance configs are equal
+ * \retval  false   Plugin instance configs are not equal
+ *
+ * \note    Result of the comparison is valid only if both plugin instance configs are valid!
+ */
+bool operator==(const PluginInstanceConfig &left, const PluginInstanceConfig &right);
+
 }
 
 #endif // CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
