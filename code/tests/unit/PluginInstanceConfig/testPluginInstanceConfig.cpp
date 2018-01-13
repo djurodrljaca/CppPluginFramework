@@ -115,6 +115,11 @@ void TestPluginInstanceConfig::testIsValid_data()
             << PluginInstanceConfig("instance2",
                                     QJsonObject(),
                                     QSet<QString> { "3instance", "instance4" } ) << false;
+
+    QTest::newRow("invalid: valid name and dependency to itself")
+            << PluginInstanceConfig("instance2",
+                                    QJsonObject(),
+                                    QSet<QString> { "instance2" } ) << false;
 }
 
 // Main function -----------------------------------------------------------------------------------
