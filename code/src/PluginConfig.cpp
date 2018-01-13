@@ -157,4 +157,13 @@ void PluginConfig::setInstanceConfigs(const QList<PluginInstanceConfig> &instanc
     m_instanceConfigs = instanceConfigs;
 }
 
+bool operator==(const PluginConfig &left, const PluginConfig &right)
+{
+    return ((left.filePath() == right.filePath()) &&
+            (left.version() == right.version()) &&
+            (left.minVersion() == right.minVersion()) &&
+            (left.maxVersion() == right.maxVersion()) &&
+            (left.instanceConfigs() == right.instanceConfigs()));
+}
+
 }
