@@ -13,6 +13,44 @@
 
 find_package(Qt5Test)
 
+# --------------------------------------------------------------------------------------------------
+# Helper methods
+# --------------------------------------------------------------------------------------------------
+function(CppPluginFramework_AddTest)
+    # Function parameters
+    set(options             DATA_DIR_ENABLED)   # Boolean parameters
+    set(oneValueParams      TEST_NAME)          # Parameters with one value
+    set(multiValueParams                        # Parameters with multiple values
+        ADDITIONAL_SOURCES
+        ADDITIONAL_HEADERS
+        ADDITIONAL_LIBS
+        LABELS)
+
+    cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
+
+    # Create test executable
+    add_executable(${PARAM_TEST_NAME}
+        ${PARAM_TEST_NAME}.cpp ${PARAM_ADDITIONAL_SOURCES} ${PARAM_ADDITIONAL_HEADERS})
+    target_link_libraries(${PARAM_TEST_NAME} CppPluginFramework Qt5::Test ${PARAM_ADDITIONAL_LIBS})
+    add_test(${PARAM_TEST_NAME} ${PARAM_TEST_NAME})
+
+    # Set test labels
+    if (PARAM_LABELS)
+        set_tests_properties(${PARAM_TEST_NAME} PROPERTIES
+            LABELS "CPPPLUGINFRAMEWORK;${PARAM_LABELS}")
+    endif()
+
+    # Prepare a define for the test data directory path so that it can be used in the C++ code
+    if(PARAM_DATA_DIR_ENABLED)
+        get_filename_component(CURRENT_SOURCE_DIR_ABSOLUTE "${CURRENT_SOURCE_DIR}" ABSOLUTE)
+        target_compile_definitions(${PARAM_TEST_NAME} PUBLIC
+            TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data")
+    endif()
+endfunction()
+
+# --------------------------------------------------------------------------------------------------
+# Tests
+# --------------------------------------------------------------------------------------------------
 add_subdirectory(unit)
 
 # TODO: add integration tests
