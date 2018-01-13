@@ -36,7 +36,7 @@
 // Macros
 
 /*!
- * Macro for geting a textual representation of an interface class name
+ * Macro for getting a textual representation of an interface class name
  *
  * \note    Make sure that the full namespace is included together with the class name!
  *
