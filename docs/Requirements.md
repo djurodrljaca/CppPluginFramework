@@ -77,7 +77,7 @@ A plugin shall optionally have dependencies to other plugins. The dependent plug
 A plugin shall enable creation of multiple instances of the same plugin, but only if they have different names!
 
 
-## [R7] Plugin Configuration
+## [R7] Configuration
 
 Loading of plugins shall done according to its configuration which shall be stored in JSON format. It shall contain the following information:
 
@@ -98,13 +98,13 @@ Loading of plugins shall done according to its configuration which shall be stor
         * Comment
         * Plugin dependencies
     
-            * Plugin name
+            * Plugin instance name
             * Comment
 
 
-### List of custom environment variables
+### [R7.1] Custom Environment Variables
 
-This is an optional part of the configuration and it can be used to make the configuration more readable and more practical to write. For example it can be used for specifying the plugin and configuration file paths.
+Specifying a list of custom environment variables is an optional part of the configuration and it can be used to make the configuration more readable and more practical to write. For example it can be used for specifying the plugin and configuration file paths.
 
 Allowed characters for the environment variable names are:
 
@@ -119,7 +119,7 @@ The value can be any string and it can also contain references to system environ
 Format for referencing a system environment variables or the ones from this list shall be: `${VARIABLE_NAME}`
 
 
-### List of plugins
+### [R7.2] Plugin Configuration
 
 This part of the configuration shall be used to specify which plugins need to be loaded and which instances need to be created.
 
@@ -147,9 +147,20 @@ A plugin shall define at least one plugin instance to be created.
 
 A plugin instance shall optionally define its dependencies to other plugins.
 
-*Plugin name* shall reference another plugin's instance name.
+*Plugin instance name* shall reference another plugin's instance name.
 
 *Comment* is optional and it can for example be used to explain the purpose of this dependency to the reader of the configuration file.
+
+
+### [R7.3] Relative Paths
+
+All relative paths referenced in the configuration shall be relative to a *Working Directory* specified by the user of the library.
+
+Here are a for examples of *Working Directories* that an application could specify:
+
+* Directory where the application's executable is located
+* Directory where the configuration file is located
+* User's *home* directory
 
 
 ## [R8] Plugin Startup
