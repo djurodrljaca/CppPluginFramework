@@ -171,7 +171,7 @@ void PluginManager::Impl::unloadPlugins()
     stopPlugins();
     ejectDependencies();
 
-    // Unload all pluginsd
+    // Unload all plugins
     while (!m_plugins.isEmpty())
     {
         Plugin *plugin = m_plugins.takeFirst();
