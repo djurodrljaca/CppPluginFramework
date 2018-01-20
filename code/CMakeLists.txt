@@ -11,20 +11,20 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.3.0)
 
 project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 find_package(Qt5Core)
 
 # --------------------------------------------------------------------------------------------------
 # CppPluginFramework library
 # --------------------------------------------------------------------------------------------------
-
-include_directories(inc)
+include_directories(${PROJECT_SOURCE_DIR}/inc)
 
 set(CppPluginFramework_HEADERS
     inc/CppPluginFramework/AbstractPlugin.hpp
@@ -61,8 +61,46 @@ set_target_properties(CppPluginFramework PROPERTIES
 )
 
 # --------------------------------------------------------------------------------------------------
+# Code Coverage
+# --------------------------------------------------------------------------------------------------
+option(CppPluginFramework_CodeCoverage "C++ Plugin Framework Code Coverage" OFF)
+
+if (CppPluginFramework_CodeCoverage MATCHES ON)
+    include(CodeCoverage)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+
+    # Prepare a function for appending exclude filters to COVERAGE_EXCLUDES variable
+    macro(APPEND_COVERAGE_EXCLUDES start_path)
+        # Iterate over all files
+        file(GLOB_RECURSE items RELATIVE ${start_path} ${start_path}/*)
+
+        foreach (item ${items})
+            # Check for source files
+            string(TOLOWER item item_lower)
+
+            if (${item_lower} MATCHES "(\.cpp|\.h|\.hpp)$")
+                # Extract directory
+                get_filename_component(item_dir ${start_path}/${item} DIRECTORY)
+
+                # Prepare exclude filter
+                set(exclude_filter "'${item_dir}/*'")
+
+                # Add the exclude filter if needed
+                if (NOT (exclude_filter IN_LIST COVERAGE_EXCLUDES))
+                    list(APPEND COVERAGE_EXCLUDES ${exclude_filter})
+                endif()
+            endif()
+        endforeach()
+    endmacro()
+
+    # Exclude paths from the report
+    APPEND_COVERAGE_EXCLUDES("/usr/include")
+    APPEND_COVERAGE_EXCLUDES("${PROJECT_SOURCE_DIR}/tests")
+    APPEND_COVERAGE_EXCLUDES("${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
+# --------------------------------------------------------------------------------------------------
 # Tests
 # --------------------------------------------------------------------------------------------------
-
 enable_testing()
 add_subdirectory(tests)

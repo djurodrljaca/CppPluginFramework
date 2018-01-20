@@ -49,7 +49,7 @@ function(CppPluginFramework_AddTest)
     endif()
 
     # Prepare a define for the test data directory path so that it can be used in the C++ code
-    if(PARAM_DATA_DIR_ENABLED)
+    if (PARAM_DATA_DIR_ENABLED)
         get_filename_component(CURRENT_SOURCE_DIR_ABSOLUTE "${CURRENT_SOURCE_DIR}" ABSOLUTE)
         target_compile_definitions(${PARAM_TEST_NAME} PUBLIC
             TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data")
@@ -61,4 +61,13 @@ endfunction()
 # --------------------------------------------------------------------------------------------------
 add_subdirectory(unit)
 
-# TODO: add integration tests
+# --------------------------------------------------------------------------------------------------
+# Code Coverage
+# --------------------------------------------------------------------------------------------------
+if (CppPluginFramework_CodeCoverage MATCHES ON)
+    # Prepare targets for code coverage
+    SETUP_TARGET_FOR_COVERAGE(
+        NAME ctest_coverage_all_tests
+        EXECUTABLE ctest -j ${PROCESSOR_COUNT}
+        DEPENDENCIES all_tests)
+endif()
