@@ -28,7 +28,7 @@ function(CppPluginFramework_AddUnitTest)
     cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
 
     # Add test
-    CppPluginFramework_AddTest(${ARGN} LABELS CPPPLUGINFRAMEWORK_UNITTESTS)
+    CppPluginFramework_AddTest(${ARGN} LABELS CPPPLUGINFRAMEWORK_UNIT_TESTS)
 
     # Add test to target "all_unit_tests"
     add_dependencies(all_unit_tests ${PARAM_TEST_NAME})
@@ -42,3 +42,14 @@ add_subdirectory(PluginConfig)
 add_subdirectory(PluginInstanceConfig)
 add_subdirectory(Validation)
 add_subdirectory(VersionInfo)
+
+# --------------------------------------------------------------------------------------------------
+# Code Coverage
+# --------------------------------------------------------------------------------------------------
+if (CppPluginFramework_CodeCoverage MATCHES ON)
+    # Prepare targets for code coverage
+    SETUP_TARGET_FOR_COVERAGE(
+        NAME ctest_coverage_all_unit_tests
+        EXECUTABLE ctest -L CPPPLUGINFRAMEWORK_UNIT_TESTS -j ${PROCESSOR_COUNT}
+        DEPENDENCIES all_tests)
+endif()
