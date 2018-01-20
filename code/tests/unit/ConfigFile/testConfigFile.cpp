@@ -35,10 +35,6 @@
 
 using namespace CppPluginFramework;
 
-typedef QHash<QString, QString> EnvironmentVariables;
-Q_DECLARE_METATYPE(EnvironmentVariables)
-Q_DECLARE_METATYPE(PluginConfig)
-
 class TestConfigFile : public QObject
 {
     Q_OBJECT

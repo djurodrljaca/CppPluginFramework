@@ -29,7 +29,8 @@ function(CppPluginFramework_AddTest)
         ADDITIONAL_SOURCES
         ADDITIONAL_HEADERS
         ADDITIONAL_LIBS
-        LABELS)
+        LABELS
+        )
 
     cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
 
@@ -60,6 +61,7 @@ endfunction()
 # Tests
 # --------------------------------------------------------------------------------------------------
 add_subdirectory(unit)
+add_subdirectory(integration)
 
 # --------------------------------------------------------------------------------------------------
 # Code Coverage
@@ -69,5 +71,6 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
     SETUP_TARGET_FOR_COVERAGE(
         NAME ctest_coverage_all_tests
         EXECUTABLE ctest -j ${PROCESSOR_COUNT}
-        DEPENDENCIES all_tests)
+        DEPENDENCIES all_tests
+        )
 endif()

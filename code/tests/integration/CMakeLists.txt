@@ -14,12 +14,12 @@
 # --------------------------------------------------------------------------------------------------
 # Custom (meta) targets
 # --------------------------------------------------------------------------------------------------
-add_custom_target(all_unit_tests)
+add_custom_target(all_integration_tests)
 
 # --------------------------------------------------------------------------------------------------
 # Helper methods
 # --------------------------------------------------------------------------------------------------
-function(CppPluginFramework_AddUnitTest)
+function(CppPluginFramework_AddIntegrationTest)
     # Function parameters
     set(options)                        # Boolean parameters
     set(oneValueParams      TEST_NAME)  # Parameters with one value
@@ -28,20 +28,21 @@ function(CppPluginFramework_AddUnitTest)
     cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
 
     # Add test
-    CppPluginFramework_AddTest(${ARGN} LABELS CPPPLUGINFRAMEWORK_UNIT_TESTS)
+    CppPluginFramework_AddTest(${ARGN} LABELS CPPPLUGINFRAMEWORK_INTEGRATION_TESTS)
 
-    # Add test to target "all_unit_tests"
-    add_dependencies(all_unit_tests ${PARAM_TEST_NAME})
+    # Add test to target "all_integration_tests"
+    add_dependencies(all_integration_tests ${PARAM_TEST_NAME})
 endfunction()
 
 # --------------------------------------------------------------------------------------------------
-# Unit tests
+# Test plugins
 # --------------------------------------------------------------------------------------------------
-add_subdirectory(ConfigFile)
-add_subdirectory(PluginConfig)
-add_subdirectory(PluginInstanceConfig)
-add_subdirectory(Validation)
-add_subdirectory(VersionInfo)
+add_subdirectory(TestPlugins)
+
+# --------------------------------------------------------------------------------------------------
+# Integration tests
+# --------------------------------------------------------------------------------------------------
+add_subdirectory(Plugin)
 
 # --------------------------------------------------------------------------------------------------
 # Code Coverage
@@ -49,7 +50,8 @@ add_subdirectory(VersionInfo)
 if (CppPluginFramework_CodeCoverage MATCHES ON)
     # Prepare targets for code coverage
     SETUP_TARGET_FOR_COVERAGE(
-        NAME ctest_coverage_all_unit_tests
-        EXECUTABLE ctest -L CPPPLUGINFRAMEWORK_UNIT_TESTS -j ${PROCESSOR_COUNT}
-        DEPENDENCIES all_unit_tests)
+        NAME ctest_coverage_all_integration_tests
+        EXECUTABLE ctest -L CPPPLUGINFRAMEWORK_INTEGRATION_TESTS -j ${PROCESSOR_COUNT}
+        DEPENDENCIES all_integration_tests
+        )
 endif()

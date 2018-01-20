@@ -233,7 +233,7 @@ Plugin::Plugin()
 
 Plugin::~Plugin()
 {
-    unloadPlugin();
+    unload();
 }
 
 bool Plugin::isLoaded() const
@@ -291,7 +291,7 @@ IPlugin *Plugin::instance(const QString &instanceName)
     return pluginInstance;
 }
 
-std::unique_ptr<Plugin> Plugin::loadPlugin(const PluginConfig &pluginConfig)
+std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig)
 {
     bool success = false;
     std::unique_ptr<Plugin> plugin;
@@ -349,7 +349,7 @@ std::unique_ptr<Plugin> Plugin::loadPlugin(const PluginConfig &pluginConfig)
     return plugin;
 }
 
-void Plugin::unloadPlugin()
+void Plugin::unload()
 {
     if (isLoaded())
     {

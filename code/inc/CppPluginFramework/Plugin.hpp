@@ -94,12 +94,12 @@ public:
      *
      * \return  Loaded plugin or nullptr if loading failed
      */
-    static std::unique_ptr<Plugin> loadPlugin(const PluginConfig &pluginConfig);
+    static std::unique_ptr<Plugin> load(const PluginConfig &pluginConfig);
 
     /*!
      * Unloads the plugin
      */
-    void unloadPlugin();
+    void unload();
 
 private:
     /*!
