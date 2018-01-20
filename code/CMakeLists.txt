@@ -17,14 +17,14 @@ project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Qt5Core)
 
 # --------------------------------------------------------------------------------------------------
 # CppPluginFramework library
 # --------------------------------------------------------------------------------------------------
-include_directories(${PROJECT_SOURCE_DIR}/inc)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
 set(CppPluginFramework_HEADERS
     inc/CppPluginFramework/AbstractPlugin.hpp
@@ -53,12 +53,12 @@ set(CppPluginFramework_SOURCES
 
 add_library(CppPluginFramework SHARED ${CppPluginFramework_SOURCES} ${CppPluginFramework_HEADERS})
 target_link_libraries(CppPluginFramework Qt5::Core)
-target_compile_definitions(CppPluginFramework PUBLIC CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
+target_compile_definitions(CppPluginFramework PRIVATE CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
 set_target_properties(CppPluginFramework PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
-)
+    )
 
 # --------------------------------------------------------------------------------------------------
 # Code Coverage
@@ -78,7 +78,7 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
             # Check for source files
             string(TOLOWER item item_lower)
 
-            if (${item_lower} MATCHES "(\.cpp|\.h|\.hpp)$")
+            if (${item_lower} MATCHES "(\.cpp|\.h|\.hpp|\.moc)$")
                 # Extract directory
                 get_filename_component(item_dir ${start_path}/${item} DIRECTORY)
 
@@ -95,7 +95,7 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
 
     # Exclude paths from the report
     APPEND_COVERAGE_EXCLUDES("/usr/include")
-    APPEND_COVERAGE_EXCLUDES("${PROJECT_SOURCE_DIR}/tests")
+    APPEND_COVERAGE_EXCLUDES("${CMAKE_CURRENT_SOURCE_DIR}/tests")
     APPEND_COVERAGE_EXCLUDES("${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 

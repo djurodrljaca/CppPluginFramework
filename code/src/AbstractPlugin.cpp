@@ -74,6 +74,10 @@ AbstractPlugin::AbstractPlugin(const QString &name)
     m_impl->m_name = name;
 }
 
+AbstractPlugin::~AbstractPlugin()
+{
+}
+
 QString AbstractPlugin::name() const
 {
     return m_impl->m_name;

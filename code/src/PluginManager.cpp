@@ -130,7 +130,7 @@ bool PluginManager::Impl::loadPlugins(const QList<PluginConfig> &pluginConfigs)
     for (const PluginConfig &pluginConfig : pluginConfigs)
     {
         // Load plugin
-        std::unique_ptr<Plugin> plugin = Plugin::loadPlugin(pluginConfig);
+        std::unique_ptr<Plugin> plugin = Plugin::load(pluginConfig);
         success = plugin->isValid();
 
         if (success)
@@ -178,7 +178,7 @@ void PluginManager::Impl::unloadPlugins()
 
         if (plugin->isLoaded())
         {
-            plugin->unloadPlugin();
+            plugin->unload();
         }
 
         delete plugin;

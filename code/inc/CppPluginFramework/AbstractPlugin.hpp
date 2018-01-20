@@ -59,7 +59,7 @@ public:
     /*!
      * Destructor
      */
-    virtual ~AbstractPlugin() = default;
+    virtual ~AbstractPlugin();
 
     /*!
      * \copydoc CppPluginFramework::IPlugin::name()
