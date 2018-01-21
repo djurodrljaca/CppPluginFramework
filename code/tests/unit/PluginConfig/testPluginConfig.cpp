@@ -125,18 +125,27 @@ void TestPluginConfig::testIsValid_data()
             << PluginConfig(validFilePath, VersionInfo(), validInstanceConfigs) << false;
 
     QTest::newRow("invalid: min version")
-            << PluginConfig(validFilePath, VersionInfo(), validVersion2, validInstanceConfigs) << false;
+            << PluginConfig(validFilePath, VersionInfo(), validVersion2, validInstanceConfigs)
+            << false;
 
     QTest::newRow("invalid: max version")
-            << PluginConfig(validFilePath, validVersion1, VersionInfo(), validInstanceConfigs) << false;
+            << PluginConfig(validFilePath, validVersion1, VersionInfo(), validInstanceConfigs)
+            << false;
 
-    QTest::newRow("valid: no instance configs")
-            << PluginConfig(validFilePath, validVersion1, QList<PluginInstanceConfig>()) << false;
+    QTest::newRow("invalid: no instance configs")
+            << PluginConfig(validFilePath, validVersion1, QList<PluginInstanceConfig>())
+            << false;
 
-    QTest::newRow("valid: no instance configs")
+    QTest::newRow("invalid: invalid instance config")
             << PluginConfig(validFilePath, validVersion1, QList<PluginInstanceConfig> {
                                 PluginInstanceConfig("instance1"),
                                 PluginInstanceConfig()
+                            }) << false;
+
+    QTest::newRow("invalid: duplicate instance name")
+            << PluginConfig(validFilePath, validVersion1, QList<PluginInstanceConfig> {
+                                PluginInstanceConfig("instance1"),
+                                PluginInstanceConfig("instance1")
                             }) << false;
 }
 

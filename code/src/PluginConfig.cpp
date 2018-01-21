@@ -80,7 +80,7 @@ bool PluginConfig::isValid() const
         // At least one plugin instance is required
         valid = !m_instanceConfigs.isEmpty();
 
-        // Check individual dependency if it is referencing a valid name
+        // Check individual dependency if it is valid
         if (valid)
         {
             for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
@@ -88,6 +88,34 @@ bool PluginConfig::isValid() const
                 if (!instanceConfig.isValid())
                 {
                     valid = false;
+                    break;
+                }
+            }
+        }
+
+        // Check if this plugin config contains multiple instances with the same name
+        if (valid)
+        {
+            for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
+            {
+                int count = 0;
+
+                for (const PluginInstanceConfig &item : m_instanceConfigs)
+                {
+                    if (item.name() == instanceConfig.name())
+                    {
+                        count++;
+
+                        if (count >= 2)
+                        {
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!valid)
+                {
                     break;
                 }
             }
