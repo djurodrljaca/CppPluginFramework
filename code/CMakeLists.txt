@@ -95,8 +95,9 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
 
     # Exclude paths from the report
     APPEND_COVERAGE_EXCLUDES("/usr/include")
-    APPEND_COVERAGE_EXCLUDES("${CMAKE_CURRENT_SOURCE_DIR}/tests")
-    APPEND_COVERAGE_EXCLUDES("${CMAKE_CURRENT_BINARY_DIR}")
+    APPEND_COVERAGE_EXCLUDES(${CMAKE_PREFIX_PATH})
+    APPEND_COVERAGE_EXCLUDES(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    APPEND_COVERAGE_EXCLUDES(${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
 # --------------------------------------------------------------------------------------------------
