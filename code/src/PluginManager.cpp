@@ -238,7 +238,7 @@ bool PluginManager::Impl::injectDependencies(const QString &instanceName,
                 if (!success)
                 {
                     qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
-                                "Error: failed to find inject dependency:"
+                                "Error: failed to inject dependency:"
                              << dependencyName << "-->" << instanceName;
                 }
             }

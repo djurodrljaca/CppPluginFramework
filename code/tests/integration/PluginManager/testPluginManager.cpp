@@ -54,6 +54,9 @@ private slots:
     // Test functions
     void testLoadPlugins();
 
+    void testLoadPluginsWithInvalidConfig();
+    void testLoadPluginsWithInvalidConfig_data();
+
     // TODO: add "negative" tests!
 
 private:
@@ -123,6 +126,30 @@ void TestPluginManager::testLoadPlugins()
 
     // Unload plugins
     pluginManager.unloadPlugins();
+}
+
+// Test: loading of plugins with invalid config ----------------------------------------------------
+
+void TestPluginManager::testLoadPluginsWithInvalidConfig()
+{
+    QFETCH(QString, fileName);
+
+    // First load the config
+    ConfigFile configFile;
+    QVERIFY(configFile.read(m_testDataDirPath.absoluteFilePath(fileName)));
+
+    // Load plugins with invalid config
+    PluginManager pluginManager;
+    QVERIFY(!pluginManager.loadPlugins(configFile.pluginConfigs()));
+}
+
+void TestPluginManager::testLoadPluginsWithInvalidConfig_data()
+{
+    QTest::addColumn<QString>("fileName");
+
+    QTest::newRow("duplicate instance names") << "InvalidAppConfig1.json";
+    QTest::newRow("unknown dependency") << "InvalidAppConfig2.json";
+    QTest::newRow("unsupported dependency") << "InvalidAppConfig3.json";
 }
 
 // Main function -----------------------------------------------------------------------------------
