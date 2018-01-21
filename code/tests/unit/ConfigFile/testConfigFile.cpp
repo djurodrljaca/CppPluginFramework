@@ -51,7 +51,9 @@ private slots:
     // Test functions
     void testReadValidConfig();
 
-    // TODO: add "negative" tests!
+    void testReadInvalidConfig();
+    void testReadInvalidConfig_data();
+
 
 private:
     // Holds the path to the data directory
@@ -147,6 +149,54 @@ void TestConfigFile::testReadValidConfig()
                                                           QJsonObject { { "param", "xyz" } },
                                                           QSet<QString>()));
     }
+}
+
+// Test: read a valid config file ------------------------------------------------------------------
+
+void TestConfigFile::testReadInvalidConfig()
+{
+    QFETCH(QString, fileName);
+
+    const QString configFilePath(m_testDataDirPath.absoluteFilePath(fileName));
+    ConfigFile configFile;
+    QVERIFY(!configFile.read(configFilePath, m_testDataDirPath.absolutePath()));
+}
+
+void TestConfigFile::testReadInvalidConfig_data()
+{
+    QTest::addColumn<QString>("fileName");
+
+    // Environment variables
+    QTest::newRow("non-string env. var. value") << "InvalidAppConfig1.json";
+    QTest::newRow("invalid env. var. name") << "InvalidAppConfig2.json";
+    QTest::newRow("env. var. references itself") << "InvalidAppConfig3.json";
+
+    // Plugins
+    QTest::newRow("invalid plugin format") << "InvalidAppConfig4.json";
+    QTest::newRow("missing plugin file path") << "InvalidAppConfig5.json";
+    QTest::newRow("invalid plugin file path") << "InvalidAppConfig6.json";
+
+    QTest::newRow("missing version 1") << "InvalidAppConfig7.json";
+    QTest::newRow("missing min version") << "InvalidAppConfig8.json";
+    QTest::newRow("missing max version") << "InvalidAppConfig9.json";
+    QTest::newRow("invalid version format") << "InvalidAppConfig10.json";
+    QTest::newRow("invalid version") << "InvalidAppConfig11.json";
+    QTest::newRow("invalid min version format") << "InvalidAppConfig12.json";
+    QTest::newRow("invalid max version format") << "InvalidAppConfig13.json";
+    QTest::newRow("invalid min version") << "InvalidAppConfig14.json";
+    QTest::newRow("invalid max version") << "InvalidAppConfig15.json";
+
+    QTest::newRow("missing instances") << "InvalidAppConfig16.json";
+    QTest::newRow("invalid instances format") << "InvalidAppConfig17.json";
+    QTest::newRow("invalid instance format") << "InvalidAppConfig18.json";
+    QTest::newRow("missing instance name") << "InvalidAppConfig19.json";
+    QTest::newRow("invalid instance name") << "InvalidAppConfig20.json";
+    QTest::newRow("invalid instance config file path") << "InvalidAppConfig21.json";
+    QTest::newRow("invalid instance config") << "InvalidAppConfig22.json";
+    QTest::newRow("instance with both config and config file path") << "InvalidAppConfig23.json";
+    QTest::newRow("invalid dependencies format") << "InvalidAppConfig24.json";
+    QTest::newRow("invalid dependency format") << "InvalidAppConfig25.json";
+    QTest::newRow("invalid dependency name") << "InvalidAppConfig26.json";
 }
 
 // Main function -----------------------------------------------------------------------------------
