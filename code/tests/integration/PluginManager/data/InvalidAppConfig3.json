@@ -1,0 +1,64 @@
+{
+    "customEnvironmentVariables":
+    {
+        "TestPluginsPath": "../TestPlugins"
+    },
+    
+    "plugins":
+    [
+        {
+            "pluginFilePath": "${TestPluginsPath}/libTestPlugin1.so",
+            "version": "1.0.0",
+            "instances":
+            [
+                {
+                    "instanceName": "instance1",
+                    "config":
+                    {
+                        "value": "value1"
+                    }
+                },
+                
+                {
+                    "instanceName": "instance2",
+                    "config":
+                    {
+                        "value": "value2"
+                    },
+                    "dependencies":
+                    [
+                        {
+                            "instanceName": "instance1"
+                        }
+                    ]
+                }
+            ]
+        },
+        
+        {
+            "pluginFilePath": "${TestPluginsPath}/libTestPlugin2.so",
+            "minVersion": "1.0.0",
+            "maxVersion": "1.0.1",
+            "instances":
+            [
+                {
+                    "instanceName": "instance3",
+                    "config":
+                    {
+                        "delimiter": ";"
+                    },
+                    "dependencies":
+                    [
+                        {
+                            "instanceName": "instance1"
+                        },
+                        
+                        {
+                            "instanceName": "instance2"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
