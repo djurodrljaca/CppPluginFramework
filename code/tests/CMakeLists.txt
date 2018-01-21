@@ -72,5 +72,6 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
         NAME ctest_coverage_all_tests
         EXECUTABLE ctest -j ${PROCESSOR_COUNT}
         DEPENDENCIES all_tests
+        PROJECT_PATH ${PROJECT_SOURCE_DIR}
         )
 endif()

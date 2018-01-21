@@ -51,5 +51,7 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
     SETUP_TARGET_FOR_COVERAGE(
         NAME ctest_coverage_all_unit_tests
         EXECUTABLE ctest -L CPPPLUGINFRAMEWORK_UNIT_TESTS -j ${PROCESSOR_COUNT}
-        DEPENDENCIES all_unit_tests)
+        DEPENDENCIES all_unit_tests
+        PROJECT_PATH ${PROJECT_SOURCE_DIR}
+        )
 endif()

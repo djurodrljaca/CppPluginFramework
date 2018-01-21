@@ -131,11 +131,12 @@ endif()
 #     NAME testrunner_coverage                    # New target name
 #     EXECUTABLE testrunner -j ${PROCESSOR_COUNT} # Executable in PROJECT_BINARY_DIR
 #     DEPENDENCIES testrunner                     # Dependencies to build first
+#     PROJECT_PATH /project/path                  # Project path
 # )
 function(SETUP_TARGET_FOR_COVERAGE)
 
     set(options NONE)
-    set(oneValueArgs NAME)
+    set(oneValueArgs NAME PROJECT_PATH)
     set(multiValueArgs EXECUTABLE EXECUTABLE_ARGS DEPENDENCIES)
     cmake_parse_arguments(Coverage "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -148,6 +149,10 @@ function(SETUP_TARGET_FOR_COVERAGE)
     endif() # NOT GENHTML_PATH
 
     # Setup target
+    if (Coverage_PROJECT_PATH)
+        set(GENHTML_PREFIX --prefix ${Coverage_PROJECT_PATH})
+    endif()
+
     add_custom_target(${Coverage_NAME}
 
         # Cleanup lcov
@@ -160,10 +165,11 @@ function(SETUP_TARGET_FOR_COVERAGE)
 
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --directory . --capture --output-file ${Coverage_NAME}.info
+
         # add baseline counters
         COMMAND ${LCOV_PATH} -a ${Coverage_NAME}.base -a ${Coverage_NAME}.info --output-file ${Coverage_NAME}.total
         COMMAND ${LCOV_PATH} --remove ${Coverage_NAME}.total ${COVERAGE_EXCLUDES} --output-file ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
-        COMMAND ${GENHTML_PATH} -o ${Coverage_NAME} ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
+        COMMAND ${GENHTML_PATH} -o ${Coverage_NAME} ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned ${GENHTML_PREFIX}
         COMMAND ${CMAKE_COMMAND} -E remove ${Coverage_NAME}.base ${Coverage_NAME}.info ${Coverage_NAME}.total ${PROJECT_BINARY_DIR}/${Coverage_NAME}.info.cleaned
 
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
