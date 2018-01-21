@@ -53,8 +53,6 @@ private slots:
     // Test functions
     void testLoadPlugin();
     void testLoadPlugin_data();
-
-    // TODO: add "negative" tests!
 };
 
 // Test Case init/cleanup methods ------------------------------------------------------------------
@@ -134,6 +132,30 @@ void TestPlugin::testLoadPlugin_data()
                             instanceConfig);
 
         QTest::newRow("valid: test plugin 2") << config << VersionInfo(1, 0, 0) << 1 << true;
+    }
+
+    // Loading of plugin with invalid config
+    {
+        QList<PluginInstanceConfig> instanceConfig;
+        instanceConfig << PluginInstanceConfig("instance1", QJsonObject { { "invalid", "x" } });
+
+        PluginConfig config("../TestPlugins/libTestPlugin1.so",
+                            VersionInfo(1, 0, 0),
+                            instanceConfig);
+
+        QTest::newRow("invalid: config") << config << VersionInfo(1, 0, 0) << 1 << false;
+    }
+
+    // Loading of plugin with invalid version
+    {
+        QList<PluginInstanceConfig> instanceConfig;
+        instanceConfig << PluginInstanceConfig("instance1", QJsonObject { { "value", "value1" } });
+
+        PluginConfig config("../TestPlugins/libTestPlugin1.so",
+                            VersionInfo(1, 0, 1),
+                            instanceConfig);
+
+        QTest::newRow("invalid: version") << config << VersionInfo(1, 0, 0) << 1 << false;
     }
 }
 
