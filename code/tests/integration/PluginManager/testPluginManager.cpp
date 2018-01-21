@@ -57,8 +57,6 @@ private slots:
     void testLoadPluginsWithInvalidConfig();
     void testLoadPluginsWithInvalidConfig_data();
 
-    // TODO: add "negative" tests!
-
 private:
     // Holds the path to the data directory
     QDir m_testDataDirPath;
