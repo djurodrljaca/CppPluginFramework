@@ -649,7 +649,7 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
                     if (dependency.isEmpty())
                     {
                         qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginInstanceConfig: "
-                                    "Error: invalid dependency:" << item;
+                                    "Error: failed to parse dependency:" << item;
                         success = false;
                         break;
                     }

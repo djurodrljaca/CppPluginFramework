@@ -43,6 +43,7 @@ add_subdirectory(TestPlugins)
 # Integration tests
 # --------------------------------------------------------------------------------------------------
 add_subdirectory(Plugin)
+add_subdirectory(PluginManager)
 
 # --------------------------------------------------------------------------------------------------
 # Code Coverage

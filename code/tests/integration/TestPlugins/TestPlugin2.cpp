@@ -135,6 +135,8 @@ QString TestPlugin2::joinedValues() const
         values.append(item->value());
     }
 
+    values.sort();
+
     return values.join(m_configuredDelimiter);
 }
 

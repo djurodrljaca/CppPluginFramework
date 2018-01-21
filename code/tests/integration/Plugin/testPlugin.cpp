@@ -54,7 +54,7 @@ private slots:
     void testLoadPlugin();
     void testLoadPlugin_data();
 
-    // TODO: add tests for invalid situations!
+    // TODO: add "negative" tests!
 };
 
 // Test Case init/cleanup methods ------------------------------------------------------------------
