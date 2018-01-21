@@ -241,6 +241,8 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
             {
                 if (m_customEnvironmentVariables.contains(name))
                 {
+                    // Note: This should not be possible because you can only get unique keys in
+                    //       QJsonObject
                     success = false;
                     qDebug() << "CppPluginFramework::ConfigFile::Impl::"
                                 "parseCustomEnvironmentVariables: "
@@ -489,8 +491,13 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
             {
                 success = false;
                 qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
-                            "Error: plugin configs have to be stored in a JSON array!";
+                            "Error: plugin instance configs have to be stored in a JSON array!";
             }
+        }
+        else
+        {
+            qDebug() << "CppPluginFramework::ConfigFile::Impl::parsePluginConfig: "
+                        "Error: no plugin instances!";
         }
     }
 
@@ -755,7 +762,7 @@ bool ConfigFile::Impl::expandVariable(const QString &name,
                 {
                     success = false;
                     qDebug() << "CppPluginFramework::ConfigFile::Impl::expandVariable: "
-                                "Error: variable value contains a reverence to itself:"
+                                "Error: variable value contains a reference to itself:"
                              << endl << "- name:" << name
                              << endl << "- value:" << value;
                     break;
@@ -895,13 +902,10 @@ bool ConfigFile::read(const QJsonObject &config, const QString &workingDirPath)
         }
         else
         {
-            if (!config["customEnvironmentVariables"].isNull())
-            {
-                success = false;
-                qDebug() << "CppPluginFramework::ConfigFile::read: "
-                            "Error: if custom environment variables are needed then they have "
-                            "to be stored in a JSON object!";
-            }
+            success = false;
+            qDebug() << "CppPluginFramework::ConfigFile::read: "
+                        "Error: if custom environment variables are needed then they have "
+                        "to be stored in a JSON object!";
         }
     }
 
