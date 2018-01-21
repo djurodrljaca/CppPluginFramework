@@ -91,6 +91,13 @@ public:
      */
     IPlugin *pluginInstance(const QString &pluginInstanceName);
 
+    /*!
+     * Gets names of all loaded plugin instances
+     *
+     * \return  Names of all loaded plugin instances
+     */
+    QStringList pluginInstanceNames() const;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;

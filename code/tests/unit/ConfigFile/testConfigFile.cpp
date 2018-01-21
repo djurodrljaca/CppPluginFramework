@@ -51,7 +51,7 @@ private slots:
     // Test functions
     void testReadValidConfig();
 
-    // TODO: add tests for invalid situations!
+    // TODO: add "negative" tests!
 
 private:
     // Holds the path to the data directory

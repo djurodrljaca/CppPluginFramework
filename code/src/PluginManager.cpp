@@ -392,10 +392,7 @@ bool PluginManager::loadPlugins(const QList<PluginConfig> &pluginConfigs)
     bool success = false;
 
     // Load plugins
-    if (success)
-    {
-        success = m_impl->loadPlugins(pluginConfigs);
-    }
+    success = m_impl->loadPlugins(pluginConfigs);
 
     // Inject dependencies
     if (success)
@@ -424,6 +421,21 @@ void PluginManager::unloadPlugins()
 IPlugin *PluginManager::pluginInstance(const QString &pluginInstanceName)
 {
     return m_impl->pluginInstance(pluginInstanceName);
+}
+
+QStringList PluginManager::pluginInstanceNames() const
+{
+    QStringList instanceNames;
+
+    for (auto plugin : m_impl->m_plugins)
+    {
+        for (auto instance : plugin->instances())
+        {
+            instanceNames.append(instance->name());
+        }
+    }
+
+    return instanceNames;
 }
 
 }
