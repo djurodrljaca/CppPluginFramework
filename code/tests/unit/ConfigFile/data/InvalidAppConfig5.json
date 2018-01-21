@@ -1,0 +1,22 @@
+{
+    "customEnvironmentVariables":
+    {
+        "var1": "value1",
+        "var2": "${var1}_var2",
+        "PluginPath": "plugins"
+    },
+    
+    "plugins":
+    [
+        {
+            "minVersion": "1.0.0",
+            "maxVersion": "2.0.0",
+            "instances":
+            [
+                {
+                    "instanceName": "instance1"
+                }
+            ]
+        }
+    ]
+}
