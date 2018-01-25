@@ -22,6 +22,7 @@
 #define CPPPLUGINFRAMEWORK_CONFIGFILE_HPP
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/EnvironmentVariables.hpp>
 #include <CppPluginFramework/PluginConfig.hpp>
 
 // Qt includes
@@ -38,7 +39,7 @@ namespace CppPluginFramework
 {
 
 /*!
- * This class enables loading of a plugin from a library
+ * This class reads and holds the plugin configuration and the environment variables
  */
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT ConfigFile
 {
@@ -47,13 +48,6 @@ public:
      * Constructor
      */
     ConfigFile();
-
-    /*!
-     * Move constructor
-     *
-     * \param   other   Object to move
-     */
-    ConfigFile(ConfigFile &&other) = default;
 
     /*!
      * Copy constructor
@@ -115,7 +109,7 @@ public:
      *
      * \return  Custom environment variables
      */
-    QHash<QString, QString> customEnvironmentVariables() const;
+    EnvironmentVariables environmentVariables() const;
 
     /*!
      * Gets plugin configs that were read from the config file

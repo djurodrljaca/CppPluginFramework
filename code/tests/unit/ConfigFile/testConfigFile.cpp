@@ -91,13 +91,11 @@ void TestConfigFile::testReadValidConfig()
     QVERIFY(configFile.read(configFilePath, m_testDataDirPath.absolutePath()));
 
     // Check custom environment variables
-    const auto variables = configFile.customEnvironmentVariables();
+    const EnvironmentVariables variables = configFile.environmentVariables();
 
-    QCOMPARE(variables.size(), 3);
-
-    QCOMPARE(variables["var1"], "value1");
-    QCOMPARE(variables["var2"], "value1_var2");
-    QCOMPARE(variables["PluginPath"], "plugins");
+    QCOMPARE(variables.value("var1"), "value1");
+    QCOMPARE(variables.expandText(variables.value("var2")), "value1_var2");
+    QCOMPARE(variables.value("PluginPath"), "plugins");
 
     // Check plugin configs
     const auto pluginConfigs = configFile.pluginConfigs();
@@ -169,7 +167,6 @@ void TestConfigFile::testReadInvalidConfig_data()
     // Environment variables
     QTest::newRow("non-string env. var. value") << "InvalidAppConfig1.json";
     QTest::newRow("invalid env. var. name") << "InvalidAppConfig2.json";
-    QTest::newRow("env. var. references itself") << "InvalidAppConfig3.json";
 
     // Plugins
     QTest::newRow("invalid plugin format") << "InvalidAppConfig4.json";
