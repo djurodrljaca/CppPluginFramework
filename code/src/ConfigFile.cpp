@@ -15,7 +15,7 @@
 /*!
  * \file
  *
- * Contains a convenience method for reading config files
+ * This class reads and holds the plugin configuration and the environment variables
  */
 
 // C++ Plugin Framework includes
@@ -72,14 +72,14 @@ struct ConfigFile::Impl
     QString getAbsoluteFilePath(const QString &filePath) const;
 
     /*!
-     * Parses custom environment variables from the config JSON object
+     * Parses environment variables from the config JSON object
      *
-     * \param   config  Config JSON object that contains the custom environment variables
+     * \param   config  Config JSON object that contains the environment variables
      *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    bool parseCustomEnvironmentVariables(const QJsonObject &config);
+    bool parseEnvironmentVariables(const QJsonObject &config);
 
     /*!
      * Parses plugin configs from the config JSON array
@@ -128,41 +128,6 @@ struct ConfigFile::Impl
     QString parseDependency(const QJsonObject &config);
 
     /*!
-     * Reads the specified environment variable
-     *
-     * \param   variableName    Name of the environment variable to read
-     *
-     * \return  Environment variable value or an empty string if the variable was not found
-     *
-     * Environment variable is read primarily from custom environment variables. If it is not found
-     * there then it attempts to read it from the system environment variables.
-     */
-    QString readEnvironmentVariable(const QString &variableName) const;
-
-    /*!
-     * Expands the specified variable
-     *
-     * \param       name            Name of the variable to expand
-     * \param       value           Variable value to expand
-     * \param[out]  expandedValue   Output for the expanded variable
-     *
-     * \retval  true    Success
-     * \retval  false   Failure
-     *
-     * \note    A variable is not allowed to reference itself
-     */
-    bool expandVariable(const QString &name, const QString &value, QString *expandedValue) const;
-
-    /*!
-     * Expands all references to environment variables in the text
-     *
-     * \param   text    Text to extend
-     *
-     * \return  Extended text
-     */
-    QString expandText(const QString &text) const;
-
-    /*!
      * Reads a JSON object from a file
      *
      * \param       filePath    Path to the JSON file
@@ -181,7 +146,7 @@ struct ConfigFile::Impl
     /*!
      * Holds the custom environment variables
      */
-    QHash<QString, QString> m_customEnvironmentVariables;
+    EnvironmentVariables m_environmentVariables;
 
     /*!
      * Holds the plugin configs
@@ -221,11 +186,10 @@ QString ConfigFile::Impl::getAbsoluteFilePath(const QString &filePath) const
     return absoluteFilePath;
 }
 
-bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config)
+bool ConfigFile::Impl::parseEnvironmentVariables(const QJsonObject &config)
 {
     // Iterate over all items
     bool success = true;
-    m_customEnvironmentVariables.clear();
 
     for (auto it = config.constBegin(); it != config.constEnd(); it++)
     {
@@ -239,21 +203,7 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
 
             if (value.isString())
             {
-                if (m_customEnvironmentVariables.contains(name))
-                {
-                    // Note: This should not be possible because you can only get unique keys in
-                    //       QJsonObject
-                    success = false;
-                    qDebug() << "CppPluginFramework::ConfigFile::Impl::"
-                                "parseCustomEnvironmentVariables: "
-                                "Error: variable with the same name already exists:"
-                             << endl << "- name:" << name
-                             << endl << "- value:" << value;
-                }
-                else
-                {
-                    m_customEnvironmentVariables[name] = value.toString();
-                }
+                m_environmentVariables.setValue(name, value.toString());
             }
             else
             {
@@ -275,48 +225,6 @@ bool ConfigFile::Impl::parseCustomEnvironmentVariables(const QJsonObject &config
         if (!success)
         {
             break;
-        }
-    }
-
-    // Expand all environment variables (max 100 cycles)
-    if (success)
-    {
-        for (int i = 0; i < 100; i++)
-        {
-            bool atLeastOneExpanded = false;
-
-            for (auto it = m_customEnvironmentVariables.begin();
-                 it != m_customEnvironmentVariables.end();
-                 it++)
-            {
-                const QString &name = it.key();
-                QString &value = it.value();
-                QString expandedValue;
-
-                success = expandVariable(name, value, &expandedValue);
-
-                if (success)
-                {
-                    // Check if value was changed
-                    if (expandedValue != value)
-                    {
-                        value = expandedValue;
-                        atLeastOneExpanded = true;
-                    }
-                }
-                else
-                {
-                    qDebug() << "CppPluginFramework::ConfigFile::Impl::"
-                                "parseCustomEnvironmentVariables: Error: invalid name:" << name;
-                    break;
-                }
-            }
-
-            if (!atLeastOneExpanded)
-            {
-                // Finished as none of the variables were expanded
-                break;
-            }
         }
     }
 
@@ -367,7 +275,8 @@ PluginConfig ConfigFile::Impl::parsePluginConfig(const QJsonObject &config)
     {
         if (config["pluginFilePath"].isString())
         {
-            const QString filePath = expandText(config["pluginFilePath"].toString());
+            const QString filePath = m_environmentVariables.expandText(
+                                         config["pluginFilePath"].toString());
             const QString absoluteFilePath = getAbsoluteFilePath(filePath);
 
             success = Validation::validateFilePath(absoluteFilePath);
@@ -576,7 +485,8 @@ PluginInstanceConfig ConfigFile::Impl::parsePluginInstanceConfig(const QJsonObje
         {
             if (config["configFilePath"].isString())
             {
-                const QString filePath = expandText(config["configFilePath"].toString());
+                const QString filePath = m_environmentVariables.expandText(
+                                             config["configFilePath"].toString());
                 const QString absoluteFilePath = getAbsoluteFilePath(filePath);
 
                 success = Validation::validateFilePath(absoluteFilePath);
@@ -713,96 +623,6 @@ QString ConfigFile::Impl::parseDependency(const QJsonObject &config)
     return dependency;
 }
 
-QString ConfigFile::Impl::readEnvironmentVariable(const QString &variableName) const
-{
-    QString variableValue;
-
-    if (m_customEnvironmentVariables.contains(variableName))
-    {
-        variableValue = m_customEnvironmentVariables[variableName];
-    }
-    else
-    {
-        variableValue = QProcessEnvironment::systemEnvironment().value(variableName);
-    }
-
-    return variableValue;
-}
-
-bool ConfigFile::Impl::expandVariable(const QString &name,
-                                      const QString &value,
-                                      QString *expandedValue) const
-{
-    bool success = (expandedValue != nullptr);
-
-    if (success)
-    {
-        // Set the initial value
-        *expandedValue = value;
-
-        // Expand all referenced environment variables (max 100 cycles)
-        QRegularExpression regex("\\${([a-zA-Z0-9_]+)}");
-
-        for (int i = 0; i < 100; i++)
-        {
-            auto match = regex.match(*expandedValue);
-
-            if (match.hasMatch())
-            {
-                const QString referenceName = match.captured(1);
-
-                if (referenceName != name)
-                {
-                    const QString reference = match.captured(0);
-                    const QString expandedReferenceValue = readEnvironmentVariable(referenceName);
-
-                    expandedValue->replace(reference, expandedReferenceValue);
-                }
-                else
-                {
-                    success = false;
-                    qDebug() << "CppPluginFramework::ConfigFile::Impl::expandVariable: "
-                                "Error: variable value contains a reference to itself:"
-                             << endl << "- name:" << name
-                             << endl << "- value:" << value;
-                    break;
-                }
-            }
-            else
-            {
-                // No references were found, exit loop
-                break;
-            }
-        }
-    }
-
-    return success;
-}
-
-QString ConfigFile::Impl::expandText(const QString &text) const
-{
-    // Set the initial value
-    QString expandedText = text;
-
-    // Expand all referenced environment variables
-    QRegularExpression regex("\\${([a-zA-Z0-9_]+)}");
-
-    auto it = regex.globalMatch(expandedText);
-
-    while (it.hasNext())
-    {
-        auto match = it.next();
-
-        const QString reference = match.captured(0);
-        const QString referenceName = match.captured(1);
-        const QString expandedReferenceValue = readEnvironmentVariable(referenceName);
-
-        expandedText.replace(reference, expandedReferenceValue);
-    }
-
-    return expandedText;
-}
-
 bool ConfigFile::Impl::readJsonObjectFromFile(const QString &filePath, QJsonObject *object)
 {
     bool success = false;
@@ -881,7 +701,7 @@ ConfigFile &ConfigFile::operator=(ConfigFile rhs)
 
 void ConfigFile::clear()
 {
-    m_impl->m_customEnvironmentVariables.clear();
+    m_impl->m_environmentVariables.reset();
     m_impl->m_pluginConfigs.clear();
 }
 
@@ -897,7 +717,7 @@ bool ConfigFile::read(const QJsonObject &config, const QString &workingDirPath)
     {
         if (config["customEnvironmentVariables"].isObject())
         {
-            success = m_impl->parseCustomEnvironmentVariables(
+            success = m_impl->parseEnvironmentVariables(
                           config["customEnvironmentVariables"].toObject());
         }
         else
@@ -951,9 +771,9 @@ bool ConfigFile::read(const QString &configFilePath, const QString &workingDirPa
     return success;
 }
 
-QHash<QString, QString> ConfigFile::customEnvironmentVariables() const
+EnvironmentVariables ConfigFile::environmentVariables() const
 {
-    return m_impl->m_customEnvironmentVariables;
+    return m_impl->m_environmentVariables;
 }
 
 QList<PluginConfig> ConfigFile::pluginConfigs() const

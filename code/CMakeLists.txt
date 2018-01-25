@@ -29,6 +29,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
 set(CppPluginFramework_HEADERS
     inc/CppPluginFramework/AbstractPlugin.hpp
     inc/CppPluginFramework/ConfigFile.hpp
+    inc/CppPluginFramework/EnvironmentVariables.hpp
     inc/CppPluginFramework/IPlugin.hpp
     inc/CppPluginFramework/LibraryExport.hpp
     inc/CppPluginFramework/Plugin.hpp
@@ -43,6 +44,7 @@ set(CppPluginFramework_HEADERS
 set(CppPluginFramework_SOURCES
     src/AbstractPlugin.cpp
     src/ConfigFile.cpp
+    src/EnvironmentVariables.cpp
     src/Plugin.cpp
     src/PluginConfig.cpp
     src/PluginInstanceConfig.cpp
