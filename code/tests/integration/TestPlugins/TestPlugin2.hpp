@@ -47,7 +47,8 @@ public:
     TestPlugin2(const QString &name);
     virtual ~TestPlugin2() = default;
 
-    virtual bool loadConfig(const QJsonObject &config) override;
+    virtual bool loadConfig(const QJsonObject &config,
+                            const EnvironmentVariables &environmentVariables) override;
     virtual bool injectDependency(IPlugin *plugin) override;
     virtual void ejectDependencies() override;
     virtual bool isStarted() override;

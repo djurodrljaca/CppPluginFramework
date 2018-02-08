@@ -18,8 +18,10 @@
  * Contains validation methods
  */
 
-// C++ Plugin Framework includes
+// Own header
 #include <CppPluginFramework/Validation.hpp>
+
+// C++ Plugin Framework includes
 #include <CppPluginFramework/VersionInfo.hpp>
 
 // Qt includes
@@ -45,6 +47,8 @@ bool validatePluginInstanceName(const QString &name)
     return match.hasMatch();
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool validateInterfaceName(const QString &name)
 {
     QRegularExpression regex("^[a-zA-Z][a-zA-Z0-9]*(::[a-zA-Z][a-zA-Z0-9]*)*$");
@@ -53,22 +57,27 @@ bool validateInterfaceName(const QString &name)
     return match.hasMatch();
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces)
 {
-    bool valid = false;
+    if (exportedInterfaces.isEmpty())
+    {
+        return false;
+    }
 
     for (const QString &item : exportedInterfaces)
     {
-        valid = validateInterfaceName(item);
-
-        if (!valid)
+        if (!validateInterfaceName(item))
         {
-            break;
+            return false;
         }
     }
 
-    return valid;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool validateEnvironmentVariableName(const QString &name)
 {
@@ -77,6 +86,8 @@ bool validateEnvironmentVariableName(const QString &name)
 
     return match.hasMatch();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool validateFilePath(const QString &filePath)
 {

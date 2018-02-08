@@ -18,9 +18,11 @@
  * Contains a class that holds version information
  */
 
+// Own header
+#include <CppPluginFramework/VersionInfo.hpp>
+
 // C++ Plugin Framework includes
 #include <CppPluginFramework/Validation.hpp>
-#include <CppPluginFramework/VersionInfo.hpp>
 
 // Qt includes
 #include <QtCore/QFileInfo>
@@ -43,6 +45,8 @@ VersionInfo::VersionInfo()
 {
 }
 
+// -------------------------------------------------------------------------------------------------
+
 VersionInfo::VersionInfo(const int major, const int minor, const int patch, const QString &dev)
     : m_major(major),
       m_minor(minor),
@@ -50,6 +54,8 @@ VersionInfo::VersionInfo(const int major, const int minor, const int patch, cons
       m_dev(dev)
 {
 }
+
+// -------------------------------------------------------------------------------------------------
 
 VersionInfo::VersionInfo(const QString &version)
     : m_major(-1),
@@ -84,7 +90,7 @@ VersionInfo::VersionInfo(const QString &version)
                 m_minor = minor.toInt(&success);
             }
 
-            // Build
+            // Patch
             if (success)
             {
                 m_patch = patch.toInt(&success);
@@ -99,55 +105,77 @@ VersionInfo::VersionInfo(const QString &version)
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool VersionInfo::isNull() const
 {
     return (*this == VersionInfo());
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool VersionInfo::isValid() const
 {
     return ((m_major >= 0) && (m_minor >= 0) && (m_patch >= 0));
 }
 
+// -------------------------------------------------------------------------------------------------
+
 int VersionInfo::major() const
 {
     return m_major;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void VersionInfo::setMajor(const int &major)
 {
     m_major = major;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 int VersionInfo::minor() const
 {
     return m_minor;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void VersionInfo::setMinor(const int &minor)
 {
     m_minor = minor;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 int VersionInfo::patch() const
 {
     return m_patch;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void VersionInfo::setPatch(const int &patch)
 {
     m_patch = patch;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 QString VersionInfo::dev() const
 {
     return m_dev;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void VersionInfo::setDev(const QString &dev)
 {
     m_dev = dev;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QString VersionInfo::toString() const
 {
@@ -166,10 +194,14 @@ QString VersionInfo::toString() const
     return version;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool VersionInfo::isRangeValid(const VersionInfo &minVersion, const VersionInfo &maxVersion)
 {
     return minVersion.isValid() && maxVersion.isValid() && (minVersion < maxVersion);
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool VersionInfo::isVersionInRange(const VersionInfo &version,
                                    const VersionInfo &minVersion,
@@ -185,123 +217,96 @@ bool VersionInfo::isVersionInRange(const VersionInfo &version,
     return inRange;
 }
 
+// -------------------------------------------------------------------------------------------------
 
 bool operator==(const VersionInfo &left, const VersionInfo &right)
 {
     return ((left.major() == right.major()) &&
             (left.minor() == right.minor()) &&
             (left.patch() == right.patch()) &&
-            (left.dev()   == right.dev()));
+            (left.dev() == right.dev()));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool operator<(const VersionInfo &left, const VersionInfo &right)
 {
-    bool smaller = false;
-    bool finished = false;
-
     // Check Major version part
     if (left.major() < right.major())
     {
         // Object "left" is smaller than object "right"
-        smaller = true;
-        finished = true;
+        return true;
     }
-    else if (left.major() == right.major())
-    {
-        // Object "left" could still be smaller than object "right"
-        finished = false;
-    }
-    else
+
+    if (left.major() > right.major())
     {
         // Object "left" is greater than object "right"
-        smaller = false;
-        finished = true;
+        return false;
     }
 
     // Check Minor version part
-    if (!finished)
+    if (left.minor() < right.minor())
     {
-        if (left.minor() < right.minor())
-        {
-            // Object "left" is smaller than object "right"
-            smaller = true;
-            finished = true;
-        }
-        else if (left.minor() == right.minor())
-        {
-            // Object "left" could still be smaller than object "right"
-            finished = false;
-        }
-        else
-        {
-            // Object "left" is greater than object "right"
-            smaller = false;
-            finished = true;
-        }
+        // Object "left" is smaller than object "right"
+        return true;
+    }
+
+    if (left.minor() > right.minor())
+    {
+        // Object "left" is greater than object "right"
+        return false;
     }
 
     // Check Patch version part
-    if (!finished)
+    if (left.patch() < right.patch())
     {
-        if (left.patch() < right.patch())
-        {
-            // Object "left" is smaller than object "right"
-            smaller = true;
-            finished = true;
-        }
-        else if (left.patch() == right.patch())
-        {
-            // Object "left" could still be smaller than object "right"
-            finished = false;
-        }
-        else
-        {
-            // Object "left" is greater than object "right"
-            smaller = false;
-            finished = true;
-        }
+        // Object "left" is smaller than object "right"
+        return true;
+    }
+
+    if (left.patch() > right.patch())
+    {
+        // Object "left" is greater than object "right"
+        return false;
     }
 
     // Check Dev version part
-    if (!finished)
+    if (left.dev().isEmpty() && right.dev().isEmpty())
     {
-        if (left.dev().isEmpty() && right.dev().isEmpty())
-        {
-            // Object "left" is equal to object "right"
-            smaller = false;
-            finished = true;
-        }
-        else if (left.dev().isEmpty() && (!right.dev().isEmpty()))
-        {
-            // Object "left" is smaller than object "right"
-            smaller = true;
-            finished = true;
-        }
-        else if ((!left.dev().isEmpty()) && right.dev().isEmpty())
-        {
-            // Object "left" is greater than object "right"
-            smaller = false;
-            finished = true;
-        }
-        else
-        {
-            smaller = (left.dev() < right.dev());
-            finished = true;
-        }
+        // Object "left" is equal to object "right"
+        return false;
     }
 
-    return smaller;
+    if (left.dev().isEmpty() && (!right.dev().isEmpty()))
+    {
+        // Object "left" is smaller than object "right"
+        return true;
+    }
+
+    if ((!left.dev().isEmpty()) && right.dev().isEmpty())
+    {
+        // Object "left" is greater than object "right"
+        return false;
+    }
+
+    return (left.dev() < right.dev());
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool operator<=(const VersionInfo &left, const VersionInfo &right)
 {
     return ((left == right) || (left < right));
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool operator>(const VersionInfo &left, const VersionInfo &right)
 {
     return !(left <= right);
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool operator>=(const VersionInfo &left, const VersionInfo &right)
 {

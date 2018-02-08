@@ -72,6 +72,13 @@ public:
     VersionInfo version() const;
 
     /*!
+     * Gets the plugin's file path
+     *
+     * \return  Plugin's file path
+     */
+    QString filePath() const;
+
+    /*!
      * Gets all instances of this plugin
      *
      * \return  All instances of the plugin
@@ -90,11 +97,13 @@ public:
     /*!
      * Loads a plugin from the specified library
      *
-     * \param   pluginConfig    Plugin config
+     * \param   pluginConfig            Plugin config
+     * \param   environmentVariables    Environment variables
      *
      * \return  Loaded plugin or nullptr if loading failed
      */
-    static std::unique_ptr<Plugin> load(const PluginConfig &pluginConfig);
+    static std::unique_ptr<Plugin> load(const PluginConfig &pluginConfig,
+                                        const EnvironmentVariables &environmentVariables);
 
     /*!
      * Unloads the plugin

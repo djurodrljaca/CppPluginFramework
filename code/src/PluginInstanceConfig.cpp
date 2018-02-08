@@ -18,8 +18,10 @@
  * Contains a class that holds a plugin's instance config
  */
 
-// C++ Plugin Framework includes
+// Own header
 #include <CppPluginFramework/PluginInstanceConfig.hpp>
+
+// C++ Plugin Framework includes
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -43,15 +45,20 @@ PluginInstanceConfig::PluginInstanceConfig(const QString &name,
 {
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool PluginInstanceConfig::isValid() const
 {
     // Check name
-    bool valid = Validation::validatePluginInstanceName(m_name);
+    if (!Validation::validatePluginInstanceName(m_name))
+    {
+        return false;
+    }
 
-    // No need to check the config because it is optional
+    // Config is optional
 
     // Check (optional) dependencies
-    if (valid && (!m_dependencies.isEmpty()))
+    if (!m_dependencies.isEmpty())
     {
         // Check individual dependency if it is referencing a valid name
         for (const QString &dependency : m_dependencies)
@@ -59,44 +66,57 @@ bool PluginInstanceConfig::isValid() const
             if ((dependency == m_name) ||
                 (!Validation::validatePluginInstanceName(dependency)))
             {
-                valid = false;
-                break;
+                return false;
             }
         }
     }
 
-    return valid;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QString PluginInstanceConfig::name() const
 {
     return m_name;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginInstanceConfig::setName(const QString &name)
 {
     m_name = name;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QJsonObject PluginInstanceConfig::config() const
 {
     return m_config;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginInstanceConfig::setConfig(const QJsonObject &config)
 {
     m_config = config;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QSet<QString> PluginInstanceConfig::dependencies() const
 {
     return m_dependencies;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginInstanceConfig::setDependencies(const QSet<QString> &dependencies)
 {
     m_dependencies = dependencies;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool operator==(const PluginInstanceConfig &left, const PluginInstanceConfig &right)
 {

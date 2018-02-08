@@ -18,8 +18,11 @@
  * Contains a class for accessing environment variables
  */
 
-// C++ Plugin Framework includes
+// Own header
 #include <CppPluginFramework/EnvironmentVariables.hpp>
+
+// C++ Plugin Framework includes
+#include "LogHelper.hpp"
 
 // Qt includes
 #include <QtCore/QProcessEnvironment>
@@ -31,6 +34,7 @@
 // Forward declarations
 
 // Macros
+#define LOG_METHOD(METHOD)      CPPPLUGINFRAMEWORK_LOG_METHOD("EnvironmentVariables::" METHOD)
 
 namespace CppPluginFramework
 {
@@ -60,14 +64,20 @@ EnvironmentVariables::EnvironmentVariables()
     reset();
 }
 
+// -------------------------------------------------------------------------------------------------
+
 EnvironmentVariables::EnvironmentVariables(const EnvironmentVariables &other)
     : m_impl(std::make_unique<EnvironmentVariables::Impl>(*(other.m_impl)))
 {
 }
 
+// -------------------------------------------------------------------------------------------------
+
 EnvironmentVariables::~EnvironmentVariables()
 {
 }
+
+// -------------------------------------------------------------------------------------------------
 
 EnvironmentVariables &EnvironmentVariables::operator=(EnvironmentVariables rhs)
 {
@@ -75,6 +85,8 @@ EnvironmentVariables &EnvironmentVariables::operator=(EnvironmentVariables rhs)
 
     return *this;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void EnvironmentVariables::reset()
 {
@@ -87,15 +99,21 @@ void EnvironmentVariables::reset()
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool EnvironmentVariables::contains(const QString &name) const
 {
     return m_impl->m_variables.contains(name);
 }
 
+// -------------------------------------------------------------------------------------------------
+
 QString EnvironmentVariables::value(const QString &name) const
 {
     return m_impl->m_variables[name];
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void EnvironmentVariables::setValue(const QString &name, const QString &value)
 {
@@ -105,6 +123,8 @@ void EnvironmentVariables::setValue(const QString &name, const QString &value)
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 QString EnvironmentVariables::expandText(const QString &text) const
 {
     // Set the initial value
@@ -112,8 +132,9 @@ QString EnvironmentVariables::expandText(const QString &text) const
 
     // Expand environment text in a loop in case of "nested" environment variables (max 100 cycles)
     QRegularExpression regex("\\${([a-zA-Z0-9_]+)}");
+    constexpr int maxCycles = 100;
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < maxCycles; i++)
     {
         // Find all environment variable references
         auto it = regex.globalMatch(expandedText);
@@ -143,11 +164,19 @@ QString EnvironmentVariables::expandText(const QString &text) const
     // Check if all environment variable references were replaced with their value
     if (regex.match(expandedText).hasMatch())
     {
-        expandedText.clear();
-        qDebug() << "EnvironmentVariables::expandText: Error: unable to fully expand text:" << text;
+        qDebug() << LOG_METHOD("expandText")
+                 << "Error: unable to fully expand text:" << text;
+        return QString();
     }
 
     return expandedText;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+QByteArray EnvironmentVariables::expandText(const QByteArray &text) const
+{
+    return expandText(QString::fromUtf8(text)).toUtf8();
 }
 
 }

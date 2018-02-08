@@ -92,8 +92,9 @@ void TestPluginManager::testLoadPlugins()
     QVERIFY(configFile.read(m_testDataDirPath.absoluteFilePath("AppConfig.json")));
 
     // Load plugins
+    EnvironmentVariables environmentVariables;
     PluginManager pluginManager;
-    QVERIFY(pluginManager.loadPlugins(configFile.pluginConfigs()));
+    QVERIFY(pluginManager.loadPlugins(configFile.pluginConfigs(), environmentVariables));
 
     // Check all instances
     const QStringList instanceNames = pluginManager.pluginInstanceNames();
@@ -137,8 +138,9 @@ void TestPluginManager::testLoadPluginsWithInvalidConfig()
     QVERIFY(configFile.read(m_testDataDirPath.absoluteFilePath(fileName)));
 
     // Load plugins with invalid config
+    EnvironmentVariables environmentVariables;
     PluginManager pluginManager;
-    QVERIFY(!pluginManager.loadPlugins(configFile.pluginConfigs()));
+    QVERIFY(!pluginManager.loadPlugins(configFile.pluginConfigs(), environmentVariables));
 }
 
 void TestPluginManager::testLoadPluginsWithInvalidConfig_data()

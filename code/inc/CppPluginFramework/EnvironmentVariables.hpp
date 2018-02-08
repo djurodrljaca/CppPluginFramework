@@ -121,6 +121,14 @@ public:
      */
     QString expandText(const QString &text) const;
 
+    /*!
+     * Convenience overload that converts the input UTF8 encoded byte array to a string, expands the
+     * text and then converts it to a UTF8 encoded byte array
+     *
+     * \param   text    Text to extend
+     */
+    QByteArray expandText(const QByteArray &text) const;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;

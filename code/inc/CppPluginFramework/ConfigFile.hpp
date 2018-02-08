@@ -109,14 +109,14 @@ public:
      *
      * \return  Custom environment variables
      */
-    EnvironmentVariables environmentVariables() const;
+    const EnvironmentVariables &environmentVariables() const;
 
     /*!
      * Gets plugin configs that were read from the config file
      *
      * \return  Plugin configs
      */
-    QList<PluginConfig> pluginConfigs() const;
+    const QList<PluginConfig> &pluginConfigs() const;
 
 private:
     struct Impl;

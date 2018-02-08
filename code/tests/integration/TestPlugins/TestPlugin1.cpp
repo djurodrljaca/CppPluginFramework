@@ -53,8 +53,10 @@ TestPlugin1::TestPlugin1(const QString &name)
     setExportedInterfaces(interfaces);
 }
 
-bool TestPlugin1::loadConfig(const QJsonObject &config)
+bool TestPlugin1::loadConfig(const QJsonObject &config,
+                             const EnvironmentVariables &environmentVariables)
 {
+    Q_UNUSED(environmentVariables)
     bool success = false;
 
     if (config.contains("value"))
