@@ -45,6 +45,7 @@ set(CppPluginFramework_SOURCES
     src/AbstractPlugin.cpp
     src/ConfigFile.cpp
     src/EnvironmentVariables.cpp
+    src/LogHelper.hpp
     src/Plugin.cpp
     src/PluginConfig.cpp
     src/PluginInstanceConfig.cpp
@@ -80,7 +81,7 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
             # Check for source files
             string(TOLOWER item item_lower)
 
-            if (${item_lower} MATCHES "(\.cpp|\.h|\.hpp|\.moc)$")
+            if (${item_lower} MATCHES "\.(cpp|h|hpp|moc)$")
                 # Extract directory
                 get_filename_component(item_dir ${start_path}/${item} DIRECTORY)
 

@@ -18,9 +18,12 @@
  * Contains a plugin management class
  */
 
-// C++ Plugin Framework includes
-#include <CppPluginFramework/Plugin.hpp>
+// Own header
 #include <CppPluginFramework/PluginManager.hpp>
+
+// C++ Plugin Framework includes
+#include "LogHelper.hpp"
+#include <CppPluginFramework/Plugin.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -33,6 +36,8 @@
 // Forward declarations
 
 // Macros
+#define LOG_METHOD(METHOD)      CPPPLUGINFRAMEWORK_LOG_METHOD("PluginManager::" METHOD)
+#define LOG_METHOD_IMPL(METHOD) CPPPLUGINFRAMEWORK_LOG_METHOD("PluginManager::Impl::" METHOD)
 
 namespace CppPluginFramework
 {
@@ -49,12 +54,14 @@ struct PluginManager::Impl
     /*!
      * Loads all specified plugins
      *
-     * \param   pluginConfigs   List of plugin configs
+     * \param   pluginConfigs           List of plugin configs
+     * \param   environmentVariables    Environment variables
      *
      * \retval  true    All plugins were loaded
      * \retval  false   Loading of at least one plugin failed
      */
-    bool loadPlugins(const QList<PluginConfig> &pluginConfigs);
+    bool loadPlugins(const QList<PluginConfig> &pluginConfigs,
+                     const EnvironmentVariables &environmentVariables);
 
     /*!
      * Unloads all loaded plugins
@@ -69,7 +76,7 @@ struct PluginManager::Impl
      * \retval  true    All dependencies were injected
      * \retval  false   Injection of at least one dependency failed
      */
-    bool injectDependencies(const QList<PluginConfig> &pluginConfigs);
+    bool injectAllDependencies(const QList<PluginConfig> &pluginConfigs);
 
     /*!
      * Injects dependencies to the specified instance
@@ -77,10 +84,10 @@ struct PluginManager::Impl
      * \param   instanceName    Name of the plugin instance to inject dependencies to
      * \param   dependencies    Names of the needed dependencies
      *
-     * \retval  true    All dependencies were injected
+     * \retval  true    Plugin's dependencies were injected
      * \retval  false   Injection of at least one dependency failed
      */
-    bool injectDependencies(const QString &instanceName, const QSet<QString> &dependencies);
+    bool injectPluginDependencies(const QString &instanceName, const QSet<QString> &dependencies);
 
     /*!
      * Ejects all injected dependencies
@@ -120,50 +127,57 @@ struct PluginManager::Impl
     QList<Plugin *> m_plugins;
 };
 
-bool PluginManager::Impl::loadPlugins(const QList<PluginConfig> &pluginConfigs)
+// -------------------------------------------------------------------------------------------------
+
+bool PluginManager::Impl::loadPlugins(const QList<PluginConfig> &pluginConfigs,
+                                      const EnvironmentVariables &environmentVariables)
 {
-    bool success = false;
+    if (!m_plugins.isEmpty())
+    {
+        qDebug() << LOG_METHOD_IMPL("loadPlugins")
+                 << "Error: plugins are already loaded";
+        return false;
+    }
 
     // Load all plugins
-    m_plugins.clear();
-
     for (const PluginConfig &pluginConfig : pluginConfigs)
     {
         // Load plugin
-        std::unique_ptr<Plugin> plugin = Plugin::load(pluginConfig);
-        success = plugin->isValid();
+        std::unique_ptr<Plugin> plugin = Plugin::load(pluginConfig, environmentVariables);
 
-        if (success)
+        if (!plugin)
         {
-            for (IPlugin *item : plugin->instances())
-            {
-                // Check if a plugin instance with the same name already exists
-                if (pluginInstance(item->name()) != nullptr)
-                {
-                    qDebug() << "CppPluginFramework::PluginManager::Impl::loadPlugins: "
-                                "Error: A plugin instance with the same name is already loaded:"
-                             << item->name();
-                    success = false;
-                    break;
-                }
-            }
+            qDebug() << LOG_METHOD_IMPL("loadPlugins")
+                     << "Error: failed to load plugin:" << pluginConfig.filePath();
+            return false;
+        }
 
-            if (success)
+        if (!plugin->isValid())
+        {
+            qDebug() << LOG_METHOD_IMPL("loadPlugins")
+                     << "Error: load plugin is invalid:" << pluginConfig.filePath();
+            return false;
+        }
+
+        // Check if a plugin instance with the same name already exists
+        for (IPlugin *item : plugin->instances())
+        {
+            if (pluginInstance(item->name()) != nullptr)
             {
-                m_plugins.append(plugin.release());
+                qDebug() << LOG_METHOD_IMPL("loadPlugins")
+                         << "Error: A plugin instance with the same name is already loaded:"
+                         << item->name();
+                return false;
             }
         }
 
-        if (!success)
-        {
-            qDebug() << "CppPluginFramework::PluginManager::Impl::loadPlugin:"
-                        "Error: failed to load plugin:" << pluginConfig.filePath();
-            break;
-        }
+        m_plugins.append(plugin.release());
     }
 
-    return success;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void PluginManager::Impl::unloadPlugins()
 {
@@ -186,10 +200,10 @@ void PluginManager::Impl::unloadPlugins()
     }
 }
 
-bool PluginManager::Impl::injectDependencies(const QList<PluginConfig> &pluginConfigs)
-{
-    bool success = true;
+// -------------------------------------------------------------------------------------------------
 
+bool PluginManager::Impl::injectAllDependencies(const QList<PluginConfig> &pluginConfigs)
+{
     // Iterate over all plugin configs
     for (const PluginConfig &pluginConfig : pluginConfigs)
     {
@@ -201,73 +215,64 @@ bool PluginManager::Impl::injectDependencies(const QList<PluginConfig> &pluginCo
 
             if (!dependencies.isEmpty())
             {
-                success = injectDependencies(pluginInstanceConfig.name(), dependencies);
-
-                if (!success)
+                if (!injectPluginDependencies(pluginInstanceConfig.name(), dependencies))
                 {
-                    break;
+                    qDebug() << LOG_METHOD_IMPL("injectAllDependencies")
+                             << "Error: failed to inject dependencies into plugin:"
+                             << pluginInstanceConfig.name();
+                    return false;
                 }
             }
         }
-
-        if (!success)
-        {
-            break;
-        }
     }
 
-    return success;
+    return true;
 }
 
-bool PluginManager::Impl::injectDependencies(const QString &instanceName,
-                                             const QSet<QString> &dependencies)
+// -------------------------------------------------------------------------------------------------
+
+bool PluginManager::Impl::injectPluginDependencies(const QString &instanceName,
+                                                   const QSet<QString> &dependencies)
 {
-    bool success = false;
+    // Find plugin instance
     IPlugin *instance = pluginInstance(instanceName);
 
-    if (instance != nullptr)
+    if (instance == nullptr)
     {
-        for (const QString &dependencyName : dependencies)
+        qDebug() << LOG_METHOD_IMPL("injectPluginDependencies")
+                 << "Error: failed to find plugin instance:" << instanceName;
+        return false;
+    }
+
+    // Inject plugin's dependencies
+    for (const QString &dependencyName : dependencies)
+    {
+        // Find dependency
+        IPlugin *dependency = pluginInstance(dependencyName);
+
+        if (dependency == nullptr)
         {
-            IPlugin *dependency = pluginInstance(dependencyName);
+            qDebug() << LOG_METHOD_IMPL("injectPluginDependencies")
+                     << "Error: failed to find dependency:" << dependencyName;
+            return false;
+        }
 
-            if (dependency != nullptr)
-            {
-                success = instance->injectDependency(dependency);
-
-                if (!success)
-                {
-                    qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
-                                "Error: failed to inject dependency:"
-                             << dependencyName << "-->" << instanceName;
-                }
-            }
-            else
-            {
-                qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies: "
-                            "Error: failed to find dependency:" << dependencyName;
-                success = false;
-            }
-
-            if (!success)
-            {
-                break;
-            }
+        if (!instance->injectDependency(dependency))
+        {
+            qDebug() << LOG_METHOD_IMPL("injectPluginDependencies")
+                     << "Error: failed to inject dependency " << dependencyName
+                     << "into plugin" << instanceName;
+            return false;
         }
     }
-    else
-    {
-        qDebug() << "CppPluginFramework::PluginManager::Impl::injectDependencies:"
-                    "Error: failed to find plugin instance:" << instanceName;
-    }
 
-    return success;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool PluginManager::Impl::ejectDependencies()
 {
-    bool success = true;
-
     for (Plugin *plugin : m_plugins)
     {
         if (plugin->isLoaded())
@@ -276,59 +281,59 @@ bool PluginManager::Impl::ejectDependencies()
             {
                 if (!pluginInstance->isStarted())
                 {
-                    pluginInstance->ejectDependencies();
+                    qDebug() << LOG_METHOD_IMPL("ejectDependencies")
+                             << "Error: plugin instance is not stopped:" << pluginInstance->name();
+                    return false;
                 }
-                else
-                {
-                    success = false;
-                    qDebug() << "CppPluginFramework::PluginManager::Impl::ejectDependencies:"
-                                "Error: plugin instance is not stopped:" << pluginInstance->name();
-                }
+
+                pluginInstance->ejectDependencies();
             }
         }
     }
 
-    return success;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool PluginManager::Impl::startPlugins()
 {
-    bool success = false;
-
+    // Iterate over all plugins and start their instances
     for (Plugin *plugin : m_plugins)
     {
-        if (plugin->isLoaded())
+        // Check if plugin is loaded
+        if (!plugin->isLoaded())
         {
-            for (IPlugin *pluginInstance : plugin->instances())
-            {
-                if (!pluginInstance->isStarted())
-                {
-                    success = pluginInstance->start();
+            qDebug() << LOG_METHOD_IMPL("startPlugins")
+                     << "Error: plugin is not loaded:" << plugin->filePath();
+            return false;
+        }
 
-                    if (!success)
-                    {
-                        qDebug() << "CppPluginFramework::PluginManager::Impl::startPlugins:"
-                                    "Error: failed to start plugin:" << pluginInstance->name();
-                        break;
-                    }
-                }
-                else
-                {
-                    success = false;
-                    qDebug() << "CppPluginFramework::PluginManager::Impl::startPlugins:"
-                                "Error: plugin instance is not stopped:" << pluginInstance->name();
-                }
+        // Start all plugin's instances
+        for (IPlugin *pluginInstance : plugin->instances())
+        {
+            // Check if plugin instance is already started
+            if (pluginInstance->isStarted())
+            {
+                qDebug() << LOG_METHOD_IMPL("startPlugins")
+                         << "Error: plugin instance is already started:" << pluginInstance->name();
+                return false;
+            }
+
+            // Start all plugin instance
+            if (!pluginInstance->start())
+            {
+                qDebug() << LOG_METHOD_IMPL("startPlugins")
+                         << "Error: failed to start plugin:" << pluginInstance->name();
+                return false;
             }
         }
     }
 
-    if (!success)
-    {
-        stopPlugins();
-    }
-
-    return success;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void PluginManager::Impl::stopPlugins()
 {
@@ -356,21 +361,21 @@ void PluginManager::Impl::stopPlugins()
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 IPlugin *PluginManager::Impl::pluginInstance(const QString &pluginInstanceName)
 {
-    IPlugin *foundPluginInterface = nullptr;
-
     for (auto plugin : m_plugins)
     {
-        foundPluginInterface = plugin->instance(pluginInstanceName);
+        IPlugin *foundPluginInterface = plugin->instance(pluginInstanceName);
 
         if (foundPluginInterface != nullptr)
         {
-            break;
+            return foundPluginInterface;
         }
     }
 
-    return foundPluginInterface;
+    return nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -382,46 +387,66 @@ PluginManager::PluginManager()
 {
 }
 
+// -------------------------------------------------------------------------------------------------
+
 PluginManager::~PluginManager()
 {
     unloadPlugins();
 }
 
-bool PluginManager::loadPlugins(const QList<PluginConfig> &pluginConfigs)
+// -------------------------------------------------------------------------------------------------
+
+bool PluginManager::loadPlugins(const QList<PluginConfig> &pluginConfigs,
+                                const EnvironmentVariables &environmentVariables)
 {
-    bool success = false;
-
     // Load plugins
-    success = m_impl->loadPlugins(pluginConfigs);
-
-    // Inject dependencies
-    if (success)
+    if (!m_impl->loadPlugins(pluginConfigs, environmentVariables))
     {
-        success = m_impl->injectDependencies(pluginConfigs);
+        qDebug() << LOG_METHOD("loadPlugins")
+                 << "Error: failed to load plugins!";
+        return false;
     }
 
-    return success;
+    // Inject dependencies
+    if (!m_impl->injectAllDependencies(pluginConfigs))
+    {
+        qDebug() << LOG_METHOD("loadPlugins")
+                 << "Error: failed to inject dependencies!";
+        return false;
+    }
+
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool PluginManager::startPlugins()
 {
     return m_impl->startPlugins();
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginManager::stopPlugins()
 {
     m_impl->stopPlugins();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void PluginManager::unloadPlugins()
 {
     m_impl->unloadPlugins();
 }
 
+// -------------------------------------------------------------------------------------------------
+
 IPlugin *PluginManager::pluginInstance(const QString &pluginInstanceName)
 {
     return m_impl->pluginInstance(pluginInstanceName);
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QStringList PluginManager::pluginInstanceNames() const
 {

@@ -85,7 +85,8 @@ void TestPlugin::testLoadPlugin()
     QFETCH(bool, result);
 
     // Load plugin
-    std::unique_ptr<Plugin> plugin = Plugin::load(config);
+    EnvironmentVariables environmentVariables;
+    std::unique_ptr<Plugin> plugin = Plugin::load(config, environmentVariables);
     QCOMPARE(plugin != nullptr, result);
 
     // Check plugin

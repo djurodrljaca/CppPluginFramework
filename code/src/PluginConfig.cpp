@@ -18,8 +18,10 @@
  * Contains a class that holds a plugin's config
  */
 
-// C++ Plugin Framework includes
+// Own header
 #include <CppPluginFramework/PluginConfig.hpp>
+
+// C++ Plugin Framework includes
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -44,6 +46,8 @@ PluginConfig::PluginConfig(const QString &filePath,
 {
 }
 
+// -------------------------------------------------------------------------------------------------
+
 PluginConfig::PluginConfig(const QString &filePath,
                            const VersionInfo &minVersion,
                            const VersionInfo &maxVersion,
@@ -56,134 +60,154 @@ PluginConfig::PluginConfig(const QString &filePath,
 {
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool PluginConfig::isValid() const
 {
     // Check file path
-    bool valid = Validation::validateFilePath(m_filePath);
+    if (!Validation::validateFilePath(m_filePath))
+    {
+        return false;
+    }
 
     // Check version info
-    if (valid)
+    if (isExactVersion())
     {
-        if (isExactVersion())
+        if (!m_version.isValid())
         {
-            valid = m_version.isValid();
+            return false;
         }
-        else
+    }
+    else
+    {
+        if (!VersionInfo::isRangeValid(m_minVersion, m_maxVersion))
         {
-            valid = VersionInfo::isRangeValid(m_minVersion, m_maxVersion);
+            return false;
         }
     }
 
-    // Check instance configs
-    if (valid)
+    // At least one plugin instance is required
+    if (m_instanceConfigs.isEmpty())
     {
-        // At least one plugin instance is required
-        valid = !m_instanceConfigs.isEmpty();
+        return false;
+    }
 
-        // Check individual dependency if it is valid
-        if (valid)
+    // Check individual instances if it is valid
+    for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
+    {
+        if (!instanceConfig.isValid())
         {
-            for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
-            {
-                if (!instanceConfig.isValid())
-                {
-                    valid = false;
-                    break;
-                }
-            }
+            return false;
         }
+    }
 
-        // Check if this plugin config contains multiple instances with the same name
-        if (valid)
+    // Check if this plugin config contains multiple instances with the same name
+    for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
+    {
+        int count = 0;
+
+        for (const PluginInstanceConfig &item : m_instanceConfigs)
         {
-            for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
+            if (item.name() == instanceConfig.name())
             {
-                int count = 0;
+                count++;
 
-                for (const PluginInstanceConfig &item : m_instanceConfigs)
+                if (count > 1)
                 {
-                    if (item.name() == instanceConfig.name())
-                    {
-                        count++;
-
-                        if (count >= 2)
-                        {
-                            valid = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (!valid)
-                {
-                    break;
+                    return false;
                 }
             }
         }
     }
 
-    return valid;
+    return true;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool PluginConfig::isExactVersion() const
 {
     return ((!m_version.isNull()) && m_minVersion.isNull() && m_maxVersion.isNull());
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool PluginConfig::isVersionRange() const
 {
     return (m_version.isNull() && (!m_minVersion.isNull()) && (!m_maxVersion.isNull()));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QString PluginConfig::filePath() const
 {
     return m_filePath;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginConfig::setFilePath(const QString &filePath)
 {
     m_filePath = filePath;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 VersionInfo PluginConfig::version() const
 {
     return m_version;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginConfig::setVersion(const VersionInfo &version)
 {
     m_version = version;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 VersionInfo PluginConfig::minVersion() const
 {
     return m_minVersion;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginConfig::setMinVersion(const VersionInfo &minVersion)
 {
     m_minVersion = minVersion;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 VersionInfo PluginConfig::maxVersion() const
 {
     return m_maxVersion;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginConfig::setMaxVersion(const VersionInfo &maxVersion)
 {
     m_maxVersion = maxVersion;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QList<PluginInstanceConfig> PluginConfig::instanceConfigs() const
 {
     return m_instanceConfigs;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void PluginConfig::setInstanceConfigs(const QList<PluginInstanceConfig> &instanceConfigs)
 {
     m_instanceConfigs = instanceConfigs;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool operator==(const PluginConfig &left, const PluginConfig &right)
 {

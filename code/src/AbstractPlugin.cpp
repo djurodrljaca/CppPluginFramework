@@ -18,8 +18,10 @@
  * Contains a convenience base class for creating plugins
  */
 
-// C++ Plugin Framework includes
+// Own header
 #include <CppPluginFramework/AbstractPlugin.hpp>
+
+// C++ Plugin Framework includes
 
 // Qt includes
 #include <QtCore/QtDebug>
@@ -74,44 +76,62 @@ AbstractPlugin::AbstractPlugin(const QString &name)
     m_impl->m_name = name;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 AbstractPlugin::~AbstractPlugin()
 {
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QString AbstractPlugin::name() const
 {
     return m_impl->m_name;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 QString AbstractPlugin::description() const
 {
     return m_impl->m_description;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 VersionInfo AbstractPlugin::version() const
 {
     return m_impl->m_version;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 bool AbstractPlugin::isInterfaceExported(const QString &interface) const
 {
     return m_impl->m_exportedInterfaces.contains(interface);
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QSet<QString> AbstractPlugin::exportedInterfaces() const
 {
     return m_impl->m_exportedInterfaces;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void AbstractPlugin::setDescription(const QString &description)
 {
     m_impl->m_description = description;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void AbstractPlugin::setVersion(const VersionInfo &version)
 {
     m_impl->m_version = version;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void AbstractPlugin::setExportedInterfaces(const QSet<QString> &interfaces)
 {

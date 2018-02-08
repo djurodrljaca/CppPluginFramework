@@ -57,12 +57,14 @@ public:
     /*!
      * Loads all plugins specified in the config
      *
-     * \param   pluginConfigs   List of plugin configs
+     * \param   pluginConfigs           List of plugin configs
+     * \param   environmentVariables    Environment variables
      *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    bool loadPlugins(const QList<PluginConfig> &pluginConfigs);
+    bool loadPlugins(const QList<PluginConfig> &pluginConfigs,
+                     const EnvironmentVariables &environmentVariables);
 
     /*!
      * Starts all loaded plugins

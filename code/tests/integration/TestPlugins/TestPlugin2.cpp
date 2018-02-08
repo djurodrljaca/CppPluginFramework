@@ -54,8 +54,10 @@ TestPlugin2::TestPlugin2(const QString &name)
     setExportedInterfaces(interfaces);
 }
 
-bool TestPlugin2::loadConfig(const QJsonObject &config)
+bool TestPlugin2::loadConfig(const QJsonObject &config,
+                             const EnvironmentVariables &environmentVariables)
 {
+    Q_UNUSED(environmentVariables)
     bool success = false;
 
     if (config.contains("delimiter"))
