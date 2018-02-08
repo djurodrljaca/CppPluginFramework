@@ -15,14 +15,7 @@
             "instances":
             [
                 {
-                    "instanceName": "instance1",
-                    "configFilePath": "instance3.json",
-                    "dependencies":
-                    [
-                        {
-                            "instanceName": "1instance2"
-                        }
-                    ]
+                    "instanceName": 123
                 }
             ]
         }

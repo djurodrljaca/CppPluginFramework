@@ -14,14 +14,6 @@
             "maxVersion": "2.0.0",
             "instances":
             [
-                {
-                    "instanceName": "instance1",
-                    "configFilePath": "instance3.json",
-                    "dependencies":
-                    [
-                        "instance2"
-                    ]
-                }
             ]
         }
     ]

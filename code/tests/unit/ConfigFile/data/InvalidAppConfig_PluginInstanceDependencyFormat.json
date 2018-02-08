@@ -16,8 +16,11 @@
             [
                 {
                     "instanceName": "instance1",
-                    "configFilePath": "instance3.json",
-                    "config": {}
+                    "configFilePath": "Instance3.json",
+                    "dependencies":
+                    [
+                        "instance2"
+                    ]
                 }
             ]
         }

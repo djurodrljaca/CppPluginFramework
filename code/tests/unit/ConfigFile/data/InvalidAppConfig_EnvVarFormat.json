@@ -1,10 +1,7 @@
 {
     "customEnvironmentVariables":
-    {
-        "var1": "value1",
-        "var2": "${var1}_var2",
-        "PluginPath": "plugins"
-    },
+    [
+    ],
     
     "plugins":
     [

@@ -303,14 +303,6 @@ bool ConfigFile::Impl::parseEnvironmentVariables(const QJsonObject &config)
 
 bool ConfigFile::Impl::parsePluginConfigs(const QJsonArray &config)
 {
-    // Check config
-    if (config.isEmpty())
-    {
-        qDebug() << LOG_METHOD_IMPL("parsePluginConfigs")
-                 << "Error: at least one plugin config is needed!";
-        return false;
-    }
-
     // Expand all text inside the config JSON object
     const QByteArray json = QJsonDocument(config).toJson(QJsonDocument::Compact);
     const QByteArray expandedJson = m_environmentVariables.expandText(json);
@@ -450,7 +442,7 @@ bool ConfigFile::Impl::parsePluginVersionRequirement(const QJsonObject &config,
              config.contains("maxVersion"))
     {
         // Parse required version range
-        if ((!config["minVersion"].isString()) && (!config["maxVersion"].isString()))
+        if ((!config["minVersion"].isString()) || (!config["maxVersion"].isString()))
         {
             qDebug() << LOG_METHOD_IMPL("parsePluginVersionRequirement")
                      << "Error: plugin min and max versions must be strings: "
@@ -698,7 +690,7 @@ bool ConfigFile::Impl::parseFilePath(const QJsonValue &value, QString *absoluteF
     if (!Validation::validateFilePath(*absoluteFilePath))
     {
         qDebug() << LOG_METHOD_IMPL("parseFilePath")
-                 << "Error: invalid plugin file path:" << value;
+                 << "Error: invalid file path:" << value;
         return false;
     }
 
