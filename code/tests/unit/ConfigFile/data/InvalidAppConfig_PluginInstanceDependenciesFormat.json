@@ -16,7 +16,8 @@
             [
                 {
                     "instanceName": "instance1",
-                    "configFilePath": "invalid_instance_config.json"
+                    "configFilePath": "Instance3.json",
+                    "dependencies": "xxx"
                 }
             ]
         }

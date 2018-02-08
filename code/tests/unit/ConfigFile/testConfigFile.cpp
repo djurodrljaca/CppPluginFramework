@@ -86,7 +86,7 @@ void TestConfigFile::cleanup()
 void TestConfigFile::testReadValidConfig()
 {
     // Read config file
-    const QString configFilePath(m_testDataDirPath.absoluteFilePath("AppConfig.json"));
+    const QString configFilePath(m_testDataDirPath.absoluteFilePath("ValidAppConfig.json"));
     ConfigFile configFile;
     QVERIFY(configFile.read(configFilePath, m_testDataDirPath.absolutePath()));
 
@@ -156,6 +156,8 @@ void TestConfigFile::testReadInvalidConfig()
     QFETCH(QString, fileName);
 
     const QString configFilePath(m_testDataDirPath.absoluteFilePath(fileName));
+    QVERIFY(QFile::exists(configFilePath));
+
     ConfigFile configFile;
     QVERIFY(!configFile.read(configFilePath, m_testDataDirPath.absolutePath()));
 }
@@ -165,35 +167,56 @@ void TestConfigFile::testReadInvalidConfig_data()
     QTest::addColumn<QString>("fileName");
 
     // Environment variables
-    QTest::newRow("non-string env. var. value") << "InvalidAppConfig1.json";
-    QTest::newRow("invalid env. var. name") << "InvalidAppConfig2.json";
+    QTest::newRow("invalid env. var. format") << "InvalidAppConfig_EnvVarFormat.json";
+    QTest::newRow("non-string env. var. value") << "InvalidAppConfig_EnvVarNonString.json";
+    QTest::newRow("invalid env. var. name") << "InvalidAppConfig_EnvVarName.json";
 
     // Plugins
-    QTest::newRow("invalid plugin format") << "InvalidAppConfig4.json";
-    QTest::newRow("missing plugin file path") << "InvalidAppConfig5.json";
-    QTest::newRow("invalid plugin file path") << "InvalidAppConfig6.json";
+    QTest::newRow("missing plugins") << "InvalidAppConfig_PluginsMissing.json";
+    QTest::newRow("invalid plugins format") << "InvalidAppConfig_PluginsFormat.json";
+    QTest::newRow("plugins empty") << "InvalidAppConfig_PluginsEmpty.json";
 
-    QTest::newRow("missing version 1") << "InvalidAppConfig7.json";
-    QTest::newRow("missing min version") << "InvalidAppConfig8.json";
-    QTest::newRow("missing max version") << "InvalidAppConfig9.json";
-    QTest::newRow("invalid version format") << "InvalidAppConfig10.json";
-    QTest::newRow("invalid version") << "InvalidAppConfig11.json";
-    QTest::newRow("invalid min version format") << "InvalidAppConfig12.json";
-    QTest::newRow("invalid max version format") << "InvalidAppConfig13.json";
-    QTest::newRow("invalid min version") << "InvalidAppConfig14.json";
-    QTest::newRow("invalid max version") << "InvalidAppConfig15.json";
+    QTest::newRow("invalid plugin format") << "InvalidAppConfig_PluginFormat.json";
+    QTest::newRow("missing plugin file path") << "InvalidAppConfig_PluginFilePathMissing.json";
+    QTest::newRow("invalid plugin file path format")
+            << "InvalidAppConfig_PluginFilePathFormat.json";
+    QTest::newRow("invalid plugin file path") << "InvalidAppConfig_PluginFilePath.json";
 
-    QTest::newRow("missing instances") << "InvalidAppConfig16.json";
-    QTest::newRow("invalid instances format") << "InvalidAppConfig17.json";
-    QTest::newRow("invalid instance format") << "InvalidAppConfig18.json";
-    QTest::newRow("missing instance name") << "InvalidAppConfig19.json";
-    QTest::newRow("invalid instance name") << "InvalidAppConfig20.json";
-    QTest::newRow("invalid instance config file path") << "InvalidAppConfig21.json";
-    QTest::newRow("invalid instance config") << "InvalidAppConfig22.json";
-    QTest::newRow("instance with both config and config file path") << "InvalidAppConfig23.json";
-    QTest::newRow("invalid dependencies format") << "InvalidAppConfig24.json";
-    QTest::newRow("invalid dependency format") << "InvalidAppConfig25.json";
-    QTest::newRow("invalid dependency name") << "InvalidAppConfig26.json";
+    QTest::newRow("missing version") << "InvalidAppConfig_PluginVersionMissing.json";
+    QTest::newRow("missing min version") << "InvalidAppConfig_PluginMinVersionMissing.json";
+    QTest::newRow("missing max version") << "InvalidAppConfig_PluginMaxVersionMissing.json";
+    QTest::newRow("invalid version format") << "InvalidAppConfig_PluginVersionFormat.json";
+    QTest::newRow("invalid version") << "InvalidAppConfig_PluginVersion.json";
+    QTest::newRow("invalid min version format") << "InvalidAppConfig_PluginMinVersionFormat.json";
+    QTest::newRow("invalid max version format") << "InvalidAppConfig_PluginMaxVersionFormat.json";
+    QTest::newRow("invalid min version") << "InvalidAppConfig_PluginMinVersion.json";
+    QTest::newRow("invalid max version") << "InvalidAppConfig_PluginMaxVersion.json";
+
+    QTest::newRow("missing instances") << "InvalidAppConfig_PluginInstancesMissing.json";
+    QTest::newRow("invalid instances format") << "InvalidAppConfig_PluginInstancesFormat.json";
+    QTest::newRow("instances empty") << "InvalidAppConfig_PluginInstancesEmpty.json";
+    QTest::newRow("invalid instance format") << "InvalidAppConfig_PluginInstanceFormat.json";
+    QTest::newRow("missing instance name") << "InvalidAppConfig_PluginInstanceNameMissing.json";
+    QTest::newRow("invalid instance name format")
+            << "InvalidAppConfig_PluginInstanceNameFormat.json";
+    QTest::newRow("invalid instance name") << "InvalidAppConfig_PluginInstanceName.json";
+    QTest::newRow("missing instance config file")
+            << "InvalidAppConfig_PluginInstanceConfigFileMissing.json";
+    QTest::newRow("invalid instance config file")
+            << "InvalidAppConfig_PluginInstanceConfigFile.json";
+    QTest::newRow("invalid instance config") << "InvalidAppConfig_PluginInstanceConfig.json";
+    QTest::newRow("instance with both config and config file path")
+            << "InvalidAppConfig_PluginInstanceConfigAndConfigFile.json";
+    QTest::newRow("invalid dependencies format")
+            << "InvalidAppConfig_PluginInstanceDependenciesFormat.json";
+    QTest::newRow("invalid dependency format")
+            << "InvalidAppConfig_PluginInstanceDependencyFormat.json";
+    QTest::newRow("missing dependency name")
+            << "InvalidAppConfig_PluginInstanceDependencyNameMissing.json";
+    QTest::newRow("invalid dependency name")
+            << "InvalidAppConfig_PluginInstanceDependencyName.json";
+    QTest::newRow("duplicate dependency name")
+            << "InvalidAppConfig_PluginInstanceDependencyNameDuplicate.json";
 }
 
 // Main function -----------------------------------------------------------------------------------
