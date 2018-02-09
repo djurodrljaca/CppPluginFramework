@@ -15,7 +15,17 @@ A simple base class `AbstractPlugin` is provided which implements the boilerplat
 ![Plugin class diagram](ClassDiagrams/PluginClassDiagram.png  "Plugin class diagram")
 
 
-### Dynamically linked library
+### Plugin Implementation
+
+Most plugins should be able to use `AbstractPlugin` base class. In this case only the following needs to be implemented:
+
+* Loading the plugin's configuration (optional feature)
+* Management of plugin's dependencies (optional feature)
+* Handling of plugin startup and shutdown procedures (for some plugins the default implementation might be good enough)
+* Exported interfaces (one or more)
+
+
+### Dynamically Linked Library
 
 A dynamically linked library must be created for each plugin. This library must  provide functions for:
 
