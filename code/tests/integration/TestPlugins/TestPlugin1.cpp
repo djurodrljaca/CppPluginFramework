@@ -39,7 +39,6 @@ static const char s_version_string[] = "1.0.0";
 TestPlugin1::TestPlugin1(const QString &name)
     : CppPluginFramework::AbstractPlugin(name),
       ITestPlugin1(),
-      m_started(false),
       m_configuredValue()
 {
     setDescription("test plugin 1");
@@ -82,29 +81,6 @@ bool TestPlugin1::injectDependency(IPlugin *plugin)
 
 void TestPlugin1::ejectDependencies()
 {
-}
-
-bool TestPlugin1::isStarted()
-{
-    return m_started;
-}
-
-bool TestPlugin1::start()
-{
-    bool success = false;
-
-    if (!m_configuredValue.isEmpty())
-    {
-        m_started = true;
-        success = true;
-    }
-
-    return success;
-}
-
-void TestPlugin1::stop()
-{
-    m_started = false;
 }
 
 QString TestPlugin1::value() const

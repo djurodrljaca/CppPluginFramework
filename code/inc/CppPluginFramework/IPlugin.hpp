@@ -139,7 +139,7 @@ public:
      * \retval  true    Plugin is started
      * \retval  false   Plugin is not started
      */
-    virtual bool isStarted() = 0;
+    virtual bool isStarted() const = 0;
 
     /*!
      * Starts the plugin
