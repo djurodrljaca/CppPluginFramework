@@ -24,6 +24,7 @@
 // C++ Plugin Framework includes
 
 // Qt includes
+#include <QtCore/QMutex>
 #include <QtCore/QtDebug>
 
 // System includes
@@ -63,6 +64,16 @@ struct AbstractPlugin::Impl
      * Holds the list of exported interfaces of the plugin
      */
     QSet<QString> m_exportedInterfaces;
+
+    /*!
+     * Holds the "started" flag
+     */
+    bool m_started;
+
+    /*!
+     * Enables access serialization between threads
+     */
+    QMutex m_mutex;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -86,6 +97,8 @@ AbstractPlugin::~AbstractPlugin()
 
 QString AbstractPlugin::name() const
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     return m_impl->m_name;
 }
 
@@ -93,6 +106,8 @@ QString AbstractPlugin::name() const
 
 QString AbstractPlugin::description() const
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     return m_impl->m_description;
 }
 
@@ -100,6 +115,8 @@ QString AbstractPlugin::description() const
 
 VersionInfo AbstractPlugin::version() const
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     return m_impl->m_version;
 }
 
@@ -107,6 +124,8 @@ VersionInfo AbstractPlugin::version() const
 
 bool AbstractPlugin::isInterfaceExported(const QString &interface) const
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     return m_impl->m_exportedInterfaces.contains(interface);
 }
 
@@ -114,13 +133,63 @@ bool AbstractPlugin::isInterfaceExported(const QString &interface) const
 
 QSet<QString> AbstractPlugin::exportedInterfaces() const
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     return m_impl->m_exportedInterfaces;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool AbstractPlugin::isStarted() const
+{
+    QMutexLocker locker(&m_impl->m_mutex);
+
+    return m_impl->m_started;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool AbstractPlugin::start()
+{
+    // Check if plugin is already started
+    if (isStarted())
+    {
+        // Error, plugin is already started
+        return false;
+    }
+
+    // Start the plugin
+    const bool success = onStart();
+
+    QMutexLocker locker(&m_impl->m_mutex);
+    m_impl->m_started = success;
+    return success;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void AbstractPlugin::stop()
+{
+    // Check if plugin is actually started
+    if (!isStarted())
+    {
+        // Plugin is already stopped
+        return;
+    }
+
+    // Stop the plugin
+    onStop();
+
+    QMutexLocker locker(&m_impl->m_mutex);
+    m_impl->m_started = false;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void AbstractPlugin::setDescription(const QString &description)
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     m_impl->m_description = description;
 }
 
@@ -128,6 +197,8 @@ void AbstractPlugin::setDescription(const QString &description)
 
 void AbstractPlugin::setVersion(const VersionInfo &version)
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     m_impl->m_version = version;
 }
 
@@ -135,7 +206,22 @@ void AbstractPlugin::setVersion(const VersionInfo &version)
 
 void AbstractPlugin::setExportedInterfaces(const QSet<QString> &interfaces)
 {
+    QMutexLocker locker(&m_impl->m_mutex);
+
     m_impl->m_exportedInterfaces = interfaces;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool AbstractPlugin::onStart()
+{
+    return true;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void AbstractPlugin::onStop()
+{
 }
 
 }

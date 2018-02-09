@@ -39,7 +39,6 @@ static const char s_version_string[] = "1.0.0";
 TestPlugin2::TestPlugin2(const QString &name)
     : CppPluginFramework::AbstractPlugin(name),
       ITestPlugin2(),
-      m_started(false),
       m_configuredDelimiter(),
       m_dependencies()
 {
@@ -103,29 +102,6 @@ void TestPlugin2::ejectDependencies()
     {
         m_dependencies.clear();
     }
-}
-
-bool TestPlugin2::isStarted()
-{
-    return m_started;
-}
-
-bool TestPlugin2::start()
-{
-    bool success = false;
-
-    if ((!m_configuredDelimiter.isEmpty()) && (!m_dependencies.isEmpty()))
-    {
-        m_started = true;
-        success = true;
-    }
-
-    return success;
-}
-
-void TestPlugin2::stop()
-{
-    m_started = false;
 }
 
 QString TestPlugin2::joinedValues() const

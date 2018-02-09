@@ -50,14 +50,10 @@ public:
                             const EnvironmentVariables &environmentVariables) override;
     virtual bool injectDependency(IPlugin *plugin) override;
     virtual void ejectDependencies() override;
-    virtual bool isStarted() override;
-    virtual bool start() override;
-    virtual void stop() override;
 
     virtual QString value() const override;
 
 private:
-    bool m_started;
     QString m_configuredValue;
 };
 

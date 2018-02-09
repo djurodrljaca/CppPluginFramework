@@ -64,27 +64,42 @@ public:
     /*!
      * \copydoc CppPluginFramework::IPlugin::name()
      */
-    virtual QString name() const override;
+    QString name() const override;
 
     /*!
      * \copydoc CppPluginFramework::IPlugin::description()
      */
-    virtual QString description() const override;
+    QString description() const override;
 
     /*!
      * \copydoc CppPluginFramework::IPlugin::version()
      */
-    virtual VersionInfo version() const override;
+    VersionInfo version() const override;
 
     /*!
      * \copydoc CppPluginFramework::IPlugin::isInterfaceExported()
      */
-    virtual bool isInterfaceExported(const QString &interface) const override;
+    bool isInterfaceExported(const QString &interface) const override;
 
     /*!
      * \copydoc CppPluginFramework::IPlugin::exportedInterfaces()
      */
-    virtual QSet<QString> exportedInterfaces() const override;
+    QSet<QString> exportedInterfaces() const override;
+
+    /*!
+     * \copydoc CppPluginFramework::IPlugin::isStarted()
+     */
+    bool isStarted() const override;
+
+    /*!
+     * \copydoc CppPluginFramework::IPlugin::start()
+     */
+    bool start() override;
+
+    /*!
+     * \copydoc CppPluginFramework::IPlugin::stop()
+     */
+    void stop() override;
 
 protected:
     /*!
@@ -109,6 +124,27 @@ protected:
     void setExportedInterfaces(const QSet<QString> &interfaces);
 
 private:
+    /*!
+     * Executes the startup procedure
+     *
+     * \retval  true    Success
+     * \retval  false    Failure
+     *
+     * This method is called inside start() method if the plugin is not started yet. Default
+     * implementation doesn't do anything. This method needs to be overridden if anything needs
+     * to be done during startup.
+     */
+    virtual bool onStart();
+
+    /*!
+     * Executes the shutdown procedure
+     *
+     * This method is called inside stop() method if the plugin is not started yet. Default
+     * implementation doesn't do anything. This method needs to be overridden if anything needs
+     * to be done during startup.
+     */
+    virtual void onStop();
+
     struct Impl;
     std::unique_ptr<Impl> m_impl;
 };
