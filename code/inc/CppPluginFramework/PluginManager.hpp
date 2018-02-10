@@ -62,6 +62,9 @@ public:
      *
      * \retval  true    Success
      * \retval  false   Failure
+     *
+     * After each plugin is loaded all of its instances get created and configured. When all the
+     * plugins are loaded the dependencies of each plugin instance are injected into it.
      */
     bool loadPlugins(const QList<PluginConfig> &pluginConfigs,
                      const EnvironmentVariables &environmentVariables);
