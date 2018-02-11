@@ -15,18 +15,15 @@ cmake_minimum_required(VERSION 3.3.0)
 
 project(CppPluginFramework VERSION 1.0.0)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(Qt5Core)
+find_package(Qt5Core REQUIRED)
 
 # --------------------------------------------------------------------------------------------------
 # CppPluginFramework library
 # --------------------------------------------------------------------------------------------------
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
-
-set(CppPluginFramework_HEADERS
+add_library(CppPluginFramework SHARED
     inc/CppPluginFramework/AbstractPlugin.hpp
     inc/CppPluginFramework/ConfigFile.hpp
     inc/CppPluginFramework/EnvironmentVariables.hpp
@@ -39,9 +36,7 @@ set(CppPluginFramework_HEADERS
     inc/CppPluginFramework/PluginManager.hpp
     inc/CppPluginFramework/Validation.hpp
     inc/CppPluginFramework/VersionInfo.hpp
-    )
 
-set(CppPluginFramework_SOURCES
     src/AbstractPlugin.cpp
     src/ConfigFile.cpp
     src/EnvironmentVariables.cpp
@@ -54,13 +49,26 @@ set(CppPluginFramework_SOURCES
     src/VersionInfo.cpp
     )
 
-add_library(CppPluginFramework SHARED ${CppPluginFramework_SOURCES} ${CppPluginFramework_HEADERS})
-target_link_libraries(CppPluginFramework Qt5::Core)
-target_compile_definitions(CppPluginFramework PRIVATE CPPPLUGINFRAMEWORK_BUILD_LIBRARY)
+target_include_directories(CppPluginFramework
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc
+    )
+
+target_link_libraries(CppPluginFramework
+    PUBLIC Qt5::Core
+    )
+
+target_compile_definitions(CppPluginFramework
+    PRIVATE CPPPLUGINFRAMEWORK_BUILD_LIBRARY
+    )
+
 set_target_properties(CppPluginFramework PROPERTIES
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
+    )
+
+add_library(CppPluginFramework::CppPluginFramework
+    ALIAS CppPluginFramework
     )
 
 # --------------------------------------------------------------------------------------------------
@@ -73,6 +81,14 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
     APPEND_COVERAGE_COMPILER_FLAGS()
 
     # Prepare a function for appending exclude filters to COVERAGE_EXCLUDES variable
+    # TODO: Currently when the coverage target is build the first time excludes for directory
+    #       CMAKE_CURRENT_BINARY_DIR do not work as the COVERAGE_EXCLUDES is populated during cmake
+    #       "configure" time and at that time the generated source files that will be in directory
+    #       CMAKE_CURRENT_BINARY_DIR do not exist yet, so they are not found and excluded. In this
+    #       case the only way to get the proper exclusion of the generated source files is to build
+    #       the coverage target twice - first build doesn't find the generated files, but all builds
+    #       after that do. Try to solve this issue (move the search for excluded file to the
+    #       coverage cmake file?).
     macro(APPEND_COVERAGE_EXCLUDES start_path)
         # Iterate over all files
         file(GLOB_RECURSE items RELATIVE ${start_path} ${start_path}/*)

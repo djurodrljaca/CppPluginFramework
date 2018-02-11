@@ -11,7 +11,7 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-find_package(Qt5Test)
+find_package(Qt5Test REQUIRED)
 
 # --------------------------------------------------------------------------------------------------
 # Custom (meta) targets
@@ -36,8 +36,13 @@ function(CppPluginFramework_AddTest)
 
     # Create test executable
     add_executable(${PARAM_TEST_NAME}
-        ${PARAM_TEST_NAME}.cpp ${PARAM_ADDITIONAL_SOURCES} ${PARAM_ADDITIONAL_HEADERS})
-    target_link_libraries(${PARAM_TEST_NAME} CppPluginFramework Qt5::Test ${PARAM_ADDITIONAL_LIBS})
+        ${PARAM_TEST_NAME}.cpp ${PARAM_ADDITIONAL_SOURCES} ${PARAM_ADDITIONAL_HEADERS}
+        )
+    target_link_libraries(${PARAM_TEST_NAME}
+        PUBLIC CppPluginFramework
+        PUBLIC Qt5::Test
+        PUBLIC ${PARAM_ADDITIONAL_LIBS}
+        )
     add_test(${PARAM_TEST_NAME} ${PARAM_TEST_NAME})
 
     # Add test to target "all_tests"
@@ -46,14 +51,16 @@ function(CppPluginFramework_AddTest)
     # Set test labels
     if (PARAM_LABELS)
         set_tests_properties(${PARAM_TEST_NAME} PROPERTIES
-            LABELS "CPPPLUGINFRAMEWORK;${PARAM_LABELS}")
+            LABELS "CPPPLUGINFRAMEWORK;${PARAM_LABELS}"
+            )
     endif()
 
     # Prepare a define for the test data directory path so that it can be used in the C++ code
     if (PARAM_DATA_DIR_ENABLED)
         get_filename_component(CURRENT_SOURCE_DIR_ABSOLUTE "${CURRENT_SOURCE_DIR}" ABSOLUTE)
-        target_compile_definitions(${PARAM_TEST_NAME} PUBLIC
-            TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data")
+        target_compile_definitions(${PARAM_TEST_NAME}
+            PUBLIC TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data"
+            )
     endif()
 endfunction()
 
