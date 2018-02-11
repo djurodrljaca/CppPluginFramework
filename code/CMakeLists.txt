@@ -80,43 +80,12 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
 
-    # Prepare a function for appending exclude filters to COVERAGE_EXCLUDES variable
-    # TODO: Currently when the coverage target is build the first time excludes for directory
-    #       CMAKE_CURRENT_BINARY_DIR do not work as the COVERAGE_EXCLUDES is populated during cmake
-    #       "configure" time and at that time the generated source files that will be in directory
-    #       CMAKE_CURRENT_BINARY_DIR do not exist yet, so they are not found and excluded. In this
-    #       case the only way to get the proper exclusion of the generated source files is to build
-    #       the coverage target twice - first build doesn't find the generated files, but all builds
-    #       after that do. Try to solve this issue (move the search for excluded file to the
-    #       coverage cmake file?).
-    macro(APPEND_COVERAGE_EXCLUDES start_path)
-        # Iterate over all files
-        file(GLOB_RECURSE items RELATIVE ${start_path} ${start_path}/*)
-
-        foreach (item ${items})
-            # Check for source files
-            string(TOLOWER item item_lower)
-
-            if (${item_lower} MATCHES "\.(cpp|h|hpp|moc)$")
-                # Extract directory
-                get_filename_component(item_dir ${start_path}/${item} DIRECTORY)
-
-                # Prepare exclude filter
-                set(exclude_filter "'${item_dir}/*'")
-
-                # Add the exclude filter if needed
-                if (NOT (exclude_filter IN_LIST COVERAGE_EXCLUDES))
-                    list(APPEND COVERAGE_EXCLUDES ${exclude_filter})
-                endif()
-            endif()
-        endforeach()
-    endmacro()
-
-    # Exclude paths from the report
-    APPEND_COVERAGE_EXCLUDES("/usr/include")
-    APPEND_COVERAGE_EXCLUDES(${CMAKE_PREFIX_PATH})
-    APPEND_COVERAGE_EXCLUDES(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-    APPEND_COVERAGE_EXCLUDES(${CMAKE_CURRENT_BINARY_DIR})
+    set(CppPluginFramework_CodeCoverage_EXCLUDES
+        "'/usr/include/*'"
+        "'${CMAKE_PREFIX_PATH}/*'"
+        "'${CMAKE_CURRENT_SOURCE_DIR}/tests/*'"
+        "'${CMAKE_CURRENT_BINARY_DIR}/*'"
+        )
 endif()
 
 # --------------------------------------------------------------------------------------------------

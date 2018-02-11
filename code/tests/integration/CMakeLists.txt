@@ -55,5 +55,6 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
         EXECUTABLE ctest -L CPPPLUGINFRAMEWORK_INTEGRATION_TESTS -j ${PROCESSOR_COUNT}
         DEPENDENCIES all_integration_tests
         PROJECT_PATH ${PROJECT_SOURCE_DIR}
+        EXCLUDES ${CppPluginFramework_CodeCoverage_EXCLUDES}
         )
 endif()
