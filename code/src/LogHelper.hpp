@@ -24,7 +24,6 @@
 // C++ Plugin Framework includes
 
 // Qt includes
-#include <QtCore/QString>
 
 // System includes
 

@@ -16,7 +16,6 @@ cmake_minimum_required(VERSION 3.3.0)
 project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_AUTOMOC ON)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Qt5Core REQUIRED)
 
@@ -49,16 +48,17 @@ add_library(CppPluginFramework SHARED
     src/VersionInfo.cpp
     )
 
-target_include_directories(CppPluginFramework
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc
+target_include_directories(CppPluginFramework PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+    $<INSTALL_INTERFACE:include>
     )
 
-target_link_libraries(CppPluginFramework
-    PUBLIC Qt5::Core
+target_link_libraries(CppPluginFramework PUBLIC
+    Qt5::Core
     )
 
-target_compile_definitions(CppPluginFramework
-    PRIVATE CPPPLUGINFRAMEWORK_BUILD_LIBRARY
+target_compile_definitions(CppPluginFramework PRIVATE
+    CPPPLUGINFRAMEWORK_BUILD_LIBRARY
     )
 
 set_target_properties(CppPluginFramework PROPERTIES
@@ -67,8 +67,66 @@ set_target_properties(CppPluginFramework PROPERTIES
     CXX_EXTENSIONS NO
     )
 
-add_library(CppPluginFramework::CppPluginFramework
-    ALIAS CppPluginFramework
+add_library(CppPluginFramework::CppPluginFramework ALIAS
+    CppPluginFramework
+    )
+
+# --------------------------------------------------------------------------------------------------
+# Package
+# --------------------------------------------------------------------------------------------------
+
+install(TARGETS CppPluginFramework EXPORT CppPluginFrameworkTargets DESTINATION
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+    )
+
+install(
+    DIRECTORY
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc/CppPluginFramework
+    DESTINATION
+        include
+    COMPONENT
+        Devel
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/CppPluginFramework/CppPluginFrameworkConfigVersion.cmake"
+    VERSION ${CppPluginFramework_VERSION}
+    COMPATIBILITY AnyNewerVersion
+    )
+
+export(EXPORT CppPluginFrameworkTargets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/CppPluginFramework/CppPluginFrameworkTargets.cmake"
+    NAMESPACE CppPluginFramework::
+    )
+
+configure_file(cmake/CppPluginFrameworkConfig.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/CppPluginFramework/CppPluginFrameworkConfig.cmake"
+    COPYONLY
+    )
+
+set(ConfigPackageLocation lib/cmake/CppPluginFramework)
+
+install(EXPORT CppPluginFrameworkTargets
+    FILE
+        CppPluginFrameworkTargets.cmake
+    NAMESPACE
+        CppPluginFramework::
+    DESTINATION
+        ${ConfigPackageLocation}
+    )
+
+install(
+    FILES
+        cmake/CppPluginFrameworkConfig.cmake
+        "${CMAKE_CURRENT_BINARY_DIR}/CppPluginFramework/CppPluginFrameworkConfigVersion.cmake"
+    DESTINATION
+        ${ConfigPackageLocation}
+    COMPONENT
+        Devel
     )
 
 # --------------------------------------------------------------------------------------------------
@@ -77,7 +135,7 @@ add_library(CppPluginFramework::CppPluginFramework
 option(CppPluginFramework_CodeCoverage "C++ Plugin Framework Code Coverage" OFF)
 
 if (CppPluginFramework_CodeCoverage MATCHES ON)
-    include(CodeCoverage)
+    include(cmake/CodeCoverage.cmake)
     APPEND_COVERAGE_COMPILER_FLAGS()
 
     set(CppPluginFramework_CodeCoverage_EXCLUDES
