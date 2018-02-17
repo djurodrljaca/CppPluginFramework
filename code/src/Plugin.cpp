@@ -312,13 +312,13 @@ std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig,
     // Check plugin config
     if (!pluginConfig.isValid())
     {
-        qDebug() << LOG_METHOD_IMPL("load")
+        qDebug() << LOG_METHOD("load")
                  << "Error: plugin config is not valid!";
         return nullptr;
     }
 
     // Load library file and then load plugin instance creation function from it
-    qDebug() << LOG_METHOD_IMPL("load")
+    qDebug() << LOG_METHOD("load")
              << "plugin file path:" << pluginConfig.filePath();
 
     std::unique_ptr<Plugin> plugin = std::unique_ptr<Plugin>(new Plugin());
@@ -331,13 +331,13 @@ std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig,
                     "Error: Failed to read the plugin's version";
     }
 
-    qDebug() << LOG_METHOD_IMPL("load")
+    qDebug() << LOG_METHOD("load")
              << "plugin version:" << plugin->m_impl->m_version.toString();
 
     // Check if plugin's version matches the version requirements
     if (!plugin->m_impl->checkPluginVersion(pluginConfig))
     {
-        qDebug() << LOG_METHOD_IMPL("load")
+        qDebug() << LOG_METHOD("load")
                  << "Error: plugin's version does not match the version requirements";
         return nullptr;
     }
@@ -345,7 +345,7 @@ std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig,
     // Create plugin instances
     if (!plugin->m_impl->createPluginInstances(pluginConfig, environmentVariables))
     {
-        qDebug() << LOG_METHOD_IMPL("load")
+        qDebug() << LOG_METHOD("load")
                  << "Error: failed to create all needed plugin instances";
         return nullptr;
     }
