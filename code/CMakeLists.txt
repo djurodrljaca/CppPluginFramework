@@ -67,13 +67,12 @@ set_target_properties(CppPluginFramework PROPERTIES
     CXX_EXTENSIONS NO
     )
 
-add_library(CppPluginFramework::CppPluginFramework ALIAS
-    CppPluginFramework
-    )
-
 # --------------------------------------------------------------------------------------------------
 # Package
 # --------------------------------------------------------------------------------------------------
+add_library(CppPluginFramework::CppPluginFramework ALIAS
+    CppPluginFramework
+    )
 
 install(TARGETS CppPluginFramework EXPORT CppPluginFrameworkTargets DESTINATION
     LIBRARY DESTINATION lib
