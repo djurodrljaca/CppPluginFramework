@@ -116,9 +116,10 @@ void TestPluginManager::testLoadPlugins()
     QVERIFY(pluginManager.startPlugins());
 
     // Check if all instances return expected values
-    QCOMPARE(instance1->interface<TestPlugins::ITestPlugin1>()->value(), "value1");
-    QCOMPARE(instance2->interface<TestPlugins::ITestPlugin1>()->value(), "value2");
-    QCOMPARE(instance3->interface<TestPlugins::ITestPlugin2>()->joinedValues(), "value1;value2");
+    QCOMPARE(instance1->interface<TestPlugins::ITestPlugin1>()->value(), QStringLiteral("value1"));
+    QCOMPARE(instance2->interface<TestPlugins::ITestPlugin1>()->value(), QStringLiteral("value2"));
+    QCOMPARE(instance3->interface<TestPlugins::ITestPlugin2>()->joinedValues(),
+             QStringLiteral("value1;value2"));
 
     // Stop plugins
     pluginManager.stopPlugins();

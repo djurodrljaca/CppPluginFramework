@@ -11,6 +11,8 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
+set(CMAKE_AUTOMOC ON)
+
 find_package(Qt5Test REQUIRED)
 
 # --------------------------------------------------------------------------------------------------
@@ -38,11 +40,23 @@ function(CppPluginFramework_AddTest)
     add_executable(${PARAM_TEST_NAME}
         ${PARAM_TEST_NAME}.cpp ${PARAM_ADDITIONAL_SOURCES} ${PARAM_ADDITIONAL_HEADERS}
         )
+
+    target_include_directories(${PARAM_TEST_NAME} PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}
+        )
+
     target_link_libraries(${PARAM_TEST_NAME}
         PUBLIC CppPluginFramework
         PUBLIC Qt5::Test
         PUBLIC ${PARAM_ADDITIONAL_LIBS}
         )
+
+    set_target_properties(${PARAM_TEST_NAME} PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        )
+
     add_test(${PARAM_TEST_NAME} ${PARAM_TEST_NAME})
 
     # Add test to target "all_tests"

@@ -93,9 +93,9 @@ void TestConfigFile::testReadValidConfig()
     // Check custom environment variables
     const EnvironmentVariables variables = configFile.environmentVariables();
 
-    QCOMPARE(variables.value("var1"), "value1");
-    QCOMPARE(variables.expandText(variables.value("var2")), "value1_var2");
-    QCOMPARE(variables.value("PluginPath"), "plugins");
+    QCOMPARE(variables.value("var1"), QStringLiteral("value1"));
+    QCOMPARE(variables.expandText(variables.value("var2")), QStringLiteral("value1_var2"));
+    QCOMPARE(variables.value("PluginPath"), QStringLiteral("plugins"));
 
     // Check plugin configs
     const auto pluginConfigs = configFile.pluginConfigs();
