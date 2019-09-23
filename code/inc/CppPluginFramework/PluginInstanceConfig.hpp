@@ -137,7 +137,8 @@ private:
  *
  * \note    Result of the comparison is valid only if both plugin instance configs are valid!
  */
-bool operator==(const PluginInstanceConfig &left, const PluginInstanceConfig &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const PluginInstanceConfig &left,
+                                                  const PluginInstanceConfig &right);
 
 }
 
