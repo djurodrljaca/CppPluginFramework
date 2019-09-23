@@ -205,7 +205,8 @@ private:
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-bool operator==(const VersionInfo &left, const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const VersionInfo &left,
+                                                  const VersionInfo &right);
 
 /*!
  * Checks if the one version is smaller than the other
@@ -218,7 +219,7 @@ bool operator==(const VersionInfo &left, const VersionInfo &right);
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-bool operator<(const VersionInfo &left, const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const VersionInfo &left, const VersionInfo &right);
 
 /*!
  * Checks if the one version is smaller than or equal to the other
@@ -231,7 +232,8 @@ bool operator<(const VersionInfo &left, const VersionInfo &right);
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-bool operator<=(const VersionInfo &left, const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const VersionInfo &left,
+                                                  const VersionInfo &right);
 
 /*!
  * Checks if the one version is bigger than the other
@@ -244,7 +246,8 @@ bool operator<=(const VersionInfo &left, const VersionInfo &right);
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-bool operator>(const VersionInfo &left, const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const VersionInfo &left,
+                                                 const VersionInfo &right);
 
 /*!
  * Checks if the one version is bigger than or equal to the other
@@ -257,7 +260,8 @@ bool operator>(const VersionInfo &left, const VersionInfo &right);
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-bool operator>=(const VersionInfo &left, const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>=(const VersionInfo &left,
+                                                  const VersionInfo &right);
 
 }
 
