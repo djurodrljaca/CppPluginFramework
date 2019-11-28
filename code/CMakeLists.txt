@@ -23,27 +23,25 @@ find_package(Qt5Core REQUIRED)
 # CppPluginFramework library
 # --------------------------------------------------------------------------------------------------
 add_library(CppPluginFramework SHARED
-    inc/CppPluginFramework/AbstractPlugin.hpp
-    inc/CppPluginFramework/ConfigFile.hpp
-    inc/CppPluginFramework/EnvironmentVariables.hpp
-    inc/CppPluginFramework/IPlugin.hpp
+#    inc/CppPluginFramework/AbstractPlugin.hpp
+#    inc/CppPluginFramework/IPlugin.hpp
     inc/CppPluginFramework/LibraryExport.hpp
-    inc/CppPluginFramework/Plugin.hpp
+#    inc/CppPluginFramework/Plugin.hpp
     inc/CppPluginFramework/PluginConfig.hpp
     inc/CppPluginFramework/PluginExport.hpp
     inc/CppPluginFramework/PluginInstanceConfig.hpp
-    inc/CppPluginFramework/PluginManager.hpp
+#    inc/CppPluginFramework/PluginManager.hpp
+    inc/CppPluginFramework/PluginManagerConfig.hpp
     inc/CppPluginFramework/Validation.hpp
     inc/CppPluginFramework/VersionInfo.hpp
 
-    src/AbstractPlugin.cpp
-    src/ConfigFile.cpp
-    src/EnvironmentVariables.cpp
-    src/LogHelper.hpp
-    src/Plugin.cpp
+#    src/AbstractPlugin.cpp
+#    src/LogHelper.hpp
+#    src/Plugin.cpp
     src/PluginConfig.cpp
     src/PluginInstanceConfig.cpp
-    src/PluginManager.cpp
+#    src/PluginManager.cpp
+    src/PluginManagerConfig.cpp
     src/Validation.cpp
     src/VersionInfo.cpp
     )
@@ -55,6 +53,7 @@ target_include_directories(CppPluginFramework PUBLIC
 
 target_link_libraries(CppPluginFramework PUBLIC
     Qt5::Core
+    CppConfigFramework
     )
 
 target_compile_definitions(CppPluginFramework PRIVATE
@@ -138,7 +137,7 @@ if (CppPluginFramework_CodeCoverage MATCHES ON)
     APPEND_COVERAGE_COMPILER_FLAGS()
 
     set(CppPluginFramework_CodeCoverage_EXCLUDES
-        "'/usr/include/*'"
+        "'/usr/*'"
         "'${CMAKE_PREFIX_PATH}/*'"
         "'${CMAKE_CURRENT_SOURCE_DIR}/tests/*'"
         "'${CMAKE_CURRENT_BINARY_DIR}/*'"

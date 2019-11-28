@@ -33,7 +33,12 @@
 
 // Test class declaration --------------------------------------------------------------------------
 
+using namespace CppConfigFramework;
 using namespace CppPluginFramework;
+
+using ConfigObjectNodePtr = std::shared_ptr<ConfigObjectNode>;
+
+Q_DECLARE_METATYPE(ConfigObjectNodePtr)
 Q_DECLARE_METATYPE(PluginConfig)
 
 class TestPluginConfig : public QObject
@@ -53,16 +58,18 @@ private slots:
     void testIsValid();
     void testIsValid_data();
 
-private:
-    // Holds the path to the data directory
-    QDir m_testDataDirPath;
+    void testFilePath();
+    void testVersion();
+    void testInstanceConfigs();
+
+    void testLoadConfig();
+    void testLoadConfig_data();
 };
 
 // Test Case init/cleanup methods ------------------------------------------------------------------
 
 void TestPluginConfig::initTestCase()
 {
-    m_testDataDirPath = QDir(TEST_DATA_DIR_PATH);
 }
 
 void TestPluginConfig::cleanupTestCase()
@@ -95,7 +102,7 @@ void TestPluginConfig::testIsValid_data()
     QTest::addColumn<bool>("result");
 
     // Prepare common data
-    const QString validFilePath = m_testDataDirPath.filePath("dummyPlugin");
+    const QString validFilePath(QCoreApplication::applicationFilePath());
 
     const VersionInfo validVersion1(1, 0, 0);
     const VersionInfo validVersion2(2, 0, 0);
@@ -106,9 +113,9 @@ void TestPluginConfig::testIsValid_data()
     };
 
     // Valid results
-    QTest::newRow("valid: specific version") << PluginConfig(validFilePath,
-                                                             validVersion1,
-                                                             validInstanceConfigs) << true;
+    QTest::newRow("valid: exact version") << PluginConfig(validFilePath,
+                                                          validVersion1,
+                                                          validInstanceConfigs) << true;
 
     QTest::newRow("valid: version range") << PluginConfig(validFilePath,
                                                           validVersion1,
@@ -121,15 +128,36 @@ void TestPluginConfig::testIsValid_data()
     QTest::newRow("invalid: file path")
             << PluginConfig(QString(), validVersion1, validInstanceConfigs) << false;
 
-    QTest::newRow("invalid: specific version")
+    QTest::newRow("invalid: exact version 1")
             << PluginConfig(validFilePath, VersionInfo(), validInstanceConfigs) << false;
 
-    QTest::newRow("invalid: min version")
+    QTest::newRow("invalid: exact version 2")
+            << PluginConfig(validFilePath, VersionInfo(-1, 0, 0), validInstanceConfigs) << false;
+
+    QTest::newRow("invalid: min version 1")
             << PluginConfig(validFilePath, VersionInfo(), validVersion2, validInstanceConfigs)
             << false;
 
-    QTest::newRow("invalid: max version")
+    QTest::newRow("invalid: min version 2")
+            << PluginConfig(validFilePath,
+                            VersionInfo(-1, 0, 0),
+                            validVersion2,
+                            validInstanceConfigs)
+            << false;
+
+    QTest::newRow("invalid: max version 1")
             << PluginConfig(validFilePath, validVersion1, VersionInfo(), validInstanceConfigs)
+            << false;
+
+    QTest::newRow("invalid: max version 2")
+            << PluginConfig(validFilePath,
+                            validVersion1,
+                            VersionInfo(-1, 0, 0),
+                            validInstanceConfigs)
+            << false;
+
+    QTest::newRow("invalid: version range")
+            << PluginConfig(validFilePath, validVersion2, validVersion1, validInstanceConfigs)
             << false;
 
     QTest::newRow("invalid: no instance configs")
@@ -147,6 +175,289 @@ void TestPluginConfig::testIsValid_data()
                                 PluginInstanceConfig("instance1"),
                                 PluginInstanceConfig("instance1")
                             }) << false;
+}
+
+// Test: file path ---------------------------------------------------------------------------------
+
+void TestPluginConfig::testFilePath()
+{
+    // Default constructor
+    {
+        PluginConfig config;
+        QCOMPARE(config.filePath(), QString());
+
+        config.setFilePath("file.so");
+        QCOMPARE(config.filePath(), QString("file.so"));
+    }
+
+    // Constructor
+    {
+        PluginConfig config("file1.so", VersionInfo());
+        QCOMPARE(config.filePath(), QString("file1.so"));
+
+        config = PluginConfig("file2.so", VersionInfo(), VersionInfo());
+        QCOMPARE(config.filePath(), QString("file2.so"));
+    }
+}
+
+// Test: version -----------------------------------------------------------------------------------
+
+void TestPluginConfig::testVersion()
+{
+    // Default constructor
+    {
+        PluginConfig config;
+        QVERIFY(config.version().isNull());
+        QVERIFY(config.minVersion().isNull());
+        QVERIFY(config.maxVersion().isNull());
+
+        config.setVersion(VersionInfo(1, 0, 0));
+        QCOMPARE(config.version(), VersionInfo(1, 0, 0));
+        QCOMPARE(config.minVersion(), VersionInfo());
+        QCOMPARE(config.maxVersion(), VersionInfo());
+        QCOMPARE(config.isExactVersion(), true);
+        QCOMPARE(config.isVersionRange(), false);
+
+        config.setMinVersion(VersionInfo(1, 1, 0));
+        QCOMPARE(config.version(), VersionInfo(1, 0, 0));
+        QCOMPARE(config.minVersion(), VersionInfo(1, 1, 0));
+        QCOMPARE(config.maxVersion(), VersionInfo());
+        QCOMPARE(config.isExactVersion(), false);
+        QCOMPARE(config.isVersionRange(), false);
+
+        config.setVersion(VersionInfo());
+        QCOMPARE(config.version(), VersionInfo());
+        QCOMPARE(config.minVersion(), VersionInfo(1, 1, 0));
+        QCOMPARE(config.maxVersion(), VersionInfo());
+        QCOMPARE(config.isExactVersion(), false);
+        QCOMPARE(config.isVersionRange(), false);
+
+        config.setMaxVersion(VersionInfo(1, 1, 1));
+        QCOMPARE(config.version(), VersionInfo());
+        QCOMPARE(config.minVersion(), VersionInfo(1, 1, 0));
+        QCOMPARE(config.maxVersion(), VersionInfo(1, 1, 1));
+        QCOMPARE(config.isExactVersion(), false);
+        QCOMPARE(config.isVersionRange(), true);
+
+        config.setMinVersion(VersionInfo());
+        QCOMPARE(config.version(), VersionInfo());
+        QCOMPARE(config.minVersion(), VersionInfo());
+        QCOMPARE(config.maxVersion(), VersionInfo(1, 1, 1));
+        QCOMPARE(config.isExactVersion(), false);
+        QCOMPARE(config.isVersionRange(), false);
+
+        config.setVersion(VersionInfo(1, 0, 0));
+        QCOMPARE(config.version(), VersionInfo(1, 0, 0));
+        QCOMPARE(config.minVersion(), VersionInfo());
+        QCOMPARE(config.maxVersion(), VersionInfo(1, 1, 1));
+        QCOMPARE(config.isExactVersion(), false);
+        QCOMPARE(config.isVersionRange(), false);
+    }
+
+    // Constructor
+    {
+        PluginConfig config("file.so", VersionInfo(1, 0, 0));
+        QCOMPARE(config.version(), VersionInfo(1, 0, 0));
+        QCOMPARE(config.minVersion(), VersionInfo());
+        QCOMPARE(config.maxVersion(), VersionInfo());
+        QCOMPARE(config.isExactVersion(), true);
+        QCOMPARE(config.isVersionRange(), false);
+
+        config = PluginConfig("file.so", VersionInfo(1, 0, 1), VersionInfo(1, 1, 0));
+        QCOMPARE(config.version(), VersionInfo());
+        QCOMPARE(config.minVersion(), VersionInfo(1, 0, 1));
+        QCOMPARE(config.maxVersion(), VersionInfo(1, 1, 0));
+        QCOMPARE(config.isExactVersion(), false);
+        QCOMPARE(config.isVersionRange(), true);
+    }
+}
+
+// Test: instance configs --------------------------------------------------------------------------
+
+void TestPluginConfig::testInstanceConfigs()
+{
+    QList<PluginInstanceConfig> instanceConfigs;
+    instanceConfigs.append(PluginInstanceConfig("test1"));
+    instanceConfigs.append(PluginInstanceConfig("test2"));
+
+    // Default constructor
+    {
+        PluginConfig config;
+        QVERIFY(config.instanceConfigs().isEmpty());
+
+        config.setInstanceConfigs(instanceConfigs);
+        QCOMPARE(config.instanceConfigs(), instanceConfigs);
+    }
+
+    // Constructor
+    {
+        PluginConfig config("file.so", VersionInfo(1, 0, 0));
+        QVERIFY(config.instanceConfigs().isEmpty());
+
+        config = PluginConfig("file.so", VersionInfo(1, 0, 0), instanceConfigs);
+        QCOMPARE(config.instanceConfigs(), instanceConfigs);
+
+        config = PluginConfig("file.so", VersionInfo(1, 0, 1), VersionInfo(1, 1, 0));
+        QVERIFY(config.instanceConfigs().isEmpty());
+
+        config = PluginConfig("file.so",
+                              VersionInfo(1, 0, 1),
+                              VersionInfo(1, 1, 0),
+                              instanceConfigs);
+        QCOMPARE(config.instanceConfigs(), instanceConfigs);
+    }
+}
+
+// Test: loadConfig() method -----------------------------------------------------------------------
+
+void TestPluginConfig::testLoadConfig()
+{
+    QFETCH(ConfigObjectNodePtr, configNode);
+    QFETCH(PluginConfig, expectedPluginConfig);
+    QFETCH(bool, expectedResult);
+
+    QString error;
+    PluginConfig pluginConfig;
+    const bool result = pluginConfig.loadConfig("plugin", *configNode, &error);
+    qDebug() << "TestPluginConfig::testLoadConfig: error:" << error;
+
+    QCOMPARE(result, expectedResult);
+
+    if (result)
+    {
+        QCOMPARE(pluginConfig, expectedPluginConfig);
+    }
+}
+
+void TestPluginConfig::testLoadConfig_data()
+{
+    QTest::addColumn<ConfigObjectNodePtr>("configNode");
+    QTest::addColumn<PluginConfig>("expectedPluginConfig");
+    QTest::addColumn<bool>("expectedResult");
+
+    // Prepare common data
+    const QString validFilePath(QCoreApplication::applicationFilePath());
+
+    const VersionInfo validVersion1(1, 0, 0);
+    const VersionInfo validVersion2(2, 0, 0);
+
+    const QList<PluginInstanceConfig> validInstanceConfigs
+    {
+        PluginInstanceConfig("instance1"), PluginInstanceConfig("instance2")
+    };
+
+    ConfigObjectNode instance1;
+    instance1.setMember("name", ConfigValueNode("instance1"));
+
+    ConfigObjectNode instance2;
+    instance2.setMember("name", ConfigValueNode("instance2"));
+
+    ConfigObjectNode instances;
+    instances.setMember("instance1", instance1);
+    instances.setMember("instance2", instance2);
+
+    // Valid: exact version
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("file_path", ConfigValueNode(validFilePath));
+        plugin.setMember("version", ConfigValueNode(validVersion1.toString()));
+        plugin.setMember("instances", instances);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("valid: exact version") << configNode
+                                              << PluginConfig(validFilePath,
+                                                              validVersion1,
+                                                              validInstanceConfigs)
+                                              << true;
+    }
+
+    // Valid: version range
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("file_path", ConfigValueNode(validFilePath));
+        plugin.setMember("min_version", ConfigValueNode(validVersion1.toString()));
+        plugin.setMember("max_version", ConfigValueNode(validVersion2.toString()));
+        plugin.setMember("instances", instances);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("valid: version range") << configNode
+                                              << PluginConfig(validFilePath,
+                                                              validVersion1,
+                                                              validVersion2,
+                                                              validInstanceConfigs)
+                                              << true;
+    }
+
+    // Invalid: file path missing
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("version", ConfigValueNode(validVersion1.toString()));
+        plugin.setMember("instances", instances);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("invalid: file path missing") << configNode << PluginConfig() << false;
+    }
+
+    // Invalid: exact version
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("file_path", ConfigValueNode(validFilePath));
+        plugin.setMember("version", ConfigValueNode(123));
+        plugin.setMember("instances", instances);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("invalid: exact version") << configNode << PluginConfig() << false;
+    }
+
+    // Invalid: min version
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("file_path", ConfigValueNode(validFilePath));
+        plugin.setMember("min_version", ConfigValueNode(123));
+        plugin.setMember("max_version", ConfigValueNode(validVersion2.toString()));
+        plugin.setMember("instances", instances);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("invalid: min version") << configNode << PluginConfig() << false;
+    }
+
+    // Invalid: max version
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("file_path", ConfigValueNode(validFilePath));
+        plugin.setMember("min_version", ConfigValueNode(validVersion1.toString()));
+        plugin.setMember("max_version", ConfigValueNode(123));
+        plugin.setMember("instances", instances);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("invalid: max version") << configNode << PluginConfig() << false;
+    }
+
+    // Invalid: instances
+    {
+        ConfigObjectNode plugin;
+        plugin.setMember("file_path", ConfigValueNode(validFilePath));
+        plugin.setMember("min_version", ConfigValueNode(validVersion1.toString()));
+        plugin.setMember("max_version", ConfigValueNode(validVersion2.toString()));
+        plugin.setMember("instances", ConfigValueNode());
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin", plugin);
+
+        QTest::newRow("invalid: instances") << configNode << PluginConfig() << false;
+    }
 }
 
 // Main function -----------------------------------------------------------------------------------

@@ -34,8 +34,11 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
+
 namespace Validation
 {
 
@@ -94,5 +97,6 @@ bool validateFilePath(const QString &filePath)
     return QFileInfo(filePath).isFile();
 }
 
-}
-}
+} // namespace Validation
+
+} // namespace CppPluginFramework
