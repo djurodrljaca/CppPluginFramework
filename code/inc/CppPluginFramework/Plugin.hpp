@@ -97,13 +97,11 @@ public:
     /*!
      * Loads a plugin from the specified library
      *
-     * \param   pluginConfig            Plugin config
-     * \param   environmentVariables    Environment variables
+     * \param   pluginConfig    Plugin config
      *
      * \return  Loaded plugin or nullptr if loading failed
      */
-    static std::unique_ptr<Plugin> load(const PluginConfig &pluginConfig,
-                                        const EnvironmentVariables &environmentVariables);
+    static std::unique_ptr<Plugin> load(const PluginConfig &pluginConfig);
 
     /*!
      * Unloads the plugin

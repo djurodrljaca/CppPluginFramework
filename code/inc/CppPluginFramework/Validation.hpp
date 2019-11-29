@@ -33,8 +33,11 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
+
 namespace Validation
 {
 
@@ -91,7 +94,8 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateEnvironmentVariableName(const QSt
  */
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateFilePath(const QString &filePath);
 
-}
-}
+} // namespace Validation
+
+} // namespace CppPluginFramework
 
 #endif // CPPPLUGINFRAMEWORK_VALIDATION_HPP

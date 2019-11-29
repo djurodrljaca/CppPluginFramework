@@ -27,12 +27,15 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QStringBuilder>
 
 // System includes
 
 // Forward declarations
 
 // Macros
+
+// -------------------------------------------------------------------------------------------------
 
 namespace CppPluginFramework
 {
@@ -217,9 +220,12 @@ bool VersionInfo::isVersionInRange(const VersionInfo &version,
     return inRange;
 }
 
+} // namespace CppPluginFramework
+
 // -------------------------------------------------------------------------------------------------
 
-bool operator==(const VersionInfo &left, const VersionInfo &right)
+bool operator==(const CppPluginFramework::VersionInfo &left,
+                const CppPluginFramework::VersionInfo &right)
 {
     return ((left.major() == right.major()) &&
             (left.minor() == right.minor()) &&
@@ -229,7 +235,16 @@ bool operator==(const VersionInfo &left, const VersionInfo &right)
 
 // -------------------------------------------------------------------------------------------------
 
-bool operator<(const VersionInfo &left, const VersionInfo &right)
+bool operator!=(const CppPluginFramework::VersionInfo &left,
+                const CppPluginFramework::VersionInfo &right)
+{
+    return !(left == right);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool operator<(const CppPluginFramework::VersionInfo &left,
+               const CppPluginFramework::VersionInfo &right)
 {
     // Check Major version part
     if (left.major() < right.major())
@@ -294,23 +309,59 @@ bool operator<(const VersionInfo &left, const VersionInfo &right)
 
 // -------------------------------------------------------------------------------------------------
 
-bool operator<=(const VersionInfo &left, const VersionInfo &right)
+bool operator<=(const CppPluginFramework::VersionInfo &left,
+                const CppPluginFramework::VersionInfo &right)
 {
     return ((left == right) || (left < right));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-bool operator>(const VersionInfo &left, const VersionInfo &right)
+bool operator>(const CppPluginFramework::VersionInfo &left,
+               const CppPluginFramework::VersionInfo &right)
 {
     return !(left <= right);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-bool operator>=(const VersionInfo &left, const VersionInfo &right)
+bool operator>=(const CppPluginFramework::VersionInfo &left,
+                const CppPluginFramework::VersionInfo &right)
 {
     return !(left < right);
 }
 
+// -------------------------------------------------------------------------------------------------
+
+template<>
+bool CppConfigFramework::ConfigParameterLoader::load(
+        const QVariant &nodeValue,
+        CppPluginFramework::VersionInfo *parameterValue,
+        QString *error)
+{
+    // Load string representation of the version
+    QString value;
+
+    if (!CppConfigFramework::ConfigParameterLoader::load(nodeValue, &value, error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load the version. Error: ") % *error;
+        }
+        return false;
+    }
+
+    CppPluginFramework::VersionInfo versionInfo(value);
+
+    if (!versionInfo.isValid())
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Version is not valid");
+        }
+        return false;
+    }
+
+    *parameterValue = versionInfo;
+    return true;
 }

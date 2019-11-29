@@ -15,7 +15,7 @@
 /*!
  * \file
  *
- * Contains a class that holds a plugin's config
+ * Contains a config class for a Plugin
  */
 
 // Own header
@@ -25,12 +25,15 @@
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
+#include <QtCore/QStringBuilder>
 
 // System includes
 
 // Forward declarations
 
 // Macros
+
+// -------------------------------------------------------------------------------------------------
 
 namespace CppPluginFramework
 {
@@ -64,63 +67,7 @@ PluginConfig::PluginConfig(const QString &filePath,
 
 bool PluginConfig::isValid() const
 {
-    // Check file path
-    if (!Validation::validateFilePath(m_filePath))
-    {
-        return false;
-    }
-
-    // Check version info
-    if (isExactVersion())
-    {
-        if (!m_version.isValid())
-        {
-            return false;
-        }
-    }
-    else
-    {
-        if (!VersionInfo::isRangeValid(m_minVersion, m_maxVersion))
-        {
-            return false;
-        }
-    }
-
-    // At least one plugin instance is required
-    if (m_instanceConfigs.isEmpty())
-    {
-        return false;
-    }
-
-    // Check individual instances if it is valid
-    for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
-    {
-        if (!instanceConfig.isValid())
-        {
-            return false;
-        }
-    }
-
-    // Check if this plugin config contains multiple instances with the same name
-    for (const PluginInstanceConfig &instanceConfig : m_instanceConfigs)
-    {
-        int count = 0;
-
-        for (const PluginInstanceConfig &item : m_instanceConfigs)
-        {
-            if (item.name() == instanceConfig.name())
-            {
-                count++;
-
-                if (count > 1)
-                {
-                    return false;
-                }
-            }
-        }
-    }
-
-    return true;
+    return validateConfig().isEmpty();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -195,7 +142,7 @@ void PluginConfig::setMaxVersion(const VersionInfo &maxVersion)
 
 // -------------------------------------------------------------------------------------------------
 
-QList<PluginInstanceConfig> PluginConfig::instanceConfigs() const
+const QList<PluginInstanceConfig> &PluginConfig::instanceConfigs() const
 {
     return m_instanceConfigs;
 }
@@ -209,13 +156,195 @@ void PluginConfig::setInstanceConfigs(const QList<PluginInstanceConfig> &instanc
 
 // -------------------------------------------------------------------------------------------------
 
-bool operator==(const PluginConfig &left, const PluginConfig &right)
+bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
+                                        QString *error)
 {
-    return ((left.filePath() == right.filePath()) &&
-            (left.version() == right.version()) &&
-            (left.minVersion() == right.minVersion()) &&
-            (left.maxVersion() == right.maxVersion()) &&
-            (left.instanceConfigs() == right.instanceConfigs()));
+    // Load file path
+    if (!loadRequiredConfigParameter(&m_filePath,
+                                     QStringLiteral("file_path"),
+                                     config,
+                                     error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin's file path. Error: ") % *error;
+        }
+        return false;
+    }
+
+    // Load version
+    bool loaded = false;
+
+    if (!loadOptionalConfigParameter(&m_version,
+                                     QStringLiteral("version"),
+                                     config,
+                                     &loaded,
+                                     error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin's version. Error: ") % *error;
+        }
+        return false;
+    }
+
+    if (!loaded)
+    {
+        m_version = VersionInfo();
+    }
+
+    // Load min version
+    loaded = false;
+
+    if (!loadOptionalConfigParameter(&m_minVersion,
+                                     QStringLiteral("min_version"),
+                                     config,
+                                     &loaded,
+                                     error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin's min version. Error: ") % *error;
+        }
+        return false;
+    }
+
+    if (!loaded)
+    {
+        m_minVersion = VersionInfo();
+    }
+
+    // Load max version
+    loaded = false;
+
+    if (!loadOptionalConfigParameter(&m_maxVersion,
+                                     QStringLiteral("max_version"),
+                                     config,
+                                     &loaded,
+                                     error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin's max version. Error: ") % *error;
+        }
+        return false;
+    }
+
+    if (!loaded)
+    {
+        m_maxVersion = VersionInfo();
+    }
+
+    // Load instance configs
+    if (!loadRequiredConfigContainer(&m_instanceConfigs,
+                                     QStringLiteral("instances"),
+                                     config,
+                                     error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin's instances. Error: ") % *error;
+        }
+        return false;
+    }
+
+    return true;
 }
 
+// -------------------------------------------------------------------------------------------------
+
+QString PluginConfig::validateConfig() const
+{
+    // Check file path
+    if (!Validation::validateFilePath(m_filePath))
+    {
+        return QStringLiteral("File path is not valid: ") % m_filePath;
+    }
+
+    // Check version info
+    if (isExactVersion())
+    {
+        if (!m_version.isValid())
+        {
+            return QStringLiteral("Version is not valid");
+        }
+    }
+    else if (isVersionRange())
+    {
+        if (!VersionInfo::isRangeValid(m_minVersion, m_maxVersion))
+        {
+            return QStringLiteral("Version range is not valid");
+        }
+    }
+    else
+    {
+        return QStringLiteral("Either just the version parameter needs to be set or "
+                              "both min and max version parameters!");
+    }
+
+    // At least one plugin instance is required
+    if (m_instanceConfigs.isEmpty())
+    {
+        return QStringLiteral("Plugin config does not define any plugin instances");
+    }
+
+    // Check individual instances are valid and if this plugin config contains duplicatate instances
+    // (instances with the same name)
+    QStringList instanceNames;
+
+    for (const auto &instanceConfig : m_instanceConfigs)
+    {
+        if (!instanceConfig.isValid())
+        {
+            return QStringLiteral("Plugin instance config is not valid: ") % instanceConfig.name();
+        }
+
+        if (instanceNames.contains(instanceConfig.name()))
+        {
+            return QStringLiteral("Duplicate plugin instance name: ") % instanceConfig.name();
+        }
+
+        instanceNames.append(instanceConfig.name());
+    }
+
+    return QString();
+}
+
+} // namespace CppPluginFramework
+
+// -------------------------------------------------------------------------------------------------
+
+bool operator==(const CppPluginFramework::PluginConfig &left,
+                const CppPluginFramework::PluginConfig &right)
+{
+    if ((left.filePath() != right.filePath()) ||
+        (left.version() != right.version()) ||
+        (left.minVersion() != right.minVersion()) ||
+        (left.maxVersion() != right.maxVersion()))
+    {
+        return false;
+    }
+
+    if (left.instanceConfigs().size() != right.instanceConfigs().size())
+    {
+        return false;
+    }
+
+    for (const auto &item : left.instanceConfigs())
+    {
+        if (!right.instanceConfigs().contains(item))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool operator!=(const CppPluginFramework::PluginConfig &left,
+                const CppPluginFramework::PluginConfig &right)
+{
+    return !(left == right);
 }

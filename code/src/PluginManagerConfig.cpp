@@ -15,13 +15,16 @@
 /*!
  * \file
  *
- * Contains the "test plugin 1"
+ * Contains a config class for the Plugin Manager
  */
 
+// Own header
+#include <CppPluginFramework/PluginManagerConfig.hpp>
+
 // C++ Plugin Framework includes
-#include "TestPlugin1.hpp"
 
 // Qt includes
+#include <QtCore/QStringBuilder>
 
 // System includes
 
@@ -33,86 +36,75 @@
 
 namespace CppPluginFramework
 {
-namespace TestPlugins
+
+bool PluginManagerConfig::isValid() const
 {
-
-// -------------------------------------------------------------------------------------------------
-
-static const char s_version_string[] = "1.0.0";
-
-// -------------------------------------------------------------------------------------------------
-
-TestPlugin1::TestPlugin1(const QString &name)
-    : CppPluginFramework::AbstractPlugin(name),
-      ITestPlugin1(),
-      m_configuredValue()
-{
-    setDescription("test plugin 1");
-    setVersion(CppPluginFramework::VersionInfo(QLatin1String(s_version_string)));
-
-    const QSet<QString> interfaces =
-    {
-        CPPPLUGINFRAMEWORK_INTERFACE_NAME(CppPluginFramework::TestPlugins::ITestPlugin1)
-    };
-
-    setExportedInterfaces(interfaces);
+    return validateConfig().isEmpty();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-bool TestPlugin1::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
+const QList<PluginConfig> &PluginManagerConfig::pluginConfigs() const
 {
-    bool success = false;
+    return m_pluginConfigs;
+}
 
-    if (config.contains("value"))
+// -------------------------------------------------------------------------------------------------
+
+void PluginManagerConfig::setPluginConfigs(const QList<PluginConfig> &pluginConfigs)
+{
+    m_pluginConfigs = pluginConfigs;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool PluginManagerConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
+                                               QString *error)
+{
+
+    // Load instance configs
+    if (!loadRequiredConfigContainer(&m_pluginConfigs, QStringLiteral("plugins"), config, error))
     {
-        auto node = config.member("value");
-
-        if (node->isValue())
+        if (error != nullptr)
         {
-            m_configuredValue = node->toValue().value().toString();
-            success = true;
+            *error = QStringLiteral("Failed to load plugin's instances. Error: ") % *error;
+        }
+        return false;
+    }
+
+    return true;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+QString PluginManagerConfig::validateConfig() const
+{
+    // Check individual plugins are valid
+    for (const auto &pluginConfig : m_pluginConfigs)
+    {
+        if (!pluginConfig.isValid())
+        {
+            return QStringLiteral("Plugin config is not valid: ") % pluginConfig.filePath();
         }
     }
 
-    return success;
+    return QString();
 }
 
-// -------------------------------------------------------------------------------------------------
-
-bool TestPlugin1::injectDependency(IPlugin *plugin)
-{
-    // This plugin doesn't support dependencies!
-    Q_UNUSED(plugin)
-    return false;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void TestPlugin1::ejectDependencies()
-{
-}
-
-// -------------------------------------------------------------------------------------------------
-
-QString TestPlugin1::value() const
-{
-    return m_configuredValue;
-}
-
-} // namespace TestPlugins
 } // namespace CppPluginFramework
 
 // -------------------------------------------------------------------------------------------------
 
-const char *readPluginVersion()
+bool operator==(const CppPluginFramework::PluginManagerConfig &left,
+                const CppPluginFramework::PluginManagerConfig &right)
 {
-    return CppPluginFramework::TestPlugins::s_version_string;
+    return (left.pluginConfigs() == right.pluginConfigs());
 }
 
 // -------------------------------------------------------------------------------------------------
 
-CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName)
+bool operator!=(const CppPluginFramework::PluginManagerConfig &left,
+                const CppPluginFramework::PluginManagerConfig &right)
 {
-    return new CppPluginFramework::TestPlugins::TestPlugin1(instanceName);
+    return !(left == right);
 }

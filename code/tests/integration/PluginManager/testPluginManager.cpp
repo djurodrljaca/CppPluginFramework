@@ -19,10 +19,13 @@
  */
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/ConfigFile.hpp>
 #include <CppPluginFramework/PluginManager.hpp>
+#include <CppPluginFramework/PluginManagerConfig.hpp>
 #include "../TestPlugins/ITestPlugin1.hpp"
 #include "../TestPlugins/ITestPlugin2.hpp"
+
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigReader.hpp>
 
 // Qt includes
 #include <QtCore/QDebug>
@@ -36,6 +39,7 @@
 
 // Test class declaration --------------------------------------------------------------------------
 
+using namespace CppConfigFramework;
 using namespace CppPluginFramework;
 
 class TestPluginManager : public QObject
@@ -88,13 +92,26 @@ void TestPluginManager::cleanup()
 void TestPluginManager::testLoadPlugins()
 {
     // First load the config
-    ConfigFile configFile;
-    QVERIFY(configFile.read(m_testDataDirPath.absoluteFilePath("AppConfig.json")));
+    ConfigReader configReader;
+    EnvironmentVariables environmentVariables;
+    QString error;
+
+    auto config = configReader.read(m_testDataDirPath.absoluteFilePath("AppConfig.json"),
+                                    QDir::current(),
+                                    ConfigNodePath::ROOT_PATH,
+                                    ConfigNodePath::ROOT_PATH,
+                                    std::vector<const ConfigObjectNode *>(),
+                                    &environmentVariables,
+                                    &error);
+    QVERIFY(config);
+
+    PluginManagerConfig pluginManagerConfig;
+    error.clear();
+    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error));
 
     // Load plugins
-    EnvironmentVariables environmentVariables;
     PluginManager pluginManager;
-    QVERIFY(pluginManager.loadPlugins(configFile.pluginConfigs(), environmentVariables));
+    QVERIFY(pluginManager.loadPlugins(pluginManagerConfig));
 
     // Check all instances
     const QStringList instanceNames = pluginManager.pluginInstanceNames();
@@ -135,13 +152,27 @@ void TestPluginManager::testLoadPluginsWithInvalidConfig()
     QFETCH(QString, fileName);
 
     // First load the config
-    ConfigFile configFile;
-    QVERIFY(configFile.read(m_testDataDirPath.absoluteFilePath(fileName)));
+    ConfigReader configReader;
+    EnvironmentVariables environmentVariables;
+    QString error;
+
+    auto config = configReader.read(m_testDataDirPath.absoluteFilePath(fileName),
+                                    QDir::current(),
+                                    ConfigNodePath::ROOT_PATH,
+                                    ConfigNodePath::ROOT_PATH,
+                                    std::vector<const ConfigObjectNode *>(),
+                                    &environmentVariables,
+                                    &error);
+    QVERIFY(config);
+
+    PluginManagerConfig pluginManagerConfig;
+    error.clear();
+    QVERIFY2(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error),
+             qPrintable(error));
 
     // Load plugins with invalid config
-    EnvironmentVariables environmentVariables;
     PluginManager pluginManager;
-    QVERIFY(!pluginManager.loadPlugins(configFile.pluginConfigs(), environmentVariables));
+    QVERIFY(!pluginManager.loadPlugins(pluginManagerConfig));
 }
 
 void TestPluginManager::testLoadPluginsWithInvalidConfig_data()

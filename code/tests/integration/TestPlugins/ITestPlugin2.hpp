@@ -32,6 +32,8 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 namespace TestPlugins
@@ -44,7 +46,7 @@ public:
     virtual QString joinedValues() const = 0;
 };
 
-}
-}
+} // namespace TestPlugins
+} // namespace CppPluginFramework
 
 #endif // CPPPLUGINFRAMEWORK_TESTPLUGINS_ITESTPLUGIN2_HPP

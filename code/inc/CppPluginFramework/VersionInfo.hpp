@@ -24,8 +24,11 @@
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigParameterLoader.hpp>
+
 // Qt includes
-#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 // System includes
 
@@ -37,6 +40,8 @@
 #undef major
 #undef minor
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 
@@ -46,9 +51,7 @@ namespace CppPluginFramework
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT VersionInfo
 {
 public:
-    /*!
-     * Constructor
-     */
+    //! Constructor
     VersionInfo();
 
     /*!
@@ -173,29 +176,23 @@ public:
                                  const VersionInfo &maxVersion);
 
 private:
-    /*!
-     * Major version number
-     */
+    //! Major version number
     int m_major;
 
-    /*!
-     * Minor version number
-     */
+    //! Minor version number
     int m_minor;
 
-    /*!
-     * Patch version number
-     */
+    //! Patch version number
     int m_patch;
 
-    /*!
-     * Development version number
-     */
+    //! Development version number
     QString m_dev;
 };
 
+} // namespace CppPluginFramework
+
 /*!
- * Checks if the two specified versions are equal
+ * Global "equal to" operator for CppPluginFramework::VersionInfo
  *
  * \param   left    Version
  * \param   right   Version
@@ -205,11 +202,25 @@ private:
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const VersionInfo &left,
-                                                  const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::VersionInfo &left,
+                                                  const CppPluginFramework::VersionInfo &right);
 
 /*!
- * Checks if the one version is smaller than the other
+ * Global "not equal to" operator for CppPluginFramework::VersionInfo
+ *
+ * \param   left    Version
+ * \param   right   Version
+ *
+ * \retval  true    Versions are not equal
+ * \retval  false   Versions are equal
+ *
+ * \note    Result of the comparison is valid only if both versions are valid!
+ */
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::VersionInfo &left,
+                                                  const CppPluginFramework::VersionInfo &right);
+
+/*!
+ * Global "less than" operator for CppPluginFramework::VersionInfo
  *
  * \param   left    Version
  * \param   right   Version
@@ -219,50 +230,54 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const VersionInfo &left,
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const VersionInfo &left, const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const CppPluginFramework::VersionInfo &left,
+                                                 const CppPluginFramework::VersionInfo &right);
 
 /*!
- * Checks if the one version is smaller than or equal to the other
+ * Global "less than or equal to" operator for CppPluginFramework::VersionInfo
  *
  * \param   left    Version
  * \param   right   Version
  *
- * \retval  true    Version "left" is smaller than or equal to version "right"
- * \retval  false   Version "left" is not smaller than or equal to version "right"
+ * \retval  true    Version "left" is less than or equal to version "right"
+ * \retval  false   Version "left" is not less than or equal to version "right"
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const VersionInfo &left,
-                                                  const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const CppPluginFramework::VersionInfo &left,
+                                                  const CppPluginFramework::VersionInfo &right);
 
 /*!
- * Checks if the one version is bigger than the other
+ * Global "greater than" operator for CppPluginFramework::VersionInfo
  *
  * \param   left    Version
  * \param   right   Version
  *
- * \retval  true    Version "left" is bigger than version "right"
- * \retval  false   Version "left" is not bigger than version "right"
+ * \retval  true    Version "left" is greater than version "right"
+ * \retval  false   Version "left" is not greater than version "right"
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const VersionInfo &left,
-                                                 const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const CppPluginFramework::VersionInfo &left,
+                                                 const CppPluginFramework::VersionInfo &right);
 
 /*!
- * Checks if the one version is bigger than or equal to the other
+ * Global "greater than or equal to" operator for CppPluginFramework::VersionInfo
  *
  * \param   left    Version
  * \param   right   Version
  *
- * \retval  true    Version "left" is bigger than or equal to version "right"
- * \retval  false   Version "left" is not bigger than or equal to version "right"
+ * \retval  true    Version "left" is greater than or equal to version "right"
+ * \retval  false   Version "left" is not greater than or equal to version "right"
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>=(const VersionInfo &left,
-                                                  const VersionInfo &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>=(const CppPluginFramework::VersionInfo &left,
+                                                  const CppPluginFramework::VersionInfo &right);
 
-}
+//! \copydoc    CppConfigFramework::ConfigParameterLoader::load()
+template<>
+bool CppConfigFramework::ConfigParameterLoader::load(
+        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue, QString *error);
 
 #endif // CPPPLUGINFRAMEWORK_VERSIONINFO_HPP

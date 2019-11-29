@@ -33,7 +33,9 @@
 
 // Test class declaration --------------------------------------------------------------------------
 
+using namespace CppConfigFramework;
 using namespace CppPluginFramework;
+
 Q_DECLARE_METATYPE(PluginConfig)
 Q_DECLARE_METATYPE(VersionInfo)
 
@@ -85,8 +87,7 @@ void TestPlugin::testLoadPlugin()
     QFETCH(bool, result);
 
     // Load plugin
-    EnvironmentVariables environmentVariables;
-    std::unique_ptr<Plugin> plugin = Plugin::load(config, environmentVariables);
+    std::unique_ptr<Plugin> plugin = Plugin::load(config);
     QCOMPARE(plugin != nullptr, result);
 
     // Check plugin
@@ -107,54 +108,72 @@ void TestPlugin::testLoadPlugin_data()
     QTest::addColumn<int>("instanceCount");
     QTest::addColumn<bool>("result");
 
+    QDir testPluginsDir(QCoreApplication::applicationDirPath());
+    testPluginsDir.cd("../TestPlugins");
+
     // Loading of test plugin 1
     {
-        QList<PluginInstanceConfig> instanceConfig;
-        instanceConfig << PluginInstanceConfig("instance1", QJsonObject { { "value", "value1" } })
-                       << PluginInstanceConfig("instance2", QJsonObject { { "value", "value2" } });
+        ConfigObjectNode instance1Config;
+        instance1Config.setMember("value", ConfigValueNode("value1"));
 
-        PluginConfig config("../TestPlugins/libTestPlugin1.so",
+        ConfigObjectNode instance2Config;
+        instance2Config.setMember("value", ConfigValueNode("value2"));
+
+        QList<PluginInstanceConfig> instanceConfigs;
+        instanceConfigs << PluginInstanceConfig("instance1", instance1Config)
+                       << PluginInstanceConfig("instance2", instance2Config);
+
+        PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
                             VersionInfo(1, 0, 0),
-                            instanceConfig);
+                            instanceConfigs);
 
         QTest::newRow("valid: test plugin 1") << config << VersionInfo(1, 0, 0) << 2 << true;
     }
 
     // Loading of test plugin 2
     {
-        QList<PluginInstanceConfig> instanceConfig;
-        instanceConfig << PluginInstanceConfig("instance3",
-                                               QJsonObject { { "delimiter", ";" } },
+        ConfigObjectNode instance3Config;
+        instance3Config.setMember("delimiter", ConfigValueNode(";"));
+
+        QList<PluginInstanceConfig> instanceConfigs;
+        instanceConfigs << PluginInstanceConfig("instance3",
+                                               instance3Config,
                                                QSet<QString> { "instance1", "instance2"});
 
-        PluginConfig config("../TestPlugins/libTestPlugin2.so",
+        PluginConfig config(testPluginsDir.filePath("libTestPlugin2.so"),
                             VersionInfo(1, 0, 0),
                             VersionInfo(1, 0, 1),
-                            instanceConfig);
+                            instanceConfigs);
 
         QTest::newRow("valid: test plugin 2") << config << VersionInfo(1, 0, 0) << 1 << true;
     }
 
     // Loading of plugin with invalid config
     {
-        QList<PluginInstanceConfig> instanceConfig;
-        instanceConfig << PluginInstanceConfig("instance1", QJsonObject { { "invalid", "x" } });
+        ConfigObjectNode instance1Config;
+        instance1Config.setMember("invalid", ConfigValueNode("x"));
 
-        PluginConfig config("../TestPlugins/libTestPlugin1.so",
+        QList<PluginInstanceConfig> instanceConfigs;
+        instanceConfigs << PluginInstanceConfig("instance1", instance1Config);
+
+        PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
                             VersionInfo(1, 0, 0),
-                            instanceConfig);
+                            instanceConfigs);
 
         QTest::newRow("invalid: config") << config << VersionInfo(1, 0, 0) << 1 << false;
     }
 
     // Loading of plugin with invalid version
     {
-        QList<PluginInstanceConfig> instanceConfig;
-        instanceConfig << PluginInstanceConfig("instance1", QJsonObject { { "value", "value1" } });
+        ConfigObjectNode instance1Config;
+        instance1Config.setMember("value", ConfigValueNode("value1"));
 
-        PluginConfig config("../TestPlugins/libTestPlugin1.so",
+        QList<PluginInstanceConfig> instanceConfigs;
+        instanceConfigs << PluginInstanceConfig("instance1", instance1Config);
+
+        PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
                             VersionInfo(1, 0, 1),
-                            instanceConfig);
+                            instanceConfigs);
 
         QTest::newRow("invalid: version") << config << VersionInfo(1, 0, 0) << 1 << false;
     }
