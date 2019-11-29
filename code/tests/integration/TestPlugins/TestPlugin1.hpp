@@ -33,6 +33,8 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 namespace TestPlugins
@@ -44,12 +46,11 @@ class CPPPLUGINFRAMEWORK_PLUGIN_EXPORT TestPlugin1 :
 {
 public:
     TestPlugin1(const QString &name);
-    virtual ~TestPlugin1() = default;
+    ~TestPlugin1() = default;
 
-    virtual bool loadConfig(const QJsonObject &config,
-                            const EnvironmentVariables &environmentVariables) override;
-    virtual bool injectDependency(IPlugin *plugin) override;
-    virtual void ejectDependencies() override;
+    bool loadConfig(const CppConfigFramework::ConfigObjectNode &config) override;
+    bool injectDependency(IPlugin *plugin) override;
+    void ejectDependencies() override;
 
     virtual QString value() const override;
 
@@ -57,7 +58,7 @@ private:
     QString m_configuredValue;
 };
 
-}
-}
+} // namespace TestPlugins
+} // namespace CppPluginFramework
 
 #endif // CPPPLUGINFRAMEWORK_TESTPLUGINS_TESTPLUGIN1_HPP

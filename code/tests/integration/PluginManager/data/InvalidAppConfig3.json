@@ -1,64 +1,65 @@
 {
-    "customEnvironmentVariables":
+    "environment_variables":
     {
         "TestPluginsPath": "../TestPlugins"
     },
     
-    "plugins":
-    [
+    "config":
+    {
+        "plugins":
         {
-            "pluginFilePath": "${TestPluginsPath}/libTestPlugin1.so",
-            "version": "1.0.0",
-            "instances":
-            [
+            "test_plugin1":
+            {
+                "$file_path": "${TestPluginsPath}/libTestPlugin1.so",
+                "version": "1.0.0",
+                "instances":
                 {
-                    "instanceName": "instance1",
-                    "config":
+                    "instance1":
                     {
-                        "value": "value1"
-                    }
-                },
-                
-                {
-                    "instanceName": "instance2",
-                    "config":
-                    {
-                        "value": "value2"
-                    },
-                    "dependencies":
-                    [
+                        "name": "instance1",
+                        "config":
                         {
-                            "instanceName": "instance1"
+                            "value": "value1"
                         }
-                    ]
-                }
-            ]
-        },
-        
-        {
-            "pluginFilePath": "${TestPluginsPath}/libTestPlugin2.so",
-            "minVersion": "1.0.0",
-            "maxVersion": "1.0.1",
-            "instances":
-            [
-                {
-                    "instanceName": "instance3",
-                    "config":
-                    {
-                        "delimiter": ";"
                     },
-                    "dependencies":
-                    [
+                    
+                    "instance2":
+                    {
+                        "name": "instance2",
+                        "config":
                         {
-                            "instanceName": "instance1"
+                            "value": "value2"
                         },
-                        
-                        {
-                            "instanceName": "instance2"
-                        }
-                    ]
+                        "dependencies":
+                        [
+                            "instance1"
+                        ]
+                    }
                 }
-            ]
+            },
+            
+            "test_plugin2":
+            {
+                "$file_path": "${TestPluginsPath}/libTestPlugin2.so",
+                "min_version": "1.0.0",
+                "max_version": "1.0.1",
+                "instances":
+                {
+                    "instance3":
+                    {
+                        "name": "instance3",
+                        "config":
+                        {
+                            "delimiter": ";"
+                        },
+                        "dependencies":
+                        [
+                            "instance1",
+                            "instance2"
+                        ]
+                    }
+                }
+            }
         }
-    ]
+    }
 }

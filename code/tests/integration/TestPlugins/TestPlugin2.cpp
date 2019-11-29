@@ -29,12 +29,18 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 namespace TestPlugins
 {
 
+// -------------------------------------------------------------------------------------------------
+
 static const char s_version_string[] = "1.0.0";
+
+// -------------------------------------------------------------------------------------------------
 
 TestPlugin2::TestPlugin2(const QString &name)
     : CppPluginFramework::AbstractPlugin(name),
@@ -53,25 +59,27 @@ TestPlugin2::TestPlugin2(const QString &name)
     setExportedInterfaces(interfaces);
 }
 
-bool TestPlugin2::loadConfig(const QJsonObject &config,
-                             const EnvironmentVariables &environmentVariables)
+// -------------------------------------------------------------------------------------------------
+
+bool TestPlugin2::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
 {
-    Q_UNUSED(environmentVariables)
     bool success = false;
 
     if (config.contains("delimiter"))
     {
-        auto delimiter = config["delimiter"];
+        auto node = config.member("delimiter");
 
-        if (delimiter.isString())
+        if (node->isValue())
         {
-            m_configuredDelimiter = delimiter.toString();
+            m_configuredDelimiter = node->toValue().value().toString();
             success = true;
         }
     }
 
     return success;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool TestPlugin2::injectDependency(IPlugin *plugin)
 {
@@ -96,6 +104,8 @@ bool TestPlugin2::injectDependency(IPlugin *plugin)
     return success;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void TestPlugin2::ejectDependencies()
 {
     if (!isStarted())
@@ -103,6 +113,8 @@ void TestPlugin2::ejectDependencies()
         m_dependencies.clear();
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QString TestPlugin2::joinedValues() const
 {
@@ -118,13 +130,17 @@ QString TestPlugin2::joinedValues() const
     return values.join(m_configuredDelimiter);
 }
 
-}
-}
+} // namespace TestPlugins
+} // namespace CppPluginFramework
+
+// -------------------------------------------------------------------------------------------------
 
 const char *readPluginVersion()
 {
     return CppPluginFramework::TestPlugins::s_version_string;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName)
 {
