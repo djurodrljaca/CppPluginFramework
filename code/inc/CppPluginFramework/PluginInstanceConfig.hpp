@@ -15,7 +15,7 @@
 /*!
  * \file
  *
- * Contains a class that holds a plugin's instance config
+ * Contains a config class for a Plugin Instance
  */
 
 #ifndef CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
@@ -24,8 +24,10 @@
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigLoader.hpp>
+
 // Qt includes
-#include <QtCore/QJsonObject>
 #include <QtCore/QSet>
 
 // System includes
@@ -34,30 +36,64 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 
-/*!
- * This class holds a plugin's instance config
- */
+//! Config class for a Plugin Instance
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginInstanceConfig
+        : public CppConfigFramework::ConfigLoader
 {
 public:
-    /*!
-     * Constructor
-     */
+    //! Constructor
     PluginInstanceConfig() = default;
 
     /*!
      * Constructor
      *
      * \param   name            Name of the plugin instance
-     * \param   config          Plugin's instance config
+     * \param   config          Plugin instance's config
      * \param   dependencies    List of plugin's dependencies
      */
     PluginInstanceConfig(const QString &name,
-                         const QJsonObject &config = QJsonObject(),
+                         const CppConfigFramework::ConfigObjectNode &config = {},
                          const QSet<QString> &dependencies = QSet<QString>());
+
+    /*!
+     * Copy constructor
+     *
+     * \param   other   Instance to copy
+     */
+    PluginInstanceConfig(const PluginInstanceConfig &other);
+
+    /*!
+     * Move constructor
+     *
+     * \param   other   Instance to move
+     */
+    PluginInstanceConfig(PluginInstanceConfig &&other) noexcept = default;
+
+    //! Destructor
+    ~PluginInstanceConfig() override = default;
+
+    /*!
+     * Copy assignment operator
+     *
+     * \param   other   Instance to copy assign
+     *
+     * \return  Reference to this instance after the assignment is made
+     */
+    PluginInstanceConfig &operator=(const PluginInstanceConfig &other);
+
+    /*!
+     * Move assignment operator
+     *
+     * \param   other   Instance to move assign
+     *
+     * \return  Reference to this instance after the assignment is made
+     */
+    PluginInstanceConfig &operator=(PluginInstanceConfig &&other) noexcept = default;
 
     /*!
      * Checks if plugin instance config is valid
@@ -68,78 +104,92 @@ public:
     bool isValid() const;
 
     /*!
-     * Returns plugin's instance name
+     * Returns plugin instance's name
      *
-     * \return  Plugin's instance name
+     * \return  Plugin instance's name
      */
     QString name() const;
 
     /*!
-     * Sets plugin's instance name
+     * Sets plugin instance's name
      *
-     * \param   name    Plugin's instance name
+     * \param   name    Plugin instance's name
      */
     void setName(const QString &name);
 
     /*!
-     * Returns the plugin's instance config
+     * Returns the plugin instance's config
      *
-     * \return  Plugin's instance config
+     * \return  Plugin instance's config
      */
-    QJsonObject config() const;
+    const CppConfigFramework::ConfigObjectNode &config() const;
 
     /*!
-     * Sets the plugin's instance config
+     * Sets the plugin instance's config
      *
-     * \param   config  Plugin's instance config
+     * \param   config  Plugin instance's config
      */
-    void setConfig(const QJsonObject &config);
+    void setConfig(const CppConfigFramework::ConfigObjectNode &config);
 
     /*!
-     * Returns list of plugin's instance dependencies
+     * Returns list of plugin instance's dependencies
      *
-     * \return  List of plugin's instance dependencies
+     * \return  List of plugin instance's dependencies
      */
     QSet<QString> dependencies() const;
 
     /*!
-     * Sets list of plugin's instance dependencies
+     * Sets list of plugin instance's dependencies
      *
-     * \param   dependencies    List of plugin's instance dependencies
+     * \param   dependencies    List of plugin instance's dependencies
      */
     void setDependencies(const QSet<QString> &dependencies);
 
 private:
-    /*!
-     * Holds the plugin's instance name
-     */
+    //! \copydoc    CppConfigFramework::ConfigLoader::loadConfigParameters()
+    bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
+                              QString *error) override;
+
+    //! \copydoc    CppConfigFramework::ConfigLoader::validateConfig()
+    QString validateConfig() const override;
+
+private:
+    //! Holds the plugin instance's name
     QString m_name;
 
-    /*!
-     * Holds the path to the plugin's instance config
-     */
-    QJsonObject m_config;
+    //! Holds the (optional) plugin instance's config node
+    CppConfigFramework::ConfigObjectNode m_config;
 
-    /*!
-     * Holds the list of plugin's instance dependencies
-     */
+    //! Holds the list of plugin instance's dependencies
     QSet<QString> m_dependencies;
 };
 
-/*!
- * Checks if the two specified plugin instance configs are equal
- *
- * \param   left    Plugin instance config
- * \param   right   Plugin instance config
- *
- * \retval  true    Plugin instance configs are equal
- * \retval  false   Plugin instance configs are not equal
- *
- * \note    Result of the comparison is valid only if both plugin instance configs are valid!
- */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const PluginInstanceConfig &left,
-                                                  const PluginInstanceConfig &right);
+} // namespace CppPluginFramework
 
-}
+/*!
+ * Global "equal to" operator for CppPluginFramework::PluginInstanceConfig
+ *
+ * \param   left    Instance config
+ * \param   right   Instance config
+ *
+ * \retval  true    Instance configs are equal
+ * \retval  false   Instance configs are not equal
+ */
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
+        const CppPluginFramework::PluginInstanceConfig &left,
+        const CppPluginFramework::PluginInstanceConfig &right);
+
+/*!
+ * Global "not equal to" operator for CppPluginFramework::PluginInstanceConfig
+ *
+ * \param   left    Instance config
+ * \param   right   Instance config
+ *
+ * \retval  true    Instance configs are not equal
+ * \retval  false   Instance configs are equal
+ */
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(
+        const CppPluginFramework::PluginInstanceConfig &left,
+        const CppPluginFramework::PluginInstanceConfig &right);
 
 #endif // CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP

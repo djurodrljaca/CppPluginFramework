@@ -84,14 +84,12 @@ struct Plugin::Impl
     /*!
      * Creates all needed plugin instances
      *
-     * \param   pluginConfig            Plugin config
-     * \param   environmentVariables    Environment variables
+     * \param   pluginConfig    Plugin config
      *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    bool createPluginInstances(const PluginConfig &pluginConfig,
-                               const EnvironmentVariables &environmentVariables);
+    bool createPluginInstances(const PluginConfig &pluginConfig);
 
     /*!
      * Holds the library object
@@ -157,8 +155,7 @@ bool Plugin::Impl::checkPluginVersion(const PluginConfig &pluginConfig) const
 
 // -------------------------------------------------------------------------------------------------
 
-bool Plugin::Impl::createPluginInstances(const PluginConfig &pluginConfig,
-                                         const EnvironmentVariables &environmentVariables)
+bool Plugin::Impl::createPluginInstances(const PluginConfig &pluginConfig)
 {
     // Check if instances are already created
     if (!m_pluginInstances.isEmpty())
@@ -202,11 +199,11 @@ bool Plugin::Impl::createPluginInstances(const PluginConfig &pluginConfig,
                  << "- Exported interfaces:" << pluginInstance->exportedInterfaces();
 
         // Configure the plugin instance
-        if (!pluginInstance->loadConfig(pluginInstanceConfig.config(), environmentVariables))
+        if (!pluginInstance->loadConfig(pluginInstanceConfig.config()))
         {
             qDebug() << LOG_METHOD_IMPL("createPluginInstances")
                      << "Error: Failed to load the plugin instance config:"
-                     << pluginInstanceConfig.config();
+                     << pluginInstanceConfig.name();
             return false;
         }
 
@@ -306,8 +303,7 @@ IPlugin *Plugin::instance(const QString &instanceName)
 
 // -------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig,
-                                     const EnvironmentVariables &environmentVariables)
+std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig)
 {
     // Check plugin config
     if (!pluginConfig.isValid())
@@ -343,7 +339,7 @@ std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig,
     }
 
     // Create plugin instances
-    if (!plugin->m_impl->createPluginInstances(pluginConfig, environmentVariables))
+    if (!plugin->m_impl->createPluginInstances(pluginConfig))
     {
         qDebug() << LOG_METHOD("load")
                  << "Error: failed to create all needed plugin instances";

@@ -15,7 +15,7 @@
 /*!
  * \file
  *
- * Contains a class that holds a plugin's instance config
+ * Contains a config class for a Plugin Instance
  */
 
 // Own header
@@ -25,7 +25,7 @@
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
-#include <QtCore/QFileInfo>
+#include <QtCore/QStringBuilder>
 
 // System includes
 
@@ -33,45 +33,51 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 
 PluginInstanceConfig::PluginInstanceConfig(const QString &name,
-                                           const QJsonObject &config,
+                                           const CppConfigFramework::ConfigObjectNode &config,
                                            const QSet<QString> &dependencies)
-    : m_name(name),
-      m_config(config),
+    : CppConfigFramework::ConfigLoader(),
+      m_name(name),
+      m_config(std::move(config.clone()->toObject())),
       m_dependencies(dependencies)
 {
 }
 
 // -------------------------------------------------------------------------------------------------
 
+PluginInstanceConfig::PluginInstanceConfig(const PluginInstanceConfig &other)
+    : CppConfigFramework::ConfigLoader(),
+      m_name(other.m_name),
+      m_config(std::move(other.m_config.clone()->toObject())),
+      m_dependencies(other.m_dependencies)
+{
+}
+
+// -------------------------------------------------------------------------------------------------
+
+PluginInstanceConfig &PluginInstanceConfig::operator=(const PluginInstanceConfig &other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    m_name = other.m_name;
+    m_config = std::move(other.m_config.clone()->toObject());
+    m_dependencies = other.m_dependencies;
+    return *this;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 bool PluginInstanceConfig::isValid() const
 {
-    // Check name
-    if (!Validation::validatePluginInstanceName(m_name))
-    {
-        return false;
-    }
-
-    // Config is optional
-
-    // Check (optional) dependencies
-    if (!m_dependencies.isEmpty())
-    {
-        // Check individual dependency if it is referencing a valid name
-        for (const QString &dependency : m_dependencies)
-        {
-            if ((dependency == m_name) ||
-                (!Validation::validatePluginInstanceName(dependency)))
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return validateConfig().isEmpty();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -90,16 +96,16 @@ void PluginInstanceConfig::setName(const QString &name)
 
 // -------------------------------------------------------------------------------------------------
 
-QJsonObject PluginInstanceConfig::config() const
+const CppConfigFramework::ConfigObjectNode &PluginInstanceConfig::config() const
 {
     return m_config;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void PluginInstanceConfig::setConfig(const QJsonObject &config)
+void PluginInstanceConfig::setConfig(const CppConfigFramework::ConfigObjectNode &config)
 {
-    m_config = config;
+    m_config = std::move(config.clone()->toObject());
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -118,11 +124,112 @@ void PluginInstanceConfig::setDependencies(const QSet<QString> &dependencies)
 
 // -------------------------------------------------------------------------------------------------
 
-bool operator==(const PluginInstanceConfig &left, const PluginInstanceConfig &right)
+bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
+                                                QString *error)
+{
+    // Load name
+    if (!loadRequiredConfigParameter(&m_name, QStringLiteral("name"), config, error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin instance's name. Error: ") % *error;
+        }
+        return false;
+    }
+
+    // Load config
+    if (config.contains(QStringLiteral("config")))
+    {
+        // Extract the config
+        const auto *node = config.member(QStringLiteral("config"));
+
+        if (!node->isObject())
+        {
+            if (error != nullptr)
+            {
+                *error = QStringLiteral("Plugin instance's config is not an Object node");
+            }
+            return false;
+        }
+
+        m_config = std::move(node->clone()->toObject());
+    }
+    else
+    {
+        // No config
+        m_config = CppConfigFramework::ConfigObjectNode();
+    }
+
+    // Load dependencies
+    bool loaded = false;
+
+    if (!loadOptionalConfigParameter(&m_dependencies,
+                                     QStringLiteral("dependencies"),
+                                     config,
+                                     &loaded,
+                                     error))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load plugin instance's dependencies. Error: ") %
+                     *error;
+        }
+        return false;
+    }
+
+    return true;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+QString PluginInstanceConfig::validateConfig() const
+{
+    // Check name
+    if (!Validation::validatePluginInstanceName(m_name))
+    {
+        return QStringLiteral("Name is not valid: ") % m_name;
+    }
+
+    // Config is optional
+
+    // Check (optional) dependencies
+    if (!m_dependencies.isEmpty())
+    {
+        // Check individual dependency if it is referencing a valid name
+        for (const QString &dependency : m_dependencies)
+        {
+            if (dependency == m_name)
+            {
+                return QStringLiteral("Dependency name is the same as the plugin instance name: ") %
+                        dependency;
+            }
+
+            if (!Validation::validatePluginInstanceName(dependency))
+            {
+                return QStringLiteral("Dependency's name is not valid: ") % dependency;
+            }
+        }
+    }
+
+    return QString();
+}
+
+} // namespace CppPluginFramework
+
+// -------------------------------------------------------------------------------------------------
+
+bool operator==(const CppPluginFramework::PluginInstanceConfig &left,
+                const CppPluginFramework::PluginInstanceConfig &right)
 {
     return ((left.name() == right.name()) &&
             (left.config() == right.config()) &&
             (left.dependencies() == right.dependencies()));
 }
 
+// -------------------------------------------------------------------------------------------------
+
+bool operator!=(const CppPluginFramework::PluginInstanceConfig &left,
+                const CppPluginFramework::PluginInstanceConfig &right)
+{
+    return !(left == right);
 }

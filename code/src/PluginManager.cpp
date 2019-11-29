@@ -54,14 +54,12 @@ struct PluginManager::Impl
     /*!
      * Loads all specified plugins
      *
-     * \param   pluginConfigs           List of plugin configs
-     * \param   environmentVariables    Environment variables
+     * \param   pluginConfigs   List of plugin configs
      *
      * \retval  true    All plugins were loaded
      * \retval  false   Loading of at least one plugin failed
      */
-    bool loadPlugins(const QList<PluginConfig> &pluginConfigs,
-                     const EnvironmentVariables &environmentVariables);
+    bool loadPlugins(const QList<PluginConfig> &pluginConfigs);
 
     /*!
      * Unloads all loaded plugins
@@ -129,8 +127,7 @@ struct PluginManager::Impl
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::Impl::loadPlugins(const QList<PluginConfig> &pluginConfigs,
-                                      const EnvironmentVariables &environmentVariables)
+bool PluginManager::Impl::loadPlugins(const QList<PluginConfig> &pluginConfigs)
 {
     if (!m_plugins.isEmpty())
     {
@@ -143,7 +140,7 @@ bool PluginManager::Impl::loadPlugins(const QList<PluginConfig> &pluginConfigs,
     for (const PluginConfig &pluginConfig : pluginConfigs)
     {
         // Load plugin
-        std::unique_ptr<Plugin> plugin = Plugin::load(pluginConfig, environmentVariables);
+        std::unique_ptr<Plugin> plugin = Plugin::load(pluginConfig);
 
         if (!plugin)
         {
@@ -396,11 +393,10 @@ PluginManager::~PluginManager()
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::loadPlugins(const QList<PluginConfig> &pluginConfigs,
-                                const EnvironmentVariables &environmentVariables)
+bool PluginManager::loadPlugins(const PluginManagerConfig &pluginManagerConfig)
 {
     // Load plugins
-    if (!m_impl->loadPlugins(pluginConfigs, environmentVariables))
+    if (!m_impl->loadPlugins(pluginManagerConfig.pluginConfigs()))
     {
         qDebug() << LOG_METHOD("loadPlugins")
                  << "Error: failed to load plugins!";
@@ -408,7 +404,7 @@ bool PluginManager::loadPlugins(const QList<PluginConfig> &pluginConfigs,
     }
 
     // Inject dependencies
-    if (!m_impl->injectAllDependencies(pluginConfigs))
+    if (!m_impl->injectAllDependencies(pluginManagerConfig.pluginConfigs()))
     {
         qDebug() << LOG_METHOD("loadPlugins")
                  << "Error: failed to inject dependencies!";

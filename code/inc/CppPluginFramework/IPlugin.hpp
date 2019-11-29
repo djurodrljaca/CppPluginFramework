@@ -22,12 +22,13 @@
 #define CPPPLUGINFRAMEWORK_IPLUGIN_HPP
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/EnvironmentVariables.hpp>
 #include <CppPluginFramework/LibraryExport.hpp>
 #include <CppPluginFramework/VersionInfo.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigObjectNode.hpp>
+
 // Qt includes
-#include <QtCore/QJsonObject>
 #include <QtCore/QSet>
 
 // System includes
@@ -109,14 +110,12 @@ public:
     /*!
      * Loads the specified config
      *
-     * \param   config                  Config
-     * \param   environmentVariables    Environment variables
+     * \param   config  Config node
      *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    virtual bool loadConfig(const QJsonObject &config,
-                            const EnvironmentVariables &environmentVariables) = 0;
+    virtual bool loadConfig(const CppConfigFramework::ConfigObjectNode &config) = 0;
 
     /*!
      * Injects all dependencies (interfaces) that can be taken out of the specified plugin instance

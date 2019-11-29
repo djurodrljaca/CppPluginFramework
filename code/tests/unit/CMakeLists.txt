@@ -37,9 +37,9 @@ endfunction()
 # --------------------------------------------------------------------------------------------------
 # Unit tests
 # --------------------------------------------------------------------------------------------------
-add_subdirectory(ConfigFile)
 add_subdirectory(PluginConfig)
 add_subdirectory(PluginInstanceConfig)
+add_subdirectory(PluginManagerConfig)
 add_subdirectory(Validation)
 add_subdirectory(VersionInfo)
 
