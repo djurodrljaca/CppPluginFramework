@@ -23,24 +23,24 @@ find_package(Qt5Core REQUIRED)
 # CppPluginFramework library
 # --------------------------------------------------------------------------------------------------
 add_library(CppPluginFramework SHARED
-#    inc/CppPluginFramework/AbstractPlugin.hpp
-#    inc/CppPluginFramework/IPlugin.hpp
+    inc/CppPluginFramework/AbstractPlugin.hpp
+    inc/CppPluginFramework/IPlugin.hpp
     inc/CppPluginFramework/LibraryExport.hpp
-#    inc/CppPluginFramework/Plugin.hpp
+    inc/CppPluginFramework/Plugin.hpp
     inc/CppPluginFramework/PluginConfig.hpp
     inc/CppPluginFramework/PluginExport.hpp
     inc/CppPluginFramework/PluginInstanceConfig.hpp
-#    inc/CppPluginFramework/PluginManager.hpp
+    inc/CppPluginFramework/PluginManager.hpp
     inc/CppPluginFramework/PluginManagerConfig.hpp
     inc/CppPluginFramework/Validation.hpp
     inc/CppPluginFramework/VersionInfo.hpp
 
-#    src/AbstractPlugin.cpp
-#    src/LogHelper.hpp
-#    src/Plugin.cpp
+    src/AbstractPlugin.cpp
+    src/LogHelper.hpp
+    src/Plugin.cpp
     src/PluginConfig.cpp
     src/PluginInstanceConfig.cpp
-#    src/PluginManager.cpp
+    src/PluginManager.cpp
     src/PluginManagerConfig.cpp
     src/Validation.cpp
     src/VersionInfo.cpp

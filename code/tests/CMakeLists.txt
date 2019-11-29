@@ -82,7 +82,7 @@ endfunction()
 # Tests
 # --------------------------------------------------------------------------------------------------
 add_subdirectory(unit)
-#add_subdirectory(integration)
+add_subdirectory(integration)
 
 # --------------------------------------------------------------------------------------------------
 # Code Coverage

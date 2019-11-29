@@ -22,7 +22,6 @@
 #define CPPPLUGINFRAMEWORK_PLUGINMANAGERCONFIG_HPP
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/EnvironmentVariables.hpp>
 #include <CppPluginFramework/PluginConfig.hpp>
 
 // Qt includes

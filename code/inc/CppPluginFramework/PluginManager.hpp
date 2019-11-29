@@ -23,7 +23,7 @@
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
-#include <CppPluginFramework/PluginConfig.hpp>
+#include <CppPluginFramework/PluginManagerConfig.hpp>
 
 // Qt includes
 #include <QtCore/QHash>
@@ -57,8 +57,7 @@ public:
     /*!
      * Loads all plugins specified in the config
      *
-     * \param   pluginConfigs           List of plugin configs
-     * \param   environmentVariables    Environment variables
+     * \param   pluginManagerConfig     Plugin manager configs
      *
      * \retval  true    Success
      * \retval  false   Failure
@@ -66,8 +65,7 @@ public:
      * After each plugin is loaded all of its instances get created and configured. When all the
      * plugins are loaded the dependencies of each plugin instance are injected into it.
      */
-    bool loadPlugins(const QList<PluginConfig> &pluginConfigs,
-                     const EnvironmentVariables &environmentVariables);
+    bool loadPlugins(const PluginManagerConfig &pluginManagerConfig);
 
     /*!
      * Starts all loaded plugins

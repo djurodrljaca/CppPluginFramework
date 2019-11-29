@@ -29,12 +29,18 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 namespace TestPlugins
 {
 
+// -------------------------------------------------------------------------------------------------
+
 static const char s_version_string[] = "1.0.0";
+
+// -------------------------------------------------------------------------------------------------
 
 TestPlugin1::TestPlugin1(const QString &name)
     : CppPluginFramework::AbstractPlugin(name),
@@ -52,25 +58,27 @@ TestPlugin1::TestPlugin1(const QString &name)
     setExportedInterfaces(interfaces);
 }
 
-bool TestPlugin1::loadConfig(const QJsonObject &config,
-                             const EnvironmentVariables &environmentVariables)
+// -------------------------------------------------------------------------------------------------
+
+bool TestPlugin1::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
 {
-    Q_UNUSED(environmentVariables)
     bool success = false;
 
     if (config.contains("value"))
     {
-        auto value = config["value"];
+        auto node = config.member("value");
 
-        if (value.isString())
+        if (node->isValue())
         {
-            m_configuredValue = value.toString();
+            m_configuredValue = node->toValue().value().toString();
             success = true;
         }
     }
 
     return success;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 bool TestPlugin1::injectDependency(IPlugin *plugin)
 {
@@ -79,22 +87,30 @@ bool TestPlugin1::injectDependency(IPlugin *plugin)
     return false;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 void TestPlugin1::ejectDependencies()
 {
 }
+
+// -------------------------------------------------------------------------------------------------
 
 QString TestPlugin1::value() const
 {
     return m_configuredValue;
 }
 
-}
-}
+} // namespace TestPlugins
+} // namespace CppPluginFramework
+
+// -------------------------------------------------------------------------------------------------
 
 const char *readPluginVersion()
 {
     return CppPluginFramework::TestPlugins::s_version_string;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName)
 {
