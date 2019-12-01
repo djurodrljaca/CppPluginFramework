@@ -98,12 +98,14 @@ void TestPluginManagerConfig::testIsValid_data()
     QTest::addColumn<bool>("result");
 
     // Prepare common data
-    const QString validFilePath(QCoreApplication::applicationFilePath());
+    const QString validFilePath1(":/TestData/dummyPlugin1");
+    const QString validFilePath2(":/TestData/dummyPlugin2");
     const VersionInfo validVersion(1, 0, 0);
-    const QList<PluginInstanceConfig> validInstanceConfigs { PluginInstanceConfig("instance") };
+    const QList<PluginInstanceConfig> validInstanceConfigs1 { PluginInstanceConfig("instance1") };
+    const QList<PluginInstanceConfig> validInstanceConfigs2 { PluginInstanceConfig("instance2") };
     const QList<PluginConfig> validPluginConfigs
     {
-        PluginConfig(validFilePath, validVersion, validInstanceConfigs)
+        PluginConfig(validFilePath1, validVersion, validInstanceConfigs1)
     };
 
     // Valid
@@ -115,15 +117,43 @@ void TestPluginManagerConfig::testIsValid_data()
         QTest::newRow("valid: nmon-empty") << managerConfig << true;
     }
 
-    // Invalid
+    // Invalid: plugin config
     {
         PluginManagerConfig managerConfig;
         managerConfig.setPluginConfigs(
                     QList<PluginConfig> {
-                        PluginConfig(QString(), validVersion, validInstanceConfigs)
+                        PluginConfig(QString(), validVersion, validInstanceConfigs1)
                     });
 
-        QTest::newRow("invalid") << managerConfig << false;
+        QTest::newRow("invalid: plugin config") << managerConfig << false;
+    }
+
+    // Invalid: duplicated plugins
+    {
+        const QList<PluginConfig> pluginConfigs
+        {
+            PluginConfig(validFilePath1, validVersion, validInstanceConfigs1),
+            PluginConfig(validFilePath1, validVersion, validInstanceConfigs2)
+        };
+
+        PluginManagerConfig managerConfig;
+        managerConfig.setPluginConfigs(pluginConfigs);
+
+        QTest::newRow("invalid: duplicated plugins") << managerConfig << false;
+    }
+
+    // Invalid: duplicated instance name
+    {
+        const QList<PluginConfig> pluginConfigs
+        {
+            PluginConfig(validFilePath1, validVersion, validInstanceConfigs1),
+            PluginConfig(validFilePath2, validVersion, validInstanceConfigs1)
+        };
+
+        PluginManagerConfig managerConfig;
+        managerConfig.setPluginConfigs(pluginConfigs);
+
+        QTest::newRow("invalid: duplicated instance name") << managerConfig << false;
     }
 }
 

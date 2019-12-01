@@ -192,10 +192,10 @@ void TestPluginConfig::testFilePath()
 
     // Constructor
     {
-        PluginConfig config("file1.so", VersionInfo());
+        PluginConfig config("file1.so", VersionInfo(), {});
         QCOMPARE(config.filePath(), QString("file1.so"));
 
-        config = PluginConfig("file2.so", VersionInfo(), VersionInfo());
+        config = PluginConfig("file2.so", VersionInfo(), VersionInfo(), {});
         QCOMPARE(config.filePath(), QString("file2.so"));
     }
 }
@@ -256,14 +256,14 @@ void TestPluginConfig::testVersion()
 
     // Constructor
     {
-        PluginConfig config("file.so", VersionInfo(1, 0, 0));
+        PluginConfig config("file.so", VersionInfo(1, 0, 0), {});
         QCOMPARE(config.version(), VersionInfo(1, 0, 0));
         QCOMPARE(config.minVersion(), VersionInfo());
         QCOMPARE(config.maxVersion(), VersionInfo());
         QCOMPARE(config.isExactVersion(), true);
         QCOMPARE(config.isVersionRange(), false);
 
-        config = PluginConfig("file.so", VersionInfo(1, 0, 1), VersionInfo(1, 1, 0));
+        config = PluginConfig("file.so", VersionInfo(1, 0, 1), VersionInfo(1, 1, 0), {});
         QCOMPARE(config.version(), VersionInfo());
         QCOMPARE(config.minVersion(), VersionInfo(1, 0, 1));
         QCOMPARE(config.maxVersion(), VersionInfo(1, 1, 0));
@@ -291,13 +291,13 @@ void TestPluginConfig::testInstanceConfigs()
 
     // Constructor
     {
-        PluginConfig config("file.so", VersionInfo(1, 0, 0));
+        PluginConfig config("file.so", VersionInfo(1, 0, 0), {});
         QVERIFY(config.instanceConfigs().isEmpty());
 
         config = PluginConfig("file.so", VersionInfo(1, 0, 0), instanceConfigs);
         QCOMPARE(config.instanceConfigs(), instanceConfigs);
 
-        config = PluginConfig("file.so", VersionInfo(1, 0, 1), VersionInfo(1, 1, 0));
+        config = PluginConfig("file.so", VersionInfo(1, 0, 1), VersionInfo(1, 1, 0), {});
         QVERIFY(config.instanceConfigs().isEmpty());
 
         config = PluginConfig("file.so",

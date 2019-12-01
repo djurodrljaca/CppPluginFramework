@@ -62,15 +62,12 @@ private slots:
     void testValidateFilePath_data();
 
 private:
-    // Holds the path to the data directory
-    QDir m_testDataDirPath;
 };
 
 // Test Case init/cleanup methods ------------------------------------------------------------------
 
 void TestValidation::initTestCase()
 {
-    m_testDataDirPath = QDir(TEST_DATA_DIR_PATH);
 }
 
 void TestValidation::cleanupTestCase()
@@ -333,25 +330,25 @@ void TestValidation::testValidateFilePath_data()
     int i = 0;
 
     // Valid results
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file") << true;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file.txt") << true;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file.ext") << true;
+    QTest::addRow("%d", i++) << ":/TestData/file" << true;
+    QTest::addRow("%d", i++) << ":/TestData/file.txt" << true;
+    QTest::addRow("%d", i++) << ":/TestData/file.ext" << true;
 
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file") << true;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file.txt") << true;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file.ext") << true;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file" << true;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file.txt" << true;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file.ext" << true;
 
     // Invalid results
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file.aaa") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file1") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file1.txt") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("file1.ext") << false;
+    QTest::addRow("%d", i++) << ":/TestData/somePath" << false;
+    QTest::addRow("%d", i++) << ":/TestData/file.aaa" << false;
+    QTest::addRow("%d", i++) << ":/TestData/file1" << false;
+    QTest::addRow("%d", i++) << ":/TestData/file1.txt" << false;
+    QTest::addRow("%d", i++) << ":/TestData/file1.ext" << false;
 
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file.aaa") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file1") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file1.txt") << false;
-    QTest::addRow("%d", i++) << m_testDataDirPath.filePath("somePath/file1.ext") << false;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file.aaa" << false;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file1" << false;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file1.txt" << false;
+    QTest::addRow("%d", i++) << ":/TestData/somePath/file1.ext" << false;
 }
 
 // Main function -----------------------------------------------------------------------------------

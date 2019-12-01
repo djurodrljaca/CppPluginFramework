@@ -37,36 +37,16 @@
 
 // Macros
 
-/*!
- * Macro for getting a textual representation of an interface class name
- *
- * \note    Make sure that the full namespace is included together with the class name!
- *
- * Example:
- *
- * \code{.cpp}
- * namespace SomeNamespace
- * {
- * class ISomePlugin { ... }
- * }
- *
- * QString interfaceName = CPPPLUGINFRAMEWORK_INTERFACE_NAME(SomeNamespace::ISomePlugin);
- * \endcode
- */
-#define CPPPLUGINFRAMEWORK_INTERFACE_NAME(INTERFACE_CLASS)  (QStringLiteral(#INTERFACE_CLASS))
+// -------------------------------------------------------------------------------------------------
 
 namespace CppPluginFramework
 {
 
-/*!
- * This is a base class for all plugins
- */
+//! This is a base class for all plugins
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT IPlugin
 {
 public:
-    /*!
-     * Destructor
-     */
+    //! Destructor
     virtual ~IPlugin() = default;
 
     /*!
@@ -77,18 +57,18 @@ public:
     virtual QString name() const = 0;
 
     /*!
-     * Returns plugin's description
-     *
-     * \return  Plugin's description
-     */
-    virtual QString description() const = 0;
-
-    /*!
      * Returns plugin's version
      *
      * \return  Plugin's version
      */
     virtual VersionInfo version() const = 0;
+
+    /*!
+     * Returns plugin's description
+     *
+     * \return  Plugin's description
+     */
+    virtual QString description() const = 0;
 
     /*!
      * Checks if the specified interface is exported by this plugin
@@ -127,9 +107,7 @@ public:
      */
     virtual bool injectDependency(IPlugin *plugin) = 0;
 
-    /*!
-     * Ejects all injected dependencies (interfaces)
-     */
+    //! Ejects all injected dependencies (interfaces)
     virtual void ejectDependencies() = 0;
 
     /*!
@@ -148,9 +126,7 @@ public:
      */
     virtual bool start() = 0;
 
-    /*!
-     * Stops the plugin
-     */
+    //! Stops the plugin
     virtual void stop() = 0;
 
     /*!
@@ -166,6 +142,6 @@ public:
     }
 };
 
-}
+} // namespace CppPluginFramework
 
 #endif // CPPPLUGINFRAMEWORK_IPLUGIN_HPP

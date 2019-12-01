@@ -25,10 +25,12 @@ find_package(Qt5Core REQUIRED)
 add_library(CppPluginFramework SHARED
     inc/CppPluginFramework/AbstractPlugin.hpp
     inc/CppPluginFramework/IPlugin.hpp
+    inc/CppPluginFramework/IPluginFactory.hpp
     inc/CppPluginFramework/LibraryExport.hpp
     inc/CppPluginFramework/Plugin.hpp
     inc/CppPluginFramework/PluginConfig.hpp
     inc/CppPluginFramework/PluginExport.hpp
+    inc/CppPluginFramework/PluginFactoryTemplate.hpp
     inc/CppPluginFramework/PluginInstanceConfig.hpp
     inc/CppPluginFramework/PluginManager.hpp
     inc/CppPluginFramework/PluginManagerConfig.hpp
@@ -36,7 +38,6 @@ add_library(CppPluginFramework SHARED
     inc/CppPluginFramework/VersionInfo.hpp
 
     src/AbstractPlugin.cpp
-    src/LogHelper.hpp
     src/Plugin.cpp
     src/PluginConfig.cpp
     src/PluginInstanceConfig.cpp

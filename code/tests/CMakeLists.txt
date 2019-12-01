@@ -12,6 +12,7 @@
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 find_package(Qt5Test REQUIRED)
 
@@ -25,9 +26,9 @@ add_custom_target(all_tests)
 # --------------------------------------------------------------------------------------------------
 function(CppPluginFramework_AddTest)
     # Function parameters
-    set(options             DATA_DIR_ENABLED)   # Boolean parameters
-    set(oneValueParams      TEST_NAME)          # Parameters with one value
-    set(multiValueParams                        # Parameters with multiple values
+    set(options)                        # Boolean parameters
+    set(oneValueParams      TEST_NAME)  # Parameters with one value
+    set(multiValueParams                # Parameters with multiple values
         ADDITIONAL_SOURCES
         ADDITIONAL_HEADERS
         ADDITIONAL_LIBS
@@ -66,14 +67,6 @@ function(CppPluginFramework_AddTest)
     if (PARAM_LABELS)
         set_tests_properties(${PARAM_TEST_NAME} PROPERTIES
             LABELS "CPPPLUGINFRAMEWORK;${PARAM_LABELS}"
-            )
-    endif()
-
-    # Prepare a define for the test data directory path so that it can be used in the C++ code
-    if (PARAM_DATA_DIR_ENABLED)
-        get_filename_component(CURRENT_SOURCE_DIR_ABSOLUTE "${CURRENT_SOURCE_DIR}" ABSOLUTE)
-        target_compile_definitions(${PARAM_TEST_NAME}
-            PUBLIC TEST_DATA_DIR_PATH="${CURRENT_SOURCE_DIR_ABSOLUTE}/data"
             )
     endif()
 endfunction()

@@ -23,6 +23,7 @@
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/AbstractPlugin.hpp>
+#include <CppPluginFramework/PluginFactoryTemplate.hpp>
 #include <ITestPlugin1.hpp>
 #include <ITestPlugin2.hpp>
 
@@ -56,8 +57,26 @@ public:
     virtual QString joinedValues() const override;
 
 private:
+    bool onStart() override;
+
+private:
     QString m_configuredDelimiter;
     QList<ITestPlugin1*> m_dependencies;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class CPPPLUGINFRAMEWORK_PLUGIN_EXPORT PluginFactory :
+        public QObject,
+        public PluginFactoryTemplate<TestPlugin2>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "CppPluginFramework::IPluginFactory")
+    Q_INTERFACES(CppPluginFramework::IPluginFactory)
+
+public:
+    //! Destructor
+    ~PluginFactory() override = default;
 };
 
 } // namespace TestPlugins

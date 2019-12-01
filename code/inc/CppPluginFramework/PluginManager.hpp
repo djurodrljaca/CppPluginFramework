@@ -26,7 +26,6 @@
 #include <CppPluginFramework/PluginManagerConfig.hpp>
 
 // Qt includes
-#include <QtCore/QHash>
 
 // System includes
 #include <memory>
@@ -35,29 +34,24 @@
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 
-/*!
- * This class can be used to manage plugins
- */
+//! This class manages plugins
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginManager
 {
 public:
-    /*!
-     * Constructor
-     */
-    PluginManager();
-
-    /*!
-     * Destructor
-     */
+    //! Destructor
     ~PluginManager();
 
     /*!
-     * Loads all plugins specified in the config
+     * Loads all plugin instances specified in the config
      *
      * \param   pluginManagerConfig     Plugin manager configs
+     *
+     * \param[out]  error   Optional output for the error string
      *
      * \retval  true    Success
      * \retval  false   Failure
@@ -65,34 +59,39 @@ public:
      * After each plugin is loaded all of its instances get created and configured. When all the
      * plugins are loaded the dependencies of each plugin instance are injected into it.
      */
-    bool loadPlugins(const PluginManagerConfig &pluginManagerConfig);
+    bool load(const PluginManagerConfig &pluginManagerConfig, QString *error = nullptr);
 
     /*!
-     * Starts all loaded plugins
+     *  Unloads all loaded plugin instances
      *
-     * \retval  true    All plugins were started
-     * \retval  false   At least one plugin failed to load
+     * \param[out]  error   Optional output for the error string
+     *
+     * \retval  true    Success
+     * \retval  false   Failure
      */
-    bool startPlugins();
+    bool unload(QString *error = nullptr);
 
     /*!
-     * Stops all loaded plugins
+     * Starts all loaded plugin instances
+     *
+     * \param[out]  error   Optional output for the error string
+     *
+     * \retval  true    Success
+     * \retval  false   Failure
      */
-    void stopPlugins();
+    bool start(QString *error = nullptr);
 
-    /*!
-     * Unloads all loaded plugins
-     */
-    void unloadPlugins();
+    //! Stops all loaded plugin instances
+    void stop();
 
     /*!
      * Gets the specified plugin instance
      *
-     * \param   pluginInstanceName  Plugin instance name
+     * \param   instanceName    Plugin instance name
      *
-     * \return  Pointer to plugin instance or nullptr
+     * \return  Plugin instance or nullptr if there is no plugin instance with that name
      */
-    IPlugin *pluginInstance(const QString &pluginInstanceName);
+    IPlugin *pluginInstance(const QString &instanceName);
 
     /*!
      * Gets names of all loaded plugin instances
@@ -102,10 +101,48 @@ public:
     QStringList pluginInstanceNames() const;
 
 private:
-    struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    /*!
+     * Injects dependencies to all specified plugins
+     *
+     * \param   pluginConfigs   List of plugin configs
+     *
+     * \param[out]  error   Optional output for the error string
+     *
+     * \retval  true    All dependencies were injected
+     * \retval  false   Injection of at least one dependency failed
+     */
+    bool injectAllDependencies(const QList<PluginConfig> &pluginConfigs, QString *error);
+
+    /*!
+     * Injects dependencies to the specified instance
+     *
+     * \param   instanceName    Name of the plugin instance to inject dependencies to
+     * \param   dependencies    Names of the needed dependencies to inject
+     *
+     * \param[out]  error   Optional output for the error string
+     *
+     * \retval  true    Success
+     * \retval  false   Failure
+     */
+    bool injectDependencies(const QString &instanceName,
+                            const QSet<QString> &dependencies,
+                            QString *error);
+
+    /*!
+     * Ejects all injected dependencies
+     *
+     * \param[out]  error   Optional output for the error string
+     *
+     * \retval  true    Success
+     * \retval  false   Failure (at least one plugin instance was still running)
+     */
+    bool ejectDependencies(QString *error);
+
+private:
+    //! Holds all of the loaded plugins
+    std::map<QString, std::unique_ptr<IPlugin>> m_pluginInstances;
 };
 
-}
+} // namespace CppPluginFramework
 
 #endif // CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP
