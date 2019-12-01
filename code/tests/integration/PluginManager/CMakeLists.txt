@@ -11,4 +11,4 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-CppPluginFramework_AddIntegrationTest(TEST_NAME testPluginManager DATA_DIR_ENABLED)
+CppPluginFramework_AddIntegrationTest(TEST_NAME testPluginManager ADDITIONAL_SOURCES TestData.qrc)

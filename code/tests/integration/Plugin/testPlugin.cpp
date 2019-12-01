@@ -19,6 +19,7 @@
  */
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/IPluginFactory.hpp>
 #include <CppPluginFramework/Plugin.hpp>
 
 // Qt includes
@@ -82,30 +83,48 @@ void TestPlugin::cleanup()
 void TestPlugin::testLoadPlugin()
 {
     QFETCH(PluginConfig, config);
+    QFETCH(QStringList, instanceNames);
     QFETCH(VersionInfo, version);
-    QFETCH(int, instanceCount);
+    QFETCH(QString, description);
+    QFETCH(QStringList, exportedInterfaces);
     QFETCH(bool, result);
 
     // Load plugin
-    std::unique_ptr<Plugin> plugin = Plugin::load(config);
-    QCOMPARE(plugin != nullptr, result);
+    QString error;
+    auto instances = Plugin::loadInstances(config, &error);
+    qDebug() << "TestPlugin::testLoadPlugin: Error:" << error;
+    QCOMPARE(instances.size(), static_cast<size_t>(instanceNames.size()));
 
     // Check plugin
     if (result)
     {
-        QVERIFY(plugin->isLoaded());
-        QVERIFY(plugin->isValid());
-        QCOMPARE(plugin->version(), version);
-        QCOMPARE(plugin->instances().count(), instanceCount);
-        plugin->unload();
+        QStringList checkedInstances;
+
+        for (const auto &instance : instances)
+        {
+            QVERIFY(instance);
+
+            QVERIFY(instanceNames.contains(instance->name()));
+            QVERIFY(!checkedInstances.contains(instance->name()));
+            checkedInstances.append(instance->name());
+
+            QCOMPARE(instance->version(), version);
+            QCOMPARE(instance->description(), description);
+            QCOMPARE(instance->exportedInterfaces(), exportedInterfaces.toSet());
+        }
+
+        QCOMPARE(checkedInstances.size(), instanceNames.size());
+        QCOMPARE(checkedInstances.toSet(), instanceNames.toSet());
     }
 }
 
 void TestPlugin::testLoadPlugin_data()
 {
     QTest::addColumn<PluginConfig>("config");
+    QTest::addColumn<QStringList>("instanceNames");
     QTest::addColumn<VersionInfo>("version");
-    QTest::addColumn<int>("instanceCount");
+    QTest::addColumn<QString>("description");
+    QTest::addColumn<QStringList>("exportedInterfaces");
     QTest::addColumn<bool>("result");
 
     QDir testPluginsDir(QCoreApplication::applicationDirPath());
@@ -121,13 +140,19 @@ void TestPlugin::testLoadPlugin_data()
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config)
-                       << PluginInstanceConfig("instance2", instance2Config);
+                        << PluginInstanceConfig("instance2", instance2Config);
 
         PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
                             VersionInfo(1, 0, 0),
                             instanceConfigs);
 
-        QTest::newRow("valid: test plugin 1") << config << VersionInfo(1, 0, 0) << 2 << true;
+        QTest::newRow("valid: test plugin 1")
+                << config
+                << QStringList { "instance1", "instance2" }
+                << VersionInfo(1, 0, 0)
+                << QString("test plugin 1")
+                << QStringList { "CppPluginFramework::TestPlugins::ITestPlugin1" }
+                << true;
     }
 
     // Loading of test plugin 2
@@ -137,15 +162,21 @@ void TestPlugin::testLoadPlugin_data()
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance3",
-                                               instance3Config,
-                                               QSet<QString> { "instance1", "instance2"});
+                                                instance3Config,
+                                                QSet<QString> { "instance1", "instance2"});
 
         PluginConfig config(testPluginsDir.filePath("libTestPlugin2.so"),
                             VersionInfo(1, 0, 0),
                             VersionInfo(1, 0, 1),
                             instanceConfigs);
 
-        QTest::newRow("valid: test plugin 2") << config << VersionInfo(1, 0, 0) << 1 << true;
+        QTest::newRow("valid: test plugin 2")
+                << config
+                << QStringList { "instance3" }
+                << VersionInfo(1, 0, 0)
+                << QString("test plugin 2")
+                << QStringList { "CppPluginFramework::TestPlugins::ITestPlugin2" }
+                << true;
     }
 
     // Loading of plugin with invalid config
@@ -160,7 +191,22 @@ void TestPlugin::testLoadPlugin_data()
                             VersionInfo(1, 0, 0),
                             instanceConfigs);
 
-        QTest::newRow("invalid: config") << config << VersionInfo(1, 0, 0) << 1 << false;
+        QTest::newRow("invalid: config") << config
+                                         << QStringList()
+                                         << VersionInfo(1, 0, 0)
+                                         << QString()
+                                         << QStringList()
+                                         << false;
+    }
+
+    // Loading of plugin with invalid plugin config
+    {
+        QTest::newRow("invalid: plugin config") << PluginConfig()
+                << QStringList()
+                << VersionInfo()
+                << QString()
+                << QStringList()
+                << false;
     }
 
     // Loading of plugin with invalid version
@@ -175,7 +221,24 @@ void TestPlugin::testLoadPlugin_data()
                             VersionInfo(1, 0, 1),
                             instanceConfigs);
 
-        QTest::newRow("invalid: version") << config << VersionInfo(1, 0, 0) << 1 << false;
+        QTest::newRow("invalid: version 1") << config
+                                            << QStringList()
+                                            << VersionInfo()
+                                            << QString()
+                                            << QStringList()
+                                            << false;
+
+        config = PluginConfig(testPluginsDir.filePath("libTestPlugin1.so"),
+                              VersionInfo(1, 0, 1),
+                              VersionInfo(1, 0, 2),
+                              instanceConfigs);
+
+        QTest::newRow("invalid: version 2") << config
+                                            << QStringList()
+                                            << VersionInfo()
+                                            << QString()
+                                            << QStringList()
+                                            << false;
     }
 }
 

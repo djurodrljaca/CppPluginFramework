@@ -23,6 +23,7 @@
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/AbstractPlugin.hpp>
+#include <CppPluginFramework/PluginFactoryTemplate.hpp>
 #include <ITestPlugin1.hpp>
 
 // Qt includes
@@ -56,6 +57,21 @@ public:
 
 private:
     QString m_configuredValue;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class CPPPLUGINFRAMEWORK_PLUGIN_EXPORT PluginFactory :
+        public QObject,
+        public PluginFactoryTemplate<TestPlugin1>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "CppPluginFramework::IPluginFactory")
+    Q_INTERFACES(CppPluginFramework::IPluginFactory)
+
+public:
+    //! Destructor
+    ~PluginFactory() override = default;
 };
 
 } // namespace TestPlugins

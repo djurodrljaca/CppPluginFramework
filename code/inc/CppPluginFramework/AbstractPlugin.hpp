@@ -25,26 +25,30 @@
 #include <CppPluginFramework/IPlugin.hpp>
 
 // Qt includes
+#include <QtCore/QMutex>
 
 // System includes
-#include <memory>
 
 // Forward declarations
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 
 /*!
- * This is a convenience base class for creating plugins. It provides a common implementation one
- * part of the plugin interface.
+ * This is a convenience base class for creating plugins. It provides a common implementation a part
+ * of the plugin interface.
  *
  * Derived classes still need to implement the following:
  * - Loading of a configuration
  * - Injection and ejection of dependencies
- * - Started state of the plugin (is started or not)
- * - Starting and stopping of the plugin
+ *
+ * Derived classes can also hook to events:
+ * - Starting plugin
+ * - Stopping plugin
  */
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT AbstractPlugin : public IPlugin
 {
@@ -53,75 +57,39 @@ public:
      * Constructor
      *
      * \param   name    Plugin instance name
+     * \param   version Plugin version
      */
-    AbstractPlugin(const QString &name);
+    AbstractPlugin(const QString &name,
+                   const VersionInfo &version,
+                   const QString &description,
+                   const QSet<QString> &exportedInterfaces);
 
-    /*!
-     * Destructor
-     */
-    ~AbstractPlugin() override;
+    //! Destructor
+    ~AbstractPlugin() override = default;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::name()
-     */
-    QString name() const override;
+    //! \copydoc CppPluginFramework::IPlugin::name()
+    QString name() const override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::description()
-     */
-    QString description() const override;
+    //! \copydoc CppPluginFramework::IPlugin::version()
+    VersionInfo version() const override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::version()
-     */
-    VersionInfo version() const override;
+    //! \copydoc CppPluginFramework::IPlugin::description()
+    QString description() const override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::isInterfaceExported()
-     */
-    bool isInterfaceExported(const QString &interface) const override;
+    //! \copydoc CppPluginFramework::IPlugin::isInterfaceExported()
+    bool isInterfaceExported(const QString &interface) const override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::exportedInterfaces()
-     */
-    QSet<QString> exportedInterfaces() const override;
+    //! \copydoc CppPluginFramework::IPlugin::exportedInterfaces()
+    QSet<QString> exportedInterfaces() const override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::isStarted()
-     */
-    bool isStarted() const override;
+    //! \copydoc CppPluginFramework::IPlugin::isStarted()
+    bool isStarted() const override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::start()
-     */
-    bool start() override;
+    //! \copydoc CppPluginFramework::IPlugin::start()
+    bool start() override final;
 
-    /*!
-     * \copydoc CppPluginFramework::IPlugin::stop()
-     */
-    void stop() override;
-
-protected:
-    /*!
-     * Sets the plugin's description
-     *
-     * \param   description     Plugin description
-     */
-    void setDescription(const QString &description);
-
-    /*!
-     * Sets the plugin's version
-     *
-     * \param   version     Plugin version
-     */
-    void setVersion(const VersionInfo &version);
-
-    /*!
-     * Sets the plugin's list of exported interfaces
-     *
-     * \param   interfaces  List of exported interfaces
-     */
-    void setExportedInterfaces(const QSet<QString> &interfaces);
+    //! \copydoc CppPluginFramework::IPlugin::stop()
+    void stop() override final;
 
 private:
     /*!
@@ -145,8 +113,24 @@ private:
      */
     virtual void onStop();
 
-    struct Impl;
-    std::unique_ptr<Impl> m_impl;
+private:
+    //! Enables thread-safe access to the plugin data
+    mutable QMutex m_mutex;
+
+    //! Holds the name of the plugin instance
+    QString m_name;
+
+    //! Holds the version of the plugin
+    VersionInfo m_version;
+
+    //! Holds the description of the plugin
+    QString m_description;
+
+    //! Holds the list of exported interfaces of the plugin
+    QSet<QString> m_exportedInterfaces;
+
+    //! Holds the "started" flag
+    bool m_started;
 };
 
 }

@@ -6,12 +6,19 @@
     
     "config":
     {
+        "plugin_startup_priorities":
+        [
+            "instance1",
+            "instance2"
+        ],
+        
         "plugins":
         {
             "test_plugin1":
             {
                 "$file_path": "${TestPluginsPath}/libTestPlugin1.so",
                 "version": "1.0.0",
+                "comment": "test plugin which just returns the configured value",
                 "instances":
                 {
                     "instance1":
@@ -39,6 +46,7 @@
                 "$file_path": "${TestPluginsPath}/libTestPlugin2.so",
                 "min_version": "1.0.0",
                 "max_version": "1.0.1",
+                "comment": "test plugin which just joins the values it gets from its dependencies",
                 "instances":
                 {
                     "instance3":
@@ -50,7 +58,7 @@
                         },
                         "dependencies":
                         [
-                            "instance4",
+                            "instance1",
                             "instance2"
                         ]
                     }

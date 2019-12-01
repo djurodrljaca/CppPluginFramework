@@ -38,25 +38,21 @@ namespace TestPlugins
 
 // -------------------------------------------------------------------------------------------------
 
-static const char s_version_string[] = "1.0.0";
+static const VersionInfo s_version("1.0.0");
+static const QString s_description("test plugin 2");
+static const QSet<QString> s_exportedInterfaces
+{
+    "CppPluginFramework::TestPlugins::ITestPlugin2"
+};
 
 // -------------------------------------------------------------------------------------------------
 
 TestPlugin2::TestPlugin2(const QString &name)
-    : CppPluginFramework::AbstractPlugin(name),
+    : CppPluginFramework::AbstractPlugin(name, s_version, s_description, s_exportedInterfaces),
       ITestPlugin2(),
       m_configuredDelimiter(),
       m_dependencies()
 {
-    setDescription("test plugin 2");
-    setVersion(CppPluginFramework::VersionInfo(QLatin1String(s_version_string)));
-
-    const QSet<QString> interfaces =
-    {
-        CPPPLUGINFRAMEWORK_INTERFACE_NAME(CppPluginFramework::TestPlugins::ITestPlugin2)
-    };
-
-    setExportedInterfaces(interfaces);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -83,25 +79,25 @@ bool TestPlugin2::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
 
 bool TestPlugin2::injectDependency(IPlugin *plugin)
 {
-    bool success = false;
-
-    if (!isStarted())
+    if (isStarted())
     {
-        if (plugin->isInterfaceExported(
-                CPPPLUGINFRAMEWORK_INTERFACE_NAME(CppPluginFramework::TestPlugins::ITestPlugin1)))
-        {
-            CppPluginFramework::TestPlugins::ITestPlugin1 *interface =
-                    plugin->interface<CppPluginFramework::TestPlugins::ITestPlugin1>();
-
-            if (interface != nullptr)
-            {
-                m_dependencies.append(interface);
-                success = true;
-            }
-        }
+        return false;
     }
 
-    return success;
+    if (!plugin->isInterfaceExported("CppPluginFramework::TestPlugins::ITestPlugin1"))
+    {
+        return false;
+    }
+
+    auto *interface = plugin->interface<CppPluginFramework::TestPlugins::ITestPlugin1>();
+
+    if (interface == nullptr)
+    {
+        return false;
+    }
+
+    m_dependencies.append(plugin);
+    return true;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -120,9 +116,10 @@ QString TestPlugin2::joinedValues() const
 {
     QStringList values;
 
-    for (auto *item : m_dependencies)
+    for (auto *dependency : m_dependencies)
     {
-        values.append(item->value());
+        auto *interface = dependency->interface<CppPluginFramework::TestPlugins::ITestPlugin1>();
+        values.append(interface->value());
     }
 
     values.sort();
@@ -130,19 +127,25 @@ QString TestPlugin2::joinedValues() const
     return values.join(m_configuredDelimiter);
 }
 
+// -------------------------------------------------------------------------------------------------
+
+bool TestPlugin2::onStart()
+{
+    if (m_dependencies.isEmpty())
+    {
+        return false;
+    }
+
+    for (auto *dependency : m_dependencies)
+    {
+        if (!dependency->isStarted())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 } // namespace TestPlugins
 } // namespace CppPluginFramework
-
-// -------------------------------------------------------------------------------------------------
-
-const char *readPluginVersion()
-{
-    return CppPluginFramework::TestPlugins::s_version_string;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName)
-{
-    return new CppPluginFramework::TestPlugins::TestPlugin2(instanceName);
-}

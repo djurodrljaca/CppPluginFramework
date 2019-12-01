@@ -38,24 +38,20 @@ namespace TestPlugins
 
 // -------------------------------------------------------------------------------------------------
 
-static const char s_version_string[] = "1.0.0";
+static const VersionInfo s_version("1.0.0");
+static const QString s_description("test plugin 1");
+static const QSet<QString> s_exportedInterfaces
+{
+    "CppPluginFramework::TestPlugins::ITestPlugin1"
+};
 
 // -------------------------------------------------------------------------------------------------
 
 TestPlugin1::TestPlugin1(const QString &name)
-    : CppPluginFramework::AbstractPlugin(name),
+    : CppPluginFramework::AbstractPlugin(name, s_version, s_description, s_exportedInterfaces),
       ITestPlugin1(),
       m_configuredValue()
 {
-    setDescription("test plugin 1");
-    setVersion(CppPluginFramework::VersionInfo(QLatin1String(s_version_string)));
-
-    const QSet<QString> interfaces =
-    {
-        CPPPLUGINFRAMEWORK_INTERFACE_NAME(CppPluginFramework::TestPlugins::ITestPlugin1)
-    };
-
-    setExportedInterfaces(interfaces);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -102,17 +98,3 @@ QString TestPlugin1::value() const
 
 } // namespace TestPlugins
 } // namespace CppPluginFramework
-
-// -------------------------------------------------------------------------------------------------
-
-const char *readPluginVersion()
-{
-    return CppPluginFramework::TestPlugins::s_version_string;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName)
-{
-    return new CppPluginFramework::TestPlugins::TestPlugin1(instanceName);
-}

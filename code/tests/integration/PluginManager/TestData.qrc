@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>TestData/AppConfig.json</file>
+        <file>TestData/InvalidConfigWithUnsupportedDependency.json</file>
+        <file>TestData/AppConfigWithInvalidStartupOrder.json</file>
+    </qresource>
+</RCC>
