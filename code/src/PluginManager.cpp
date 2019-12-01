@@ -116,6 +116,17 @@ bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig, QString
         return false;
     }
 
+    // Startup order (instances from startup priorities first, then all others)
+    m_pluginStartupOrder = pluginManagerConfig.pluginStartupPriorities();
+
+    for (const QString &instanceName : pluginInstanceNames())
+    {
+        if (!m_pluginStartupOrder.contains(instanceName))
+        {
+            m_pluginStartupOrder.append(instanceName);
+        }
+    }
+
     return true;
 }
 
@@ -145,19 +156,17 @@ bool PluginManager::unload(QString *error)
 
 bool PluginManager::start(QString *error)
 {
-    // TODO: make it possible to start the plugin instances in a specific order!
-
-    // Iterate over all plugin instances and start them
-    for (auto &item : m_pluginInstances)
+    // Start plugin instances in the defined startup order
+    for (auto it = m_pluginStartupOrder.begin(); it != m_pluginStartupOrder.end(); it++)
     {
-        auto *instance = item.second.get();
+        auto *instance = pluginInstance(*it);
 
         // Check if plugin instance is loaded
         if (instance == nullptr)
         {
             if (error != nullptr)
             {
-                *error = QString("Plugin instance [%1] is null!").arg(item.first);
+                *error = QString("Plugin instance [%1] is null!").arg(*it);
             }
             return false;
         }
@@ -189,12 +198,10 @@ bool PluginManager::start(QString *error)
 
 void PluginManager::stop()
 {
-    // TODO: make it possible to stop the plugin instances in a specific order!
-
-    // Iterate over all plugin instances and stop them
-    for (auto &item : m_pluginInstances)
+    // Stop plugin instances in the reverse order as they were started
+    for (auto it = m_pluginStartupOrder.rbegin(); it != m_pluginStartupOrder.rend(); it++)
     {
-        auto *instance = item.second.get();
+        auto *instance = pluginInstance(*it);
 
         // Stop plugin instance
         if ((instance != nullptr) && (instance->isStarted()))

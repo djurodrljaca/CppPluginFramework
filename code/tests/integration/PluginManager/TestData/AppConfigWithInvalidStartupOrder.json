@@ -1,0 +1,16 @@
+{
+    "includes":
+    [
+        {
+            "file_path": "AppConfig.json"
+        }
+    ],
+    
+    "config":
+    {
+        "plugin_startup_priorities":
+        [
+            "instance3"
+        ]
+    }
+}

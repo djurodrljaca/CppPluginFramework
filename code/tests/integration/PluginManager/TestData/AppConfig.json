@@ -6,6 +6,12 @@
     
     "config":
     {
+        "plugin_startup_priorities":
+        [
+            "instance1",
+            "instance2"
+        ],
+        
         "plugins":
         {
             "test_plugin1":

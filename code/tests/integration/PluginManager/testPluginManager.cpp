@@ -58,11 +58,9 @@ private slots:
     // Test functions
     void testLoad();
     void testLoadAfterStart();
-
-    void testLoadPluginsWithInvalidConfig1();
-    void testLoadPluginsWithInvalidConfig1_data();
-
-    void testLoadPluginsWithInvalidConfig2();
+    void testLoadPluginsWithInvalidConfig();
+    void testLoadPluginsWithUnsupportedDependency();
+    void testLoadPluginsWithInvalidStartupOrder();
 };
 
 // Test Case init/cleanup methods ------------------------------------------------------------------
@@ -190,16 +188,27 @@ void TestPluginManager::testLoadAfterStart()
 
 // Test: loading of plugins with invalid config ----------------------------------------------------
 
-void TestPluginManager::testLoadPluginsWithInvalidConfig1()
+void TestPluginManager::testLoadPluginsWithInvalidConfig()
 {
-    QFETCH(QString, filePath);
+    PluginManagerConfig pluginManagerConfig;
+    pluginManagerConfig.setPluginConfigs({ PluginConfig() });
 
+    // Load plugins with invalid config
+    QString error;
+    PluginManager pluginManager;
+    QVERIFY(!pluginManager.load(pluginManagerConfig, &error));
+}
+
+// Test: loading of plugins with an unsupported dependency -----------------------------------------
+
+void TestPluginManager::testLoadPluginsWithUnsupportedDependency()
+{
     // First load the config
     ConfigReader configReader;
     EnvironmentVariables environmentVariables;
     QString error;
 
-    auto config = configReader.read(filePath,
+    auto config = configReader.read(":/TestData/InvalidConfigWithUnsupportedDependency.json",
                                     QDir(QCoreApplication::applicationDirPath()),
                                     ConfigNodePath::ROOT_PATH,
                                     ConfigNodePath::ROOT_PATH,
@@ -213,31 +222,41 @@ void TestPluginManager::testLoadPluginsWithInvalidConfig1()
     QVERIFY2(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error),
              qPrintable(error));
 
-    // Load plugins with invalid config
     error.clear();
     PluginManager pluginManager;
     QVERIFY(!pluginManager.load(pluginManagerConfig, &error));
 }
 
-void TestPluginManager::testLoadPluginsWithInvalidConfig1_data()
+// Test: loading of plugins with invalid startup order ---------------------------------------------
+
+void TestPluginManager::testLoadPluginsWithInvalidStartupOrder()
 {
-    QTest::addColumn<QString>("filePath");
-
-    QTest::newRow("unknown dependency") << ":/TestData/InvalidAppConfig1.json";
-    QTest::newRow("unsupported dependency") << ":/TestData/InvalidAppConfig2.json";
-}
-
-// Test: loading of plugins with invalid config ----------------------------------------------------
-
-void TestPluginManager::testLoadPluginsWithInvalidConfig2()
-{
-    PluginManagerConfig pluginManagerConfig;
-    pluginManagerConfig.setPluginConfigs({ PluginConfig() });
-
-    // Load plugins with invalid config
+    // First load the config
+    ConfigReader configReader;
+    EnvironmentVariables environmentVariables;
     QString error;
+
+    auto config = configReader.read(":/TestData/AppConfigWithInvalidStartupOrder.json",
+                                    QDir(QCoreApplication::applicationDirPath()),
+                                    ConfigNodePath::ROOT_PATH,
+                                    ConfigNodePath::ROOT_PATH,
+                                    std::vector<const ConfigObjectNode *>(),
+                                    &environmentVariables,
+                                    &error);
+    QVERIFY(config);
+
+    error.clear();
+    PluginManagerConfig pluginManagerConfig;
+    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error));
+
+    // Load plugins
+    error.clear();
     PluginManager pluginManager;
-    QVERIFY(!pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(pluginManager.load(pluginManagerConfig, &error));
+
+    // Start plugins (must fail)
+    error.clear();
+    QVERIFY(!pluginManager.start(&error));
 }
 
 // Main function -----------------------------------------------------------------------------------
