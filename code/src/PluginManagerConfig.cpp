@@ -79,12 +79,37 @@ bool PluginManagerConfig::loadConfigParameters(const CppConfigFramework::ConfigO
 
 QString PluginManagerConfig::validateConfig() const
 {
-    // Check individual plugins are valid
+    // Check individual plugins are valid and extract all instance names
+    QStringList plugins;
+    QStringList instanceNames;
+
     for (const auto &pluginConfig : m_pluginConfigs)
     {
+        // Check individual plugins are valid
         if (!pluginConfig.isValid())
         {
             return QStringLiteral("Plugin config is not valid: ") % pluginConfig.filePath();
+        }
+
+        // Check for duplicate plugins
+        if (plugins.contains(pluginConfig.filePath()))
+        {
+            return QStringLiteral("Duplicated plugin: [%1]") % pluginConfig.filePath();
+        }
+
+        plugins.append(pluginConfig.filePath());
+
+        // Check for duplicate instance names
+        for (const auto &instanceConfig : pluginConfig.instanceConfigs())
+        {
+            if (instanceNames.contains(instanceConfig.name()))
+            {
+                return QString("Plugin [%1] has an instance with a duplicated name [%2]!")
+                        .arg(pluginConfig.filePath(),
+                             instanceConfig.name());
+            }
+
+            instanceNames.append(instanceConfig.name());
         }
     }
 
