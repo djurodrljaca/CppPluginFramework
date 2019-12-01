@@ -61,7 +61,7 @@ private:
 
 private:
     QString m_configuredDelimiter;
-    QList<ITestPlugin1*> m_dependencies;
+    QList<IPlugin*> m_dependencies;
 };
 
 // -------------------------------------------------------------------------------------------------

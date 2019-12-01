@@ -79,24 +79,25 @@ bool TestPlugin2::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
 
 bool TestPlugin2::injectDependency(IPlugin *plugin)
 {
-    bool success = false;
-
-    if (!isStarted())
+    if (isStarted())
     {
-        if (plugin->isInterfaceExported("CppPluginFramework::TestPlugins::ITestPlugin1"))
-        {
-            CppPluginFramework::TestPlugins::ITestPlugin1 *interface =
-                    plugin->interface<CppPluginFramework::TestPlugins::ITestPlugin1>();
-
-            if (interface != nullptr)
-            {
-                m_dependencies.append(interface);
-                success = true;
-            }
-        }
+        return false;
     }
 
-    return success;
+    if (!plugin->isInterfaceExported("CppPluginFramework::TestPlugins::ITestPlugin1"))
+    {
+        return false;
+    }
+
+    auto *interface = plugin->interface<CppPluginFramework::TestPlugins::ITestPlugin1>();
+
+    if (interface == nullptr)
+    {
+        return false;
+    }
+
+    m_dependencies.append(plugin);
+    return true;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -115,9 +116,10 @@ QString TestPlugin2::joinedValues() const
 {
     QStringList values;
 
-    for (auto *item : m_dependencies)
+    for (auto *dependency : m_dependencies)
     {
-        values.append(item->value());
+        auto *interface = dependency->interface<CppPluginFramework::TestPlugins::ITestPlugin1>();
+        values.append(interface->value());
     }
 
     values.sort();
@@ -129,7 +131,20 @@ QString TestPlugin2::joinedValues() const
 
 bool TestPlugin2::onStart()
 {
-    return (!m_dependencies.isEmpty());
+    if (m_dependencies.isEmpty())
+    {
+        return false;
+    }
+
+    for (auto *dependency : m_dependencies)
+    {
+        if (!dependency->isStarted())
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace TestPlugins

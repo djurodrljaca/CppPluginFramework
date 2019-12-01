@@ -105,16 +105,21 @@ void TestPluginManagerConfig::testIsValid_data()
     const QList<PluginInstanceConfig> validInstanceConfigs2 { PluginInstanceConfig("instance2") };
     const QList<PluginConfig> validPluginConfigs
     {
-        PluginConfig(validFilePath1, validVersion, validInstanceConfigs1)
+        PluginConfig(validFilePath1, validVersion, validInstanceConfigs1),
+        PluginConfig(validFilePath2, validVersion, validInstanceConfigs2)
     };
 
     // Valid
     {
+        QTest::newRow("valid: empty") << PluginManagerConfig() << true;
+
         PluginManagerConfig managerConfig;
         managerConfig.setPluginConfigs(validPluginConfigs);
 
-        QTest::newRow("valid: empty") << PluginManagerConfig() << true;
-        QTest::newRow("valid: nmon-empty") << managerConfig << true;
+        QTest::newRow("valid: non-empty") << managerConfig << true;
+
+        managerConfig.setPluginStartupPriorities({ "instance1" });
+        QTest::newRow("valid: non-empty with startup priorities") << managerConfig << true;
     }
 
     // Invalid: plugin config
@@ -155,6 +160,35 @@ void TestPluginManagerConfig::testIsValid_data()
 
         QTest::newRow("invalid: duplicated instance name") << managerConfig << false;
     }
+
+    // Invalid: dependency
+    {
+        auto invalidInstanceConfigs1 = validInstanceConfigs1;
+        invalidInstanceConfigs1.first().setDependencies({ "instance3" });
+
+        const QList<PluginConfig> pluginConfigs
+        {
+            PluginConfig(validFilePath1, validVersion, invalidInstanceConfigs1),
+            PluginConfig(validFilePath2, validVersion, validInstanceConfigs2)
+        };
+
+        PluginManagerConfig managerConfig;
+        managerConfig.setPluginConfigs(pluginConfigs);
+
+        QTest::newRow("invalid: dependency") << managerConfig << false;
+    }
+
+    // Invalid: startup priorities
+    {
+        PluginManagerConfig managerConfig;
+        managerConfig.setPluginConfigs(validPluginConfigs);
+        managerConfig.setPluginStartupPriorities({ "instance3" });
+
+        QTest::newRow("invalid: startup priorities 1") << managerConfig << false;
+
+        managerConfig.setPluginStartupPriorities({ "instance1", "instance2", "instance1" });
+        QTest::newRow("invalid: startup priorities 2") << managerConfig << false;
+    }
 }
 
 // Test: loadConfig() method -----------------------------------------------------------------------
@@ -189,17 +223,25 @@ void TestPluginManagerConfig::testLoadConfig_data()
     // Prepare common data
     const QString validFilePath(QCoreApplication::applicationFilePath());
     const VersionInfo validVersion(1, 0, 0);
-    const QList<PluginInstanceConfig> validInstanceConfigs { PluginInstanceConfig("instance") };
+    const QList<PluginInstanceConfig> validInstanceConfigs
+    {
+        PluginInstanceConfig("instance1"),
+        PluginInstanceConfig("instance2"),
+    };
     const QList<PluginConfig> validPluginConfigs
     {
         PluginConfig(validFilePath, validVersion, validInstanceConfigs)
     };
 
-    ConfigObjectNode instance;
-    instance.setMember("name", ConfigValueNode("instance"));
+    ConfigObjectNode instance1;
+    instance1.setMember("name", ConfigValueNode("instance1"));
+
+    ConfigObjectNode instance2;
+    instance2.setMember("name", ConfigValueNode("instance2"));
 
     ConfigObjectNode instances;
-    instances.setMember("instance", instance);
+    instances.setMember("instance1", instance1);
+    instances.setMember("instance2", instance2);
 
     ConfigObjectNode plugin;
     plugin.setMember("file_path", ConfigValueNode(validFilePath));
@@ -228,11 +270,40 @@ void TestPluginManagerConfig::testLoadConfig_data()
         QTest::newRow("valid: non-empty") << configNode << managerConfig << true;
     }
 
-    // Invalid
+    // Valid: non-empty with startup priorities
+    {
+        ConfigObjectNode plugins;
+        plugins.setMember("plugin1", plugin);
+
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugin_startup_priorities",
+                              ConfigValueNode(QVariantList { "instance1" }));
+        configNode->setMember("plugins", plugins);
+
+        PluginManagerConfig managerConfig;
+        managerConfig.setPluginConfigs(validPluginConfigs);
+        managerConfig.setPluginStartupPriorities({ "instance1" });
+
+        QTest::newRow("valid: non-empty with startup priorities") << configNode
+                                                                  << managerConfig
+                                                                  << true;
+    }
+
+    // Invalid: plugin startup priorities node
     {
         auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugins", ConfigValueNode());
 
-        QTest::newRow("invalid") << configNode << PluginManagerConfig() << false;
+        QTest::newRow("invalid: plugins node") << configNode << PluginManagerConfig() << false;
+    }
+
+    // Invalid: plugins node
+    {
+        auto configNode = std::make_shared<ConfigObjectNode>();
+        configNode->setMember("plugins", ConfigObjectNode());
+        configNode->setMember("plugin_startup_priorities", ConfigValueNode(true));
+
+        QTest::newRow("invalid: plugins node") << configNode << PluginManagerConfig() << false;
     }
 }
 

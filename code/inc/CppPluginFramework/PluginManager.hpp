@@ -141,6 +141,9 @@ private:
 private:
     //! Holds all of the loaded plugins
     std::map<QString, std::unique_ptr<IPlugin>> m_pluginInstances;
+
+    //! Holds the order in which the plugin instances will be started
+    QStringList m_pluginStartupOrder;
 };
 
 } // namespace CppPluginFramework
