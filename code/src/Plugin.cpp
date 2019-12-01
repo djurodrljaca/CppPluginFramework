@@ -22,11 +22,11 @@
 #include <CppPluginFramework/Plugin.hpp>
 
 // C++ Plugin Framework includes
-#include "LogHelper.hpp"
+#include <CppPluginFramework/IPluginFactory.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
-#include <QtCore/QLibrary>
+#include <QtCore/QPluginLoader>
 #include <QtCore/QtDebug>
 
 // System includes
@@ -34,344 +34,162 @@
 // Forward declarations
 
 // Macros
-#define LOG_METHOD(METHOD)      CPPPLUGINFRAMEWORK_LOG_METHOD("Plugin::" METHOD)
-#define LOG_METHOD_IMPL(METHOD) CPPPLUGINFRAMEWORK_LOG_METHOD("Plugin::Impl::" METHOD)
+
+// -------------------------------------------------------------------------------------------------
 
 namespace CppPluginFramework
 {
 
-// -------------------------------------------------------------------------------------------------
-// Implementation
-// -------------------------------------------------------------------------------------------------
-
-/*!
- * Pointer to a function for reading the plugin version
- */
-typedef const char *(*ReadPluginVersionFunction)();
-
-// -------------------------------------------------------------------------------------------------
-
-/*!
- * Pointer to a function for creation of a plugin instance
- */
-typedef IPlugin *(*CreatePluginInstanceFunction)(const QString &instanceName);
-
-// -------------------------------------------------------------------------------------------------
-
-/*!
- * Private implementation struct
- */
-struct Plugin::Impl
-{
-    /*!
-     * Reads the plugin version
-     *
-     * \retval  true    Success
-     * \retval  false   Failure
-     */
-    bool readPluginVersion();
-
-    /*!
-     * Checks if plugin's version matches the version requirements
-     *
-     * \param   pluginConfig    Plugin config
-     *
-     * \retval  true    Plugin matches the version requirements
-     * \retval  false   Plugin does not match the version requirements
-     */
-    bool checkPluginVersion(const PluginConfig &pluginConfig) const;
-
-    /*!
-     * Creates all needed plugin instances
-     *
-     * \param   pluginConfig    Plugin config
-     *
-     * \retval  true    Success
-     * \retval  false   Failure
-     */
-    bool createPluginInstances(const PluginConfig &pluginConfig);
-
-    /*!
-     * Holds the library object
-     */
-    QLibrary m_library;
-
-    /*!
-     * Holds the plugin version
-     */
-    VersionInfo m_version;
-
-    /*!
-     * Holds the plugin instances
-     */
-    QList<IPlugin *> m_pluginInstances;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-bool Plugin::Impl::readPluginVersion()
-{
-    // Load the function for reading the plugin version
-    auto readPluginVersionFunction =
-            reinterpret_cast<ReadPluginVersionFunction>(m_library.resolve("readPluginVersion"));
-
-    if (readPluginVersionFunction == nullptr)
-    {
-        qDebug() << LOG_METHOD_IMPL("readPluginVersion")
-                 << "Error: Failed to load the function for reading the plugin version";
-        return false;
-    }
-
-    // Read version from plugin
-    const QString versionString = QString::fromUtf8(readPluginVersionFunction());
-    const VersionInfo version(versionString);
-
-    if (!version.isValid())
-    {
-        qDebug() << LOG_METHOD_IMPL("readPluginVersion")
-                 << "Error: Invalid plugin version:" << versionString;
-        return false;
-    }
-
-    m_version = version;
-    return true;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-bool Plugin::Impl::checkPluginVersion(const PluginConfig &pluginConfig) const
-{
-    if (pluginConfig.isExactVersion())
-    {
-        return (m_version == pluginConfig.version());
-    }
-    else
-    {
-        return VersionInfo::isVersionInRange(m_version,
-                                             pluginConfig.minVersion(),
-                                             pluginConfig.maxVersion());
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-bool Plugin::Impl::createPluginInstances(const PluginConfig &pluginConfig)
-{
-    // Check if instances are already created
-    if (!m_pluginInstances.isEmpty())
-    {
-        qDebug() << LOG_METHOD_IMPL("createPluginInstances")
-                 << "Error: plugin instance are already created";
-        return false;
-    }
-
-    // Load the function for creating the plugin instances
-    auto createPluginInstanceFunction = reinterpret_cast<CreatePluginInstanceFunction>(
-                                            m_library.resolve("createPluginInstance"));
-
-    if (createPluginInstanceFunction == nullptr)
-    {
-        qDebug() << LOG_METHOD_IMPL("createPluginInstances")
-                 << "Error: Failed to load plugin instance creation function:" << endl
-                 << "- File path:" << pluginConfig.filePath() << endl
-                 << "- Error string:" << m_library.errorString();
-        return false;
-    }
-
-    // Create plugin instances
-    for (const PluginInstanceConfig &pluginInstanceConfig : pluginConfig.instanceConfigs())
-    {
-        // Create plugin instance
-        IPlugin *pluginInstance = createPluginInstanceFunction(pluginInstanceConfig.name());
-
-        if (pluginInstance == nullptr)
-        {
-            qDebug() << LOG_METHOD_IMPL("createPluginInstances")
-                     << "Error: Failed to create plugin instance:" << pluginInstanceConfig.name();
-            return false;
-        }
-
-        qDebug() << LOG_METHOD_IMPL("createPluginInstances")
-                 << "Created plugin instance:"
-                 << "- Name:" << pluginInstance->name() << endl
-                 << "- Description:" << pluginInstance->description() << endl
-                 << "- Version:" << pluginInstance->version().toString() << endl
-                 << "- Exported interfaces:" << pluginInstance->exportedInterfaces();
-
-        // Configure the plugin instance
-        if (!pluginInstance->loadConfig(pluginInstanceConfig.config()))
-        {
-            qDebug() << LOG_METHOD_IMPL("createPluginInstances")
-                     << "Error: Failed to load the plugin instance config:"
-                     << pluginInstanceConfig.name();
-            return false;
-        }
-
-        m_pluginInstances.append(pluginInstance);
-    }
-
-    if (m_pluginInstances.isEmpty())
-    {
-        qDebug() << LOG_METHOD_IMPL("createPluginInstances")
-                 << "Error: No plugin instances were created!";
-        return false;
-    }
-
-    return true;
-}
-
-// -------------------------------------------------------------------------------------------------
-// API
-// -------------------------------------------------------------------------------------------------
-
-Plugin::Plugin()
-    : m_impl(std::make_unique<Plugin::Impl>())
-{
-}
-
-// -------------------------------------------------------------------------------------------------
-
-Plugin::~Plugin()
-{
-    unload();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-bool Plugin::isLoaded() const
-{
-    return (!m_impl->m_pluginInstances.isEmpty());
-}
-
-// -------------------------------------------------------------------------------------------------
-
-bool Plugin::isValid() const
-{
-    // Plugin is valid if all of its instances are loaded and if the instance's name, version, and
-    // list of exported interfaces are all valid
-    if (isLoaded())
-    {
-        for (IPlugin *item : m_impl->m_pluginInstances)
-        {
-            if ((!Validation::validatePluginInstanceName(item->name())) ||
-                (!item->version().isValid()) ||
-                (!Validation::validateExportedInterfaces(item->exportedInterfaces())))
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-VersionInfo Plugin::version() const
-{
-    return m_impl->m_version;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-QString Plugin::filePath() const
-{
-    return m_impl->m_library.fileName();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-QList<IPlugin *> Plugin::instances()
-{
-    return m_impl->m_pluginInstances;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-IPlugin *Plugin::instance(const QString &instanceName)
-{
-    for (IPlugin *item : m_impl->m_pluginInstances)
-    {
-        if (item->name() == instanceName)
-        {
-            return item;
-        }
-    }
-
-    return nullptr;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-std::unique_ptr<Plugin> Plugin::load(const PluginConfig &pluginConfig)
+std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &pluginConfig,
+                                                            QString *error)
 {
     // Check plugin config
     if (!pluginConfig.isValid())
     {
-        qDebug() << LOG_METHOD("load")
-                 << "Error: plugin config is not valid!";
-        return nullptr;
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Error: plugin config is not valid!");
+        }
+        return {};
     }
 
-    // Load library file and then load plugin instance creation function from it
-    qDebug() << LOG_METHOD("load")
-             << "plugin file path:" << pluginConfig.filePath();
+    // Load plugin from the library and extract the plugin factory interface from it
+    QPluginLoader loader(pluginConfig.filePath());
+    auto *loaderInstance = loader.instance();
 
-    std::unique_ptr<Plugin> plugin = std::unique_ptr<Plugin>(new Plugin());
-    plugin->m_impl->m_library.setFileName(pluginConfig.filePath());
-
-    // Read plugin version
-    if (!plugin->m_impl->readPluginVersion())
+    if (loaderInstance == nullptr)
     {
-        qDebug() << "CppPluginFramework::Plugin::loadPlugin: "
-                    "Error: Failed to read the plugin's version";
+        if (error != nullptr)
+        {
+            *error = QString("Failed to load plugin [%1]! Error: [%2]").arg(loader.fileName(),
+                                                                            loader.errorString());
+        }
+        return {};
     }
 
-    qDebug() << LOG_METHOD("load")
-             << "plugin version:" << plugin->m_impl->m_version.toString();
+    auto *pluginFactory = qobject_cast<IPluginFactory*>(loaderInstance);
 
-    // Check if plugin's version matches the version requirements
-    if (!plugin->m_impl->checkPluginVersion(pluginConfig))
+    if (pluginFactory == nullptr)
     {
-        qDebug() << LOG_METHOD("load")
-                 << "Error: plugin's version does not match the version requirements";
-        return nullptr;
+        if (error != nullptr)
+        {
+            *error = QString("Loaded plugin [%1] does not implement the plugin factory interface!")
+                     .arg(loader.fileName());
+        }
+        return {};
     }
 
     // Create plugin instances
-    if (!plugin->m_impl->createPluginInstances(pluginConfig))
+    std::vector<std::unique_ptr<IPlugin>> instances;
+
+    for (const PluginInstanceConfig &instanceConfig : pluginConfig.instanceConfigs())
     {
-        qDebug() << LOG_METHOD("load")
-                 << "Error: failed to create all needed plugin instances";
-        return nullptr;
+        // Create plugin instance
+        auto instance = loadInstance(*pluginFactory, instanceConfig, error);
+
+        if (!instance)
+        {
+            if (error != nullptr)
+            {
+                *error = QString("Failed to load the plugin instance [%1] from the plugin [%2]! "
+                                 "Error: [%3]").arg(instanceConfig.name(),
+                                                    loader.fileName(),
+                                                    *error);
+            }
+            return {};
+        }
+
+        // Check plugin's version
+        if (!checkVersion(instance->version(), pluginConfig, error))
+        {
+            if (error != nullptr)
+            {
+                *error = QString("Plugin instance [%1] from the plugin [%2] has an unsupported "
+                                 "version! Error: [%3]").arg(instanceConfig.name(),
+                                                             loader.fileName(),
+                                                             *error);
+            }
+            return {};
+        }
+
+        // Add the instance to the container of loaded instances
+        instances.push_back(std::move(instance));
     }
 
-    return plugin;
+    return instances;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void Plugin::unload()
+std::unique_ptr<IPlugin> Plugin::loadInstance(const IPluginFactory &pluginFactory,
+                                              const PluginInstanceConfig &instanceConfig,
+                                              QString *error)
 {
-    if (isLoaded())
+    // Create plugin instance
+    auto instance = pluginFactory.createInstance(instanceConfig.name());
+
+    if (!instance)
     {
-        // Destroy plugin instance
-        for (IPlugin *pluginInstance : m_impl->m_pluginInstances)
+        if (error != nullptr)
         {
-            if (pluginInstance->isStarted())
-            {
-                pluginInstance->stop();
-            }
-
-            pluginInstance->ejectDependencies();
+            *error = QStringLiteral("Failed to create the plugin instance!");
         }
-
-        qDeleteAll(m_impl->m_pluginInstances);
-        m_impl->m_pluginInstances.clear();
-
-        // Unload plugin library
-        m_impl->m_library.unload();
+        return {};
     }
+
+    // Configure the plugin instance
+    if (!instance->loadConfig(instanceConfig.config()))
+    {
+        if (error != nullptr)
+        {
+            *error = QStringLiteral("Failed to load the plugin instance's configuration!");
+        }
+        return {};
+    }
+
+    return instance;
 }
 
+// -------------------------------------------------------------------------------------------------
+
+bool Plugin::checkVersion(const VersionInfo &pluginVersion,
+                          const PluginConfig &pluginConfig,
+                          QString *error)
+{
+    if (pluginConfig.isExactVersion())
+    {
+        // Plugin's version must match the exact version
+        if (pluginVersion != pluginConfig.version())
+        {
+            if (error != nullptr)
+            {
+                *error = QString("Loaded plugin's version [%1] does not match the expected version "
+                                 "[%2]!").arg(pluginVersion.toString(),
+                                              pluginConfig.version().toString());
+            }
+            return false;
+        }
+    }
+    else
+    {
+        // Plugin's version must be within the version range
+        if (!VersionInfo::isVersionInRange(pluginVersion,
+                                           pluginConfig.minVersion(),
+                                           pluginConfig.maxVersion()))
+        {
+            if (error != nullptr)
+            {
+                *error = QString("Loaded plugin's version [%1] does not match the expected version "
+                                 "range: min=[%2], max=[%3]!")
+                         .arg(pluginVersion.toString(),
+                              pluginConfig.minVersion().toString(),
+                              pluginConfig.maxVersion().toString());
+            }
+            return false;
+        }
+    }
+
+    return true;
 }
+
+} // namespace CppPluginFramework

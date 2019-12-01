@@ -104,6 +104,20 @@ public:
      */
     void setPluginConfigs(const QList<PluginConfig> &pluginConfigs);
 
+    /*!
+     * Gets priorities for starting plugin instances
+     *
+     * \return  Plugin configs
+     */
+    const QStringList &pluginStartupPriorities() const;
+
+    /*!
+     * Sets priorities for starting plugin instances
+     *
+     * \param   startupPriorities   Priorities for starting plugin instances
+     */
+    void setPluginStartupPriorities(const QStringList &startupPriorities);
+
 private:
     //! \copydoc    CppConfigFramework::ConfigLoader::loadConfigParameters()
     bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
@@ -115,6 +129,10 @@ private:
 private:
     //! Holds the plugin configs
     QList<PluginConfig> m_pluginConfigs;
+
+    //! Holds the optional order in which the plugin instances need to be started; all unreferenced
+    //! plugin instances will be started in no particular order
+    QStringList m_pluginStartupPriorities;
 };
 
 } // namespace CppPluginFramework

@@ -55,7 +55,7 @@ public:
      */
     PluginConfig(const QString &filePath,
                  const VersionInfo &version,
-                 const QList<PluginInstanceConfig> &instanceConfigs = {});
+                 const QList<PluginInstanceConfig> &instanceConfigs);
 
     /*!
      * Constructor
@@ -68,7 +68,7 @@ public:
     PluginConfig(const QString &filePath,
                  const VersionInfo &minVersion,
                  const VersionInfo &maxVersion,
-                 const QList<PluginInstanceConfig> &instanceConfigs = {});
+                 const QList<PluginInstanceConfig> &instanceConfigs);
 
     /*!
      * Copy constructor

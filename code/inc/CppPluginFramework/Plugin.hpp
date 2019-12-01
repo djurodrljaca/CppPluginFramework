@@ -23,101 +23,71 @@
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
+#include <CppPluginFramework/IPluginFactory.hpp>
 #include <CppPluginFramework/PluginConfig.hpp>
 
 // Qt includes
 
 // System includes
-#include <memory>
 
 // Forward declarations
 
 // Macros
 
+// -------------------------------------------------------------------------------------------------
+
 namespace CppPluginFramework
 {
 
-/*!
- * This class enables loading of a plugin from a library
- */
+//! This class enables loading of plugin instances from a library
 class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Plugin
 {
 public:
     /*!
-     * Destructor
-     */
-    ~Plugin();
-
-    /*!
-     * Checks if the plugin is loaded
-     *
-     * \retval  true    Plugin is loaded
-     * \retval  false   Plugin is not loaded
-     */
-    bool isLoaded() const;
-
-    /*!
-     * Checks if the plugin is valid
-     *
-     * \retval  true    Plugin is valid
-     * \retval  false   Plugin is not valid
-     */
-    bool isValid() const;
-
-    /*!
-     * Gets the plugin's version
-     *
-     * \return  Plugin's version
-     */
-    VersionInfo version() const;
-
-    /*!
-     * Gets the plugin's file path
-     *
-     * \return  Plugin's file path
-     */
-    QString filePath() const;
-
-    /*!
-     * Gets all instances of this plugin
-     *
-     * \return  All instances of the plugin
-     */
-    QList<IPlugin *> instances();
-
-    /*!
-     * Gets the specified plugin instance
-     *
-     * \param   instanceName    Name of the plugin instance
-     *
-     * \return  Plugin instance or nullptr
-     */
-    IPlugin *instance(const QString &instanceName);
-
-    /*!
-     * Loads a plugin from the specified library
+     * Loads plugin instances from the specified library
      *
      * \param   pluginConfig    Plugin config
      *
-     * \return  Loaded plugin or nullptr if loading failed
+     * \param[out]  error   Optional output for the error string
+     *
+     * \return  Loaded plugin instances or an empty vector if loading failed
      */
-    static std::unique_ptr<Plugin> load(const PluginConfig &pluginConfig);
-
-    /*!
-     * Unloads the plugin
-     */
-    void unload();
+    static std::vector<std::unique_ptr<IPlugin>> loadInstances(const PluginConfig &pluginConfig,
+                                                               QString *error = nullptr);
 
 private:
-    /*!
-     * Private constructor
-     */
+    //! Construction of this class is disabled
     Plugin();
 
-    struct Impl;
-    std::unique_ptr<Impl> m_impl;
+    /*!
+     * Loads the plugin instance from the specified library and configures it
+     *
+     * \param   instanceConfig  Plugin instance config
+     *
+     * \param[out]  error   Optional output for the error string
+     *
+     * \return  Loaded plugin instance or nullptr if loading failed
+     */
+    static std::unique_ptr<IPlugin> loadInstance(const IPluginFactory &pluginFactory,
+                                                 const PluginInstanceConfig &instanceConfig,
+                                                 QString *error);
+
+    /*!
+     * Checks if the version matches the plugin config's version requirements
+     *
+     * \param   pluginVersion   Plugin version
+     * \param   pluginConfig    Plugin config
+     *
+     * \param[out]  error   Optional output for the error string
+     *
+     * \retval  true    Success
+     * \retval  false   Failure
+     */
+    static bool checkVersion(const VersionInfo &pluginVersion,
+                             const PluginConfig &pluginConfig,
+                             QString *error);
 };
 
-}
+} // namespace CppPluginFramework
 
 #endif // CPPPLUGINFRAMEWORK_PLUGIN_HPP

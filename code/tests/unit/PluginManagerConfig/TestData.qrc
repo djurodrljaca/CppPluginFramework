@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>TestData/dummyPlugin1</file>
+        <file>TestData/dummyPlugin2</file>
+    </qresource>
+</RCC>
