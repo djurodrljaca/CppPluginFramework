@@ -17,6 +17,7 @@ project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_AUTOMOC ON)
 
+find_package(CppConfigFramework REQUIRED)
 find_package(Qt5Core REQUIRED)
 
 # --------------------------------------------------------------------------------------------------
