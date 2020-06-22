@@ -272,20 +272,20 @@ void TestPluginInstanceConfig::testLoadConfig_data()
         QTest::newRow("valid: name and config") << configNode << instanceConfig << true;
     }
 
-    // Valid: name and dependncies
+    // Valid: name and dependencies
     {
         const QSet<QString> dependencies = {"aaa", "bbb"};
 
         ConfigObjectNode instance;
         instance.setMember("name", ConfigValueNode("test3"));
-        instance.setMember("dependencies", ConfigValueNode(QVariant(dependencies.toList())));
+        instance.setMember("dependencies", ConfigValueNode(QVariant(dependencies.values())));
 
         auto configNode = std::make_shared<ConfigObjectNode>();
         configNode->setMember("instance", instance);
 
         auto instanceConfig = PluginInstanceConfig("test3", ConfigObjectNode(), dependencies);
 
-        QTest::newRow("valid: name and dependncies") << configNode << instanceConfig << true;
+        QTest::newRow("valid: name and dependencies") << configNode << instanceConfig << true;
     }
 
     // Valid: all params
@@ -298,7 +298,7 @@ void TestPluginInstanceConfig::testLoadConfig_data()
         ConfigObjectNode instance;
         instance.setMember("name", ConfigValueNode("test4"));
         instance.setMember("config", config);
-        instance.setMember("dependencies", ConfigValueNode(QVariant(dependencies.toList())));
+        instance.setMember("dependencies", ConfigValueNode(QVariant(dependencies.values())));
 
         auto configNode = std::make_shared<ConfigObjectNode>();
         configNode->setMember("instance", instance);
