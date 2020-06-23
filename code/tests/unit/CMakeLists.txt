@@ -21,9 +21,11 @@ add_custom_target(all_unit_tests)
 # --------------------------------------------------------------------------------------------------
 function(CppPluginFramework_AddUnitTest)
     # Function parameters
-    set(options)                        # Boolean parameters
-    set(oneValueParams      TEST_NAME)  # Parameters with one value
-    set(multiValueParams)               # Parameters with multiple values
+    set(options)                # Boolean parameters
+    set(oneValueParams          # Parameters with one value
+            TEST_NAME
+        )
+    set(multiValueParams)       # Parameters with multiple values
 
     cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
 
@@ -49,10 +51,10 @@ add_subdirectory(VersionInfo)
 if (CppPluginFramework_CodeCoverage MATCHES ON)
     # Prepare targets for code coverage
     SETUP_TARGET_FOR_COVERAGE(
-        NAME ctest_coverage_all_unit_tests
-        EXECUTABLE ctest -L CPPPLUGINFRAMEWORK_UNIT_TESTS -j ${PROCESSOR_COUNT}
-        DEPENDENCIES all_unit_tests
-        PROJECT_PATH ${PROJECT_SOURCE_DIR}
-        EXCLUDES ${CppPluginFramework_CodeCoverage_EXCLUDES}
+            NAME         ctest_coverage_all_unit_tests
+            EXECUTABLE   ctest -L CPPPLUGINFRAMEWORK_UNIT_TESTS
+            DEPENDENCIES all_unit_tests
+            PROJECT_PATH ${PROJECT_SOURCE_DIR}
+            EXCLUDES     ${CppPluginFramework_CodeCoverage_EXCLUDES}
         )
 endif()

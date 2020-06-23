@@ -15,54 +15,42 @@
 # Test Plugin 1
 # --------------------------------------------------------------------------------------------------
 add_library(TestPlugin1 SHARED
-    ITestPlugin1.hpp
-    TestPlugin1.hpp
-    TestPlugin1.cpp
+        ITestPlugin1.hpp
+        TestPlugin1.hpp
+        TestPlugin1.cpp
     )
 
 target_include_directories(TestPlugin1
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 target_link_libraries(TestPlugin1
-    PUBLIC CppPluginFramework
-    PUBLIC Qt5::Core
+        PUBLIC CppPluginFramework
+        PUBLIC Qt5::Core
     )
 
 target_compile_definitions(TestPlugin1
-    PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
-    )
-
-set_target_properties(TestPlugin1 PROPERTIES
-    CXX_STANDARD 14
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
+        PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
     )
 
 # --------------------------------------------------------------------------------------------------
 # Test Plugin 2
 # --------------------------------------------------------------------------------------------------
 add_library(TestPlugin2 SHARED
-    ITestPlugin2.hpp
-    TestPlugin2.hpp
-    TestPlugin2.cpp
+        ITestPlugin2.hpp
+        TestPlugin2.hpp
+        TestPlugin2.cpp
     )
 
 target_include_directories(TestPlugin2
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
 target_link_libraries(TestPlugin2
-    PUBLIC CppPluginFramework
-    PUBLIC Qt5::Core
+        PUBLIC CppPluginFramework
+        PUBLIC Qt5::Core
     )
 
 target_compile_definitions(TestPlugin2
-    PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
-    )
-
-set_target_properties(TestPlugin2 PROPERTIES
-    CXX_STANDARD 14
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
+        PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
     )
