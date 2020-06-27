@@ -22,6 +22,7 @@
 #include <CppPluginFramework/VersionInfo.hpp>
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/LoggingCategories.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -335,19 +336,15 @@ bool operator>=(const CppPluginFramework::VersionInfo &left,
 
 template<>
 bool CppConfigFramework::ConfigParameterLoader::load(
-        const QVariant &nodeValue,
-        CppPluginFramework::VersionInfo *parameterValue,
-        QString *error)
+        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue)
 {
     // Load string representation of the version
     QString value;
 
-    if (!CppConfigFramework::ConfigParameterLoader::load(nodeValue, &value, error))
+    if (!CppConfigFramework::ConfigParameterLoader::load(nodeValue, &value))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load the version. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load the version!";
         return false;
     }
 
@@ -355,10 +352,7 @@ bool CppConfigFramework::ConfigParameterLoader::load(
 
     if (!versionInfo.isValid())
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Version is not valid");
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config) << "Version is not valid";
         return false;
     }
 

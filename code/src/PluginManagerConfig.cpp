@@ -22,6 +22,7 @@
 #include <CppPluginFramework/PluginManagerConfig.hpp>
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/LoggingCategories.hpp>
 
 // Qt includes
 #include <QtCore/QStringBuilder>
@@ -72,30 +73,23 @@ void PluginManagerConfig::setPluginStartupPriorities(const QStringList &startupP
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManagerConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
-                                               QString *error)
+bool PluginManagerConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config)
 {
     // Load plugin configs
-    if (!loadRequiredConfigContainer(&m_pluginConfigs, QStringLiteral("plugins"), config, error))
+    if (!loadRequiredConfigContainer(&m_pluginConfigs, QStringLiteral("plugins"), config))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin configurations. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin configurations!";
         return false;
     }
 
     // Load plugin startup priorities
     if (!loadOptionalConfigParameter(&m_pluginStartupPriorities,
                                      QStringLiteral("plugin_startup_priorities"),
-                                     config,
-                                     nullptr,
-                                     error))
+                                     config))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin's startup priorities. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin's startup priorities!";
         return false;
     }
 

@@ -48,12 +48,9 @@ public:
      *
      * \param   pluginConfig    Plugin config
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \return  Loaded plugin instances or an empty vector if loading failed
      */
-    static std::vector<std::unique_ptr<IPlugin>> loadInstances(const PluginConfig &pluginConfig,
-                                                               QString *error = nullptr);
+    static std::vector<std::unique_ptr<IPlugin>> loadInstances(const PluginConfig &pluginConfig);
 
 private:
     //! Construction of this class is disabled
@@ -64,13 +61,10 @@ private:
      *
      * \param   instanceConfig  Plugin instance config
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \return  Loaded plugin instance or nullptr if loading failed
      */
     static std::unique_ptr<IPlugin> loadInstance(const IPluginFactory &pluginFactory,
-                                                 const PluginInstanceConfig &instanceConfig,
-                                                 QString *error);
+                                                 const PluginInstanceConfig &instanceConfig);
 
     /*!
      * Checks if the version matches the plugin config's version requirements
@@ -78,14 +72,10 @@ private:
      * \param   pluginVersion   Plugin version
      * \param   pluginConfig    Plugin config
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    static bool checkVersion(const VersionInfo &pluginVersion,
-                             const PluginConfig &pluginConfig,
-                             QString *error);
+    static bool checkVersion(const VersionInfo &pluginVersion, const PluginConfig &pluginConfig);
 };
 
 } // namespace CppPluginFramework

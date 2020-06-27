@@ -90,25 +90,21 @@ void TestPluginManager::testLoad()
     // First load the config
     ConfigReader configReader;
     EnvironmentVariables environmentVariables;
-    QString error;
 
     auto config = configReader.read(":/TestData/AppConfig.json",
                                     QDir(QCoreApplication::applicationDirPath()),
                                     ConfigNodePath::ROOT_PATH,
                                     ConfigNodePath::ROOT_PATH,
                                     std::vector<const ConfigObjectNode *>(),
-                                    &environmentVariables,
-                                    &error);
+                                    &environmentVariables);
     QVERIFY(config);
 
-    error.clear();
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error));
+    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
 
     // Load plugins
-    error.clear();
     PluginManager pluginManager;
-    QVERIFY(pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(pluginManager.load(pluginManagerConfig));
 
     // Check all instances
     const QStringList instanceNames = pluginManager.pluginInstanceNames();
@@ -127,8 +123,7 @@ void TestPluginManager::testLoad()
     QVERIFY(instance3 != nullptr);
 
     // Start plugins
-    error.clear();
-    QVERIFY(pluginManager.start(&error));
+    QVERIFY(pluginManager.start());
 
     // Check if all instances return expected values
     QCOMPARE(instance1->interface<TestPlugins::ITestPlugin1>()->value(), QStringLiteral("value1"));
@@ -140,8 +135,7 @@ void TestPluginManager::testLoad()
     pluginManager.stop();
 
     // Unload plugins
-    error.clear();
-    QVERIFY(pluginManager.unload(&error));
+    QVERIFY(pluginManager.unload());
 }
 
 // Test: loading of plugins after the plugins were already started ---------------------------------
@@ -151,39 +145,33 @@ void TestPluginManager::testLoadAfterStart()
     // First load the config
     ConfigReader configReader;
     EnvironmentVariables environmentVariables;
-    QString error;
 
     auto config = configReader.read(":/TestData/AppConfig.json",
                                     QDir(QCoreApplication::applicationDirPath()),
                                     ConfigNodePath::ROOT_PATH,
                                     ConfigNodePath::ROOT_PATH,
                                     std::vector<const ConfigObjectNode *>(),
-                                    &environmentVariables,
-                                    &error);
+                                    &environmentVariables);
     QVERIFY(config);
 
-    error.clear();
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error));
+    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
 
     // Load plugins
-    error.clear();
     PluginManager pluginManager;
-    QVERIFY(pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(pluginManager.load(pluginManagerConfig));
 
     // Start plugins
-    error.clear();
-    QVERIFY(pluginManager.start(&error));
+    QVERIFY(pluginManager.start());
 
     // Load plugins again (must fail)
-    QVERIFY(!pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(!pluginManager.load(pluginManagerConfig));
 
     // Stop plugins
     pluginManager.stop();
 
     // Unload plugins
-    error.clear();
-    QVERIFY(pluginManager.unload(&error));
+    QVERIFY(pluginManager.unload());
 }
 
 // Test: loading of plugins with invalid config ----------------------------------------------------
@@ -194,9 +182,8 @@ void TestPluginManager::testLoadPluginsWithInvalidConfig()
     pluginManagerConfig.setPluginConfigs({ PluginConfig() });
 
     // Load plugins with invalid config
-    QString error;
     PluginManager pluginManager;
-    QVERIFY(!pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(!pluginManager.load(pluginManagerConfig));
 }
 
 // Test: loading of plugins with an unsupported dependency -----------------------------------------
@@ -206,25 +193,20 @@ void TestPluginManager::testLoadPluginsWithUnsupportedDependency()
     // First load the config
     ConfigReader configReader;
     EnvironmentVariables environmentVariables;
-    QString error;
 
     auto config = configReader.read(":/TestData/InvalidConfigWithUnsupportedDependency.json",
                                     QDir(QCoreApplication::applicationDirPath()),
                                     ConfigNodePath::ROOT_PATH,
                                     ConfigNodePath::ROOT_PATH,
                                     std::vector<const ConfigObjectNode *>(),
-                                    &environmentVariables,
-                                    &error);
+                                    &environmentVariables);
     QVERIFY(config);
 
-    error.clear();
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY2(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error),
-             qPrintable(error));
+    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
 
-    error.clear();
     PluginManager pluginManager;
-    QVERIFY(!pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(!pluginManager.load(pluginManagerConfig));
 }
 
 // Test: loading of plugins with invalid startup order ---------------------------------------------
@@ -234,29 +216,24 @@ void TestPluginManager::testLoadPluginsWithInvalidStartupOrder()
     // First load the config
     ConfigReader configReader;
     EnvironmentVariables environmentVariables;
-    QString error;
 
     auto config = configReader.read(":/TestData/AppConfigWithInvalidStartupOrder.json",
                                     QDir(QCoreApplication::applicationDirPath()),
                                     ConfigNodePath::ROOT_PATH,
                                     ConfigNodePath::ROOT_PATH,
                                     std::vector<const ConfigObjectNode *>(),
-                                    &environmentVariables,
-                                    &error);
+                                    &environmentVariables);
     QVERIFY(config);
 
-    error.clear();
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config, &error));
+    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
 
     // Load plugins
-    error.clear();
     PluginManager pluginManager;
-    QVERIFY(pluginManager.load(pluginManagerConfig, &error));
+    QVERIFY(pluginManager.load(pluginManagerConfig));
 
     // Start plugins (must fail)
-    error.clear();
-    QVERIFY(!pluginManager.start(&error));
+    QVERIFY(!pluginManager.start());
 }
 
 // Main function -----------------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include <CppPluginFramework/PluginInstanceConfig.hpp>
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/LoggingCategories.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -124,16 +125,13 @@ void PluginInstanceConfig::setDependencies(const QSet<QString> &dependencies)
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
-                                                QString *error)
+bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config)
 {
     // Load name
-    if (!loadRequiredConfigParameter(&m_name, QStringLiteral("name"), config, error))
+    if (!loadRequiredConfigParameter(&m_name, QStringLiteral("name"), config))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin instance's name. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin instance's name!";
         return false;
     }
 
@@ -145,10 +143,8 @@ bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::Config
 
         if (!node->isObject())
         {
-            if (error != nullptr)
-            {
-                *error = QStringLiteral("Plugin instance's config is not an Object node");
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::Config)
+                    << "Plugin instance's config is not an Object node!";
             return false;
         }
 
@@ -166,14 +162,10 @@ bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::Config
     if (!loadOptionalConfigParameter(&m_dependencies,
                                      QStringLiteral("dependencies"),
                                      config,
-                                     &loaded,
-                                     error))
+                                     &loaded))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin instance's dependencies. Error: ") %
-                     *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin instance's dependencies!";
         return false;
     }
 

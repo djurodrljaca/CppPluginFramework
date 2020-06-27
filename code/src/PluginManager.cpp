@@ -22,6 +22,7 @@
 #include <CppPluginFramework/PluginManager.hpp>
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/LoggingCategories.hpp>
 #include <CppPluginFramework/Plugin.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
@@ -48,25 +49,21 @@ PluginManager::~PluginManager()
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig, QString *error)
+bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig)
 {
     // Check if plugins are already loaded
     if (!m_pluginInstances.empty())
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Plugins are already loaded!");
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                << "Plugins are already loaded!";
         return false;
     }
 
     // Check if config is valid
     if (!pluginManagerConfig.isValid())
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Plugin manager config is not valid!");
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                << "Plugin manager config is not valid!";
         return false;
     }
 
@@ -74,16 +71,12 @@ bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig, QString
     for (const auto &pluginConfig : pluginManagerConfig.pluginConfigs())
     {
         // Load plugin instances
-        auto instances = Plugin::loadInstances(pluginConfig, error);
+        auto instances = Plugin::loadInstances(pluginConfig);
 
         if (instances.empty())
         {
-            if (error != nullptr)
-            {
-                *error = QString("Failed to load plugin [%1]. Error: [%2]")
-                         .arg(pluginConfig.filePath(),
-                              *error);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Failed to load plugin:" << pluginConfig.filePath();
             return false;
         }
 
@@ -93,11 +86,9 @@ bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig, QString
             // Make sure that an instance with the same name is not already in the container
             if (pluginInstance(instance->name()) != nullptr)
             {
-                if (error != nullptr)
-                {
-                    *error = QString("A plugin instance with the same name [%1] was already "
-                                     "loaded!").arg(instance->name());
-                }
+                qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                        << QString("A plugin instance with the same name [%1] was already loaded!")
+                           .arg(instance->name());
                 return false;
             }
 
@@ -107,12 +98,10 @@ bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig, QString
     }
 
     // Inject dependencies
-    if (!injectAllDependencies(pluginManagerConfig.pluginConfigs(), error))
+    if (!injectAllDependencies(pluginManagerConfig.pluginConfigs()))
     {
-        if (error != nullptr)
-        {
-            *error = QString("Failed to inject dependencies! Error: [%1]").arg(*error);
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                << "Failed to inject dependencies!";
         return false;
     }
 
@@ -132,18 +121,16 @@ bool PluginManager::load(const PluginManagerConfig &pluginManagerConfig, QString
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::unload(QString *error)
+bool PluginManager::unload()
 {
     // Make sure that all plugins are stopped
     stop();
 
     // Make sure that all of their dependencies are ejected
-    if (!ejectDependencies(error))
+    if (!ejectDependencies())
     {
-        if (error != nullptr)
-        {
-            *error = QString("Failed to unload eject dependencies! Error: [%1]").arg(*error);
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                << "Failed to unload eject dependencies!";
         return false;
     }
 
@@ -154,39 +141,33 @@ bool PluginManager::unload(QString *error)
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::start(QString *error)
+bool PluginManager::start()
 {
     // Start plugin instances in the defined startup order
-    for (auto it = m_pluginStartupOrder.begin(); it != m_pluginStartupOrder.end(); it++)
+    for (const QString &instanceName : m_pluginStartupOrder)
     {
-        auto *instance = pluginInstance(*it);
+        auto *instance = pluginInstance(instanceName);
 
         // Check if plugin instance is loaded
         if (instance == nullptr)
         {
-            if (error != nullptr)
-            {
-                *error = QString("Plugin instance [%1] is null!").arg(*it);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Plugin instance is null:" << instanceName;
             return false;
         }
 
         // Start plugin instance
         if (instance->isStarted())
         {
-            if (error != nullptr)
-            {
-                *error = QString("Plugin instance [%1] is already started!").arg(instance->name());
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Plugin instance is already started:" << instanceName;
             return false;
         }
 
         if (!instance->start())
         {
-            if (error != nullptr)
-            {
-                *error = QString("Failed to start plugin instance [%1]!").arg(instance->name());
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Failed to start plugin instance:" << instanceName;
             return false;
         }
     }
@@ -241,7 +222,7 @@ QStringList PluginManager::pluginInstanceNames() const
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::injectAllDependencies(const QList<PluginConfig> &pluginConfigs, QString *error)
+bool PluginManager::injectAllDependencies(const QList<PluginConfig> &pluginConfigs)
 {
     // Iterate over all plugin configs
     for (const PluginConfig &pluginConfig : pluginConfigs)
@@ -254,14 +235,11 @@ bool PluginManager::injectAllDependencies(const QList<PluginConfig> &pluginConfi
 
             if (!dependencies.isEmpty())
             {
-                if (!injectDependencies(instanceConfig.name(), dependencies, error))
+                if (!injectDependencies(instanceConfig.name(), dependencies))
                 {
-                    if (error != nullptr)
-                    {
-                        *error = QString("Failed to inject dependencies to plugin instance [%1]. "
-                                         "Error: [%2]").arg(instanceConfig.name(),
-                                                            *error);
-                    }
+                    qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                            << "Failed to inject dependencies to plugin instance:"
+                            << instanceConfig.name();
                     return false;
                 }
             }
@@ -274,18 +252,15 @@ bool PluginManager::injectAllDependencies(const QList<PluginConfig> &pluginConfi
 // -------------------------------------------------------------------------------------------------
 
 bool PluginManager::injectDependencies(const QString &instanceName,
-                                       const QSet<QString> &dependencies,
-                                       QString *error)
+                                       const QSet<QString> &dependencies)
 {
     // Find plugin instance
     auto *instance = pluginInstance(instanceName);
 
     if (instance == nullptr)
     {
-        if (error != nullptr)
-        {
-            *error = QString("Plugin instance [%1] was not found!").arg(instanceName);
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                << "Plugin instance was not found:" << instanceName;
         return false;
     }
 
@@ -297,21 +272,16 @@ bool PluginManager::injectDependencies(const QString &instanceName,
 
         if (dependency == nullptr)
         {
-            if (error != nullptr)
-            {
-                *error = QString("Dependency [%1] was not found!").arg(dependencyName);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Dependency was not found:" << dependencyName;
             return false;
         }
 
         if (!instance->injectDependency(dependency))
         {
-            if (error != nullptr)
-            {
-                *error = QString("Failed to inject dependency [%1] into plugin instance [%2]!")
-                         .arg(dependencyName,
-                              instanceName);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << QString("Failed to inject dependency [%1] into plugin instance [%2]!")
+                       .arg(dependencyName, instanceName);
             return false;
         }
     }
@@ -321,7 +291,7 @@ bool PluginManager::injectDependencies(const QString &instanceName,
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginManager::ejectDependencies(QString *error)
+bool PluginManager::ejectDependencies()
 {
     // Iterate over all plugin instances and eject their dependencies
     for (auto &item : m_pluginInstances)
@@ -331,20 +301,16 @@ bool PluginManager::ejectDependencies(QString *error)
         // Check if plugin instance is loaded
         if (instance == nullptr)
         {
-            if (error != nullptr)
-            {
-                *error = QString("Plugin instance [%1] is null!").arg(item.first);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Plugin instance is null:" << item.first;
             return false;
         }
 
         // Check if plugin instance is started
         if (instance->isStarted())
         {
-            if (error != nullptr)
-            {
-                *error = QString("Plugin instance [%1] is not stopped!").arg(instance->name());
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::PluginManager)
+                    << "Plugin instance is not stopped:" << instance->name();
             return false;
         }
 

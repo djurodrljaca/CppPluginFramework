@@ -51,35 +51,29 @@ public:
      *
      * \param   pluginManagerConfig     Plugin manager configs
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    Success
      * \retval  false   Failure
      *
      * After each plugin is loaded all of its instances get created and configured. When all the
      * plugins are loaded the dependencies of each plugin instance are injected into it.
      */
-    bool load(const PluginManagerConfig &pluginManagerConfig, QString *error = nullptr);
+    bool load(const PluginManagerConfig &pluginManagerConfig);
 
     /*!
      *  Unloads all loaded plugin instances
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    bool unload(QString *error = nullptr);
+    bool unload();
 
     /*!
      * Starts all loaded plugin instances
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    bool start(QString *error = nullptr);
+    bool start();
 
     //! Stops all loaded plugin instances
     void stop();
@@ -106,12 +100,10 @@ private:
      *
      * \param   pluginConfigs   List of plugin configs
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    All dependencies were injected
      * \retval  false   Injection of at least one dependency failed
      */
-    bool injectAllDependencies(const QList<PluginConfig> &pluginConfigs, QString *error);
+    bool injectAllDependencies(const QList<PluginConfig> &pluginConfigs);
 
     /*!
      * Injects dependencies to the specified instance
@@ -119,24 +111,18 @@ private:
      * \param   instanceName    Name of the plugin instance to inject dependencies to
      * \param   dependencies    Names of the needed dependencies to inject
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    Success
      * \retval  false   Failure
      */
-    bool injectDependencies(const QString &instanceName,
-                            const QSet<QString> &dependencies,
-                            QString *error);
+    bool injectDependencies(const QString &instanceName, const QSet<QString> &dependencies);
 
     /*!
      * Ejects all injected dependencies
      *
-     * \param[out]  error   Optional output for the error string
-     *
      * \retval  true    Success
      * \retval  false   Failure (at least one plugin instance was still running)
      */
-    bool ejectDependencies(QString *error);
+    bool ejectDependencies();
 
 private:
     //! Holds all of the loaded plugins

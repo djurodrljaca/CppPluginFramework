@@ -23,6 +23,7 @@
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPluginFactory.hpp>
+#include <CppPluginFramework/LoggingCategories.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -40,16 +41,12 @@
 namespace CppPluginFramework
 {
 
-std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &pluginConfig,
-                                                            QString *error)
+std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &pluginConfig)
 {
     // Check plugin config
     if (!pluginConfig.isValid())
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Error: plugin config is not valid!");
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Plugin) << "Plugin config is not valid!";
         return {};
     }
 
@@ -59,11 +56,8 @@ std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &
 
     if (loaderInstance == nullptr)
     {
-        if (error != nullptr)
-        {
-            *error = QString("Failed to load plugin [%1]! Error: [%2]").arg(loader.fileName(),
-                                                                            loader.errorString());
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                << "Failed to load plugin:" << loader.fileName();
         return {};
     }
 
@@ -71,11 +65,9 @@ std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &
 
     if (pluginFactory == nullptr)
     {
-        if (error != nullptr)
-        {
-            *error = QString("Loaded plugin [%1] does not implement the plugin factory interface!")
-                     .arg(loader.fileName());
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                << QString("Loaded plugin [%1] does not implement the plugin factory interface!")
+                   .arg(loader.fileName());
         return {};
     }
 
@@ -85,30 +77,22 @@ std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &
     for (const PluginInstanceConfig &instanceConfig : pluginConfig.instanceConfigs())
     {
         // Create plugin instance
-        auto instance = loadInstance(*pluginFactory, instanceConfig, error);
+        auto instance = loadInstance(*pluginFactory, instanceConfig);
 
         if (!instance)
         {
-            if (error != nullptr)
-            {
-                *error = QString("Failed to load the plugin instance [%1] from the plugin [%2]! "
-                                 "Error: [%3]").arg(instanceConfig.name(),
-                                                    loader.fileName(),
-                                                    *error);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                    << QString("Failed to load the plugin instance [%1] from the plugin [%2]!")
+                       .arg(instanceConfig.name(), loader.fileName());
             return {};
         }
 
         // Check plugin's version
-        if (!checkVersion(instance->version(), pluginConfig, error))
+        if (!checkVersion(instance->version(), pluginConfig))
         {
-            if (error != nullptr)
-            {
-                *error = QString("Plugin instance [%1] from the plugin [%2] has an unsupported "
-                                 "version! Error: [%3]").arg(instanceConfig.name(),
-                                                             loader.fileName(),
-                                                             *error);
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                    << QString("Plugin instance [%1] from the plugin [%2] has an unsupported "
+                               "version!").arg(instanceConfig.name(), loader.fileName());
             return {};
         }
 
@@ -122,28 +106,23 @@ std::vector<std::unique_ptr<IPlugin>> Plugin::loadInstances(const PluginConfig &
 // -------------------------------------------------------------------------------------------------
 
 std::unique_ptr<IPlugin> Plugin::loadInstance(const IPluginFactory &pluginFactory,
-                                              const PluginInstanceConfig &instanceConfig,
-                                              QString *error)
+                                              const PluginInstanceConfig &instanceConfig)
 {
     // Create plugin instance
     auto instance = pluginFactory.createInstance(instanceConfig.name());
 
     if (!instance)
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to create the plugin instance!");
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                << "Failed to create the plugin instance!";
         return {};
     }
 
     // Configure the plugin instance
     if (!instance->loadConfig(instanceConfig.config()))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load the plugin instance's configuration!");
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                << "Failed to load the plugin instance's configuration!";
         return {};
     }
 
@@ -152,21 +131,17 @@ std::unique_ptr<IPlugin> Plugin::loadInstance(const IPluginFactory &pluginFactor
 
 // -------------------------------------------------------------------------------------------------
 
-bool Plugin::checkVersion(const VersionInfo &pluginVersion,
-                          const PluginConfig &pluginConfig,
-                          QString *error)
+bool Plugin::checkVersion(const VersionInfo &pluginVersion, const PluginConfig &pluginConfig)
 {
     if (pluginConfig.isExactVersion())
     {
         // Plugin's version must match the exact version
         if (pluginVersion != pluginConfig.version())
         {
-            if (error != nullptr)
-            {
-                *error = QString("Loaded plugin's version [%1] does not match the expected version "
-                                 "[%2]!").arg(pluginVersion.toString(),
-                                              pluginConfig.version().toString());
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                    << QString("Loaded plugin's version [%1] does not match the expected version "
+                               "[%2]!").arg(pluginVersion.toString(),
+                                            pluginConfig.version().toString());
             return false;
         }
     }
@@ -177,14 +152,12 @@ bool Plugin::checkVersion(const VersionInfo &pluginVersion,
                                            pluginConfig.minVersion(),
                                            pluginConfig.maxVersion()))
         {
-            if (error != nullptr)
-            {
-                *error = QString("Loaded plugin's version [%1] does not match the expected version "
-                                 "range: min=[%2], max=[%3]!")
-                         .arg(pluginVersion.toString(),
-                              pluginConfig.minVersion().toString(),
-                              pluginConfig.maxVersion().toString());
-            }
+            qCWarning(CppPluginFramework::LoggingCategory::Plugin)
+                    << QString("Loaded plugin's version [%1] does not match the expected version "
+                               "range: min=[%2], max=[%3]!")
+                       .arg(pluginVersion.toString(),
+                            pluginConfig.minVersion().toString(),
+                            pluginConfig.maxVersion().toString());
             return false;
         }
     }

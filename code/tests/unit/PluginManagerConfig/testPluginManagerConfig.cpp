@@ -199,12 +199,8 @@ void TestPluginManagerConfig::testLoadConfig()
     QFETCH(PluginManagerConfig, expectedPluginManagerConfig);
     QFETCH(bool, expectedResult);
 
-    QString error;
     PluginManagerConfig managerConfig;
-    const bool result = managerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH,
-                                                       *configNode,
-                                                       &error);
-    qDebug() << "TestPluginManagerConfig::testLoadConfig: error:" << error;
+    const bool result = managerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *configNode);
 
     QCOMPARE(result, expectedResult);
 

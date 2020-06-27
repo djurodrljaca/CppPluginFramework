@@ -316,10 +316,8 @@ void TestPluginConfig::testLoadConfig()
     QFETCH(PluginConfig, expectedPluginConfig);
     QFETCH(bool, expectedResult);
 
-    QString error;
     PluginConfig pluginConfig;
-    const bool result = pluginConfig.loadConfig("plugin", *configNode, &error);
-    qDebug() << "TestPluginConfig::testLoadConfig: error:" << error;
+    const bool result = pluginConfig.loadConfig("plugin", *configNode);
 
     QCOMPARE(result, expectedResult);
 
