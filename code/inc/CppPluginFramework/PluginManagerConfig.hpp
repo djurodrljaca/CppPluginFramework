@@ -120,8 +120,7 @@ public:
 
 private:
     //! \copydoc    CppConfigFramework::ConfigLoader::loadConfigParameters()
-    bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
-                              QString *error) override;
+    bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config) override;
 
     //! \copydoc    CppConfigFramework::ConfigLoader::validateConfig()
     QString validateConfig() const override;

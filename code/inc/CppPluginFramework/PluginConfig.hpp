@@ -201,8 +201,7 @@ public:
 
 private:
     //! \copydoc    CppConfigFramework::ConfigLoader::loadConfigParameters()
-    bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
-                              QString *error) override;
+    bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config) override;
 
     //! \copydoc    CppConfigFramework::ConfigLoader::validateConfig()
     QString validateConfig() const override;
@@ -235,9 +234,8 @@ private:
  * \retval  true    Plugin configs are equal
  * \retval  false   Plugin configs are not equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
-        const CppPluginFramework::PluginConfig &left,
-        const CppPluginFramework::PluginConfig &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::PluginConfig &left,
+                                                  const CppPluginFramework::PluginConfig &right);
 
 /*!
  * Global "not equal to" operator for CppPluginFramework::PluginConfig
@@ -248,8 +246,7 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
  * \retval  true    Plugin configs are not equal
  * \retval  false   Plugin configs are equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(
-        const CppPluginFramework::PluginConfig &left,
-        const CppPluginFramework::PluginConfig &right);
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::PluginConfig &left,
+                                                  const CppPluginFramework::PluginConfig &right);
 
 #endif // CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP

@@ -22,6 +22,7 @@
 #include <CppPluginFramework/PluginConfig.hpp>
 
 // C++ Plugin Framework includes
+#include <CppPluginFramework/LoggingCategories.hpp>
 #include <CppPluginFramework/Validation.hpp>
 
 // Qt includes
@@ -156,35 +157,23 @@ void PluginConfig::setInstanceConfigs(const QList<PluginInstanceConfig> &instanc
 
 // -------------------------------------------------------------------------------------------------
 
-bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config,
-                                        QString *error)
+bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config)
 {
     // Load file path
-    if (!loadRequiredConfigParameter(&m_filePath,
-                                     QStringLiteral("file_path"),
-                                     config,
-                                     error))
+    if (!loadRequiredConfigParameter(&m_filePath, QStringLiteral("file_path"), config))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin's file path. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin's file path!";
         return false;
     }
 
     // Load version
     bool loaded = false;
 
-    if (!loadOptionalConfigParameter(&m_version,
-                                     QStringLiteral("version"),
-                                     config,
-                                     &loaded,
-                                     error))
+    if (!loadOptionalConfigParameter(&m_version, QStringLiteral("version"), config, &loaded))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin's version. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin's version!";
         return false;
     }
 
@@ -196,16 +185,10 @@ bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNo
     // Load min version
     loaded = false;
 
-    if (!loadOptionalConfigParameter(&m_minVersion,
-                                     QStringLiteral("min_version"),
-                                     config,
-                                     &loaded,
-                                     error))
+    if (!loadOptionalConfigParameter(&m_minVersion, QStringLiteral("min_version"), config, &loaded))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin's min version. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin's min version!";
         return false;
     }
 
@@ -217,16 +200,10 @@ bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNo
     // Load max version
     loaded = false;
 
-    if (!loadOptionalConfigParameter(&m_maxVersion,
-                                     QStringLiteral("max_version"),
-                                     config,
-                                     &loaded,
-                                     error))
+    if (!loadOptionalConfigParameter(&m_maxVersion, QStringLiteral("max_version"), config, &loaded))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin's max version. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin's max version";
         return false;
     }
 
@@ -236,15 +213,10 @@ bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNo
     }
 
     // Load instance configs
-    if (!loadRequiredConfigContainer(&m_instanceConfigs,
-                                     QStringLiteral("instances"),
-                                     config,
-                                     error))
+    if (!loadRequiredConfigContainer(&m_instanceConfigs, QStringLiteral("instances"), config))
     {
-        if (error != nullptr)
-        {
-            *error = QStringLiteral("Failed to load plugin's instances. Error: ") % *error;
-        }
+        qCWarning(CppPluginFramework::LoggingCategory::Config)
+                << "Failed to load plugin's instances!";
         return false;
     }
 
@@ -288,7 +260,7 @@ QString PluginConfig::validateConfig() const
         return QStringLiteral("Plugin config does not define any plugin instances");
     }
 
-    // Check individual instances are valid and if this plugin config contains duplicatate instances
+    // Check individual instances are valid and if this plugin config contains duplicate instances
     // (instances with the same name)
     QStringList instanceNames;
 

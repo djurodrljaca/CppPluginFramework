@@ -28,6 +28,7 @@ add_library(CppPluginFramework SHARED
         inc/CppPluginFramework/IPlugin.hpp
         inc/CppPluginFramework/IPluginFactory.hpp
         inc/CppPluginFramework/LibraryExport.hpp
+        inc/CppPluginFramework/LoggingCategories.hpp
         inc/CppPluginFramework/Plugin.hpp
         inc/CppPluginFramework/PluginConfig.hpp
         inc/CppPluginFramework/PluginExport.hpp
@@ -39,6 +40,7 @@ add_library(CppPluginFramework SHARED
         inc/CppPluginFramework/VersionInfo.hpp
 
         src/AbstractPlugin.cpp
+        src/LoggingCategories.cpp
         src/Plugin.cpp
         src/PluginConfig.cpp
         src/PluginInstanceConfig.cpp

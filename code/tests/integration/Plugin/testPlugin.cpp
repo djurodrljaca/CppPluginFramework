@@ -90,9 +90,7 @@ void TestPlugin::testLoadPlugin()
     QFETCH(bool, result);
 
     // Load plugin
-    QString error;
-    auto instances = Plugin::loadInstances(config, &error);
-    qDebug() << "TestPlugin::testLoadPlugin: Error:" << error;
+    auto instances = Plugin::loadInstances(config);
     QCOMPARE(instances.size(), static_cast<size_t>(instanceNames.size()));
 
     // Check plugin

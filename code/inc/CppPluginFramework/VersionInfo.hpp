@@ -278,6 +278,6 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>=(const CppPluginFramework::Vers
 //! \copydoc    CppConfigFramework::ConfigParameterLoader::load()
 template<>
 bool CppConfigFramework::ConfigParameterLoader::load(
-        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue, QString *error);
+        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue);
 
 #endif // CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
