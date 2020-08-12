@@ -16,7 +16,7 @@
         {
             "test_plugin1":
             {
-                "$file_path": "${TestPluginsPath}/libTestPlugin1.so",
+                "$file_path": "${TestPluginsPath}/TestPlugin1.plugin",
                 "version": "1.0.0",
                 "comment": "test plugin which just returns the configured value",
                 "instances":
@@ -43,7 +43,7 @@
             
             "test_plugin2":
             {
-                "$file_path": "${TestPluginsPath}/libTestPlugin2.so",
+                "$file_path": "${TestPluginsPath}/TestPlugin2.plugin",
                 "min_version": "1.0.0",
                 "max_version": "1.0.1",
                 "comment": "test plugin which just joins the values it gets from its dependencies",

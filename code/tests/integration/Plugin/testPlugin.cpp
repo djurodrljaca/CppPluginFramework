@@ -142,7 +142,7 @@ void TestPlugin::testLoadPlugin_data()
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config)
                         << PluginInstanceConfig("instance2", instance2Config);
 
-        PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
+        PluginConfig config(testPluginsDir.filePath("TestPlugin1.plugin"),
                             VersionInfo(1, 0, 0),
                             instanceConfigs);
 
@@ -165,7 +165,7 @@ void TestPlugin::testLoadPlugin_data()
                                                 instance3Config,
                                                 QSet<QString> { "instance1", "instance2"});
 
-        PluginConfig config(testPluginsDir.filePath("libTestPlugin2.so"),
+        PluginConfig config(testPluginsDir.filePath("TestPlugin2.plugin"),
                             VersionInfo(1, 0, 0),
                             VersionInfo(1, 0, 1),
                             instanceConfigs);
@@ -187,7 +187,7 @@ void TestPlugin::testLoadPlugin_data()
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config);
 
-        PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
+        PluginConfig config(testPluginsDir.filePath("TestPlugin1.plugin"),
                             VersionInfo(1, 0, 0),
                             instanceConfigs);
 
@@ -217,7 +217,7 @@ void TestPlugin::testLoadPlugin_data()
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config);
 
-        PluginConfig config(testPluginsDir.filePath("libTestPlugin1.so"),
+        PluginConfig config(testPluginsDir.filePath("TestPlugin1.plugin"),
                             VersionInfo(1, 0, 1),
                             instanceConfigs);
 
@@ -228,7 +228,7 @@ void TestPlugin::testLoadPlugin_data()
                                             << QStringList()
                                             << false;
 
-        config = PluginConfig(testPluginsDir.filePath("libTestPlugin1.so"),
+        config = PluginConfig(testPluginsDir.filePath("TestPlugin1.plugin"),
                               VersionInfo(1, 0, 1),
                               VersionInfo(1, 0, 2),
                               instanceConfigs);
