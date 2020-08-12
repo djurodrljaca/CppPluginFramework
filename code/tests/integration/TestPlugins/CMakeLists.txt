@@ -33,6 +33,11 @@ target_compile_definitions(TestPlugin1
         PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
     )
 
+set_target_properties(TestPlugin1 PROPERTIES
+        PREFIX ""
+        SUFFIX ".plugin"
+    )
+
 # --------------------------------------------------------------------------------------------------
 # Test Plugin 2
 # --------------------------------------------------------------------------------------------------
@@ -53,4 +58,9 @@ target_link_libraries(TestPlugin2
 
 target_compile_definitions(TestPlugin2
         PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
+    )
+
+set_target_properties(TestPlugin2 PROPERTIES
+        PREFIX ""
+        SUFFIX ".plugin"
     )
