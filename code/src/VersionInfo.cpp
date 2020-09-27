@@ -335,20 +335,18 @@ bool operator>=(const CppPluginFramework::VersionInfo &left,
 // -------------------------------------------------------------------------------------------------
 
 template<>
-bool CppConfigFramework::ConfigParameterLoader::load(
-        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue)
+bool CedarFramework::deserialize(const QJsonValue &json, CppPluginFramework::VersionInfo *value)
 {
-    // Load string representation of the version
-    QString value;
+    Q_ASSERT(value != nullptr);
 
-    if (!CppConfigFramework::ConfigParameterLoader::load(nodeValue, &value))
+    if (!json.isString())
     {
         qCWarning(CppPluginFramework::LoggingCategory::Config)
-                << "Failed to load the version!";
+                << QStringLiteral("JSON value is not a string:") << json;
         return false;
     }
 
-    CppPluginFramework::VersionInfo versionInfo(value);
+    CppPluginFramework::VersionInfo versionInfo(json.toString());
 
     if (!versionInfo.isValid())
     {
@@ -356,6 +354,6 @@ bool CppConfigFramework::ConfigParameterLoader::load(
         return false;
     }
 
-    *parameterValue = versionInfo;
+    *value = versionInfo;
     return true;
 }

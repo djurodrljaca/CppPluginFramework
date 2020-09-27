@@ -21,6 +21,12 @@
 // C++ Plugin Framework includes
 #include "TestPlugin2.hpp"
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
+// Cedar Framework includes
+#include <CedarFramework/Deserialization.hpp>
+
 // Qt includes
 
 // System includes
@@ -57,22 +63,9 @@ TestPlugin2::TestPlugin2(const QString &name)
 
 // -------------------------------------------------------------------------------------------------
 
-bool TestPlugin2::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
+bool TestPlugin2::loadConfig(const QJsonObject &config)
 {
-    bool success = false;
-
-    if (config.contains("delimiter"))
-    {
-        auto node = config.member("delimiter");
-
-        if (node->isValue())
-        {
-            m_configuredDelimiter = node->toValue().value().toString();
-            success = true;
-        }
-    }
-
-    return success;
+    return CedarFramework::deserializeNode(config, "delimiter", &m_configuredDelimiter);
 }
 
 // -------------------------------------------------------------------------------------------------

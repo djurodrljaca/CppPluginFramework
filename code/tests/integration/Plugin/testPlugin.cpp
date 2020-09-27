@@ -22,6 +22,9 @@
 #include <CppPluginFramework/IPluginFactory.hpp>
 #include <CppPluginFramework/Plugin.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtTest/QTest>
@@ -132,11 +135,15 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of test plugin 1
     {
-        ConfigObjectNode instance1Config;
-        instance1Config.setMember("value", ConfigValueNode("value1"));
+        QJsonObject instance1Config
+        {
+            { "value", "value1" }
+        };
 
-        ConfigObjectNode instance2Config;
-        instance2Config.setMember("value", ConfigValueNode("value2"));
+        QJsonObject instance2Config
+        {
+            { "value", "value2" }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config)
@@ -157,8 +164,10 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of test plugin 2
     {
-        ConfigObjectNode instance3Config;
-        instance3Config.setMember("delimiter", ConfigValueNode(";"));
+        QJsonObject instance3Config
+        {
+            { "delimiter", ";" }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance3",
@@ -181,8 +190,10 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of plugin with invalid config
     {
-        ConfigObjectNode instance1Config;
-        instance1Config.setMember("invalid", ConfigValueNode("x"));
+        QJsonObject instance1Config
+        {
+            { "invalid", "x" }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config);
@@ -211,8 +222,10 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of plugin with invalid version
     {
-        ConfigObjectNode instance1Config;
-        instance1Config.setMember("value", ConfigValueNode("value1"));
+        QJsonObject instance1Config
+        {
+            { "value", "value1" }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config);

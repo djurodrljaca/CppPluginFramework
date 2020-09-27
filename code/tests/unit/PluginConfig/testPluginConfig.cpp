@@ -21,6 +21,9 @@
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginConfig.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtTest/QTest>
@@ -344,117 +347,164 @@ void TestPluginConfig::testLoadConfig_data()
         PluginInstanceConfig("instance1"), PluginInstanceConfig("instance2")
     };
 
-    ConfigObjectNode instance1;
-    instance1.setMember("name", ConfigValueNode("instance1"));
+    ConfigObjectNode instances
+    {
+        {
+            "instance1", ConfigObjectNode
+            {
+                { "name", ConfigValueNode("instance1") }
+            }
+        },
+        {
+            "instance2", ConfigObjectNode
+            {
+                { "name", ConfigValueNode("instance2") }
+            }
+        }
 
-    ConfigObjectNode instance2;
-    instance2.setMember("name", ConfigValueNode("instance2"));
-
-    ConfigObjectNode instances;
-    instances.setMember("instance1", instance1);
-    instances.setMember("instance2", instance2);
+    };
 
     // Valid: exact version
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("file_path", ConfigValueNode(validFilePath));
-        plugin.setMember("version", ConfigValueNode(validVersion1.toString()));
-        plugin.setMember("instances", instances);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "file_path", ConfigValueNode(validFilePath) },
+                    { "version", ConfigValueNode(validVersion1.toString()) },
+                    { "instances", std::move(instances.clone()->toObject()) }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("valid: exact version") << configNode
-                                              << PluginConfig(validFilePath,
-                                                              validVersion1,
-                                                              validInstanceConfigs)
-                                              << true;
+        QTest::newRow("valid: exact version")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig(validFilePath, validVersion1, validInstanceConfigs)
+                << true;
     }
 
     // Valid: version range
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("file_path", ConfigValueNode(validFilePath));
-        plugin.setMember("min_version", ConfigValueNode(validVersion1.toString()));
-        plugin.setMember("max_version", ConfigValueNode(validVersion2.toString()));
-        plugin.setMember("instances", instances);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "file_path", ConfigValueNode(validFilePath) },
+                    { "min_version", ConfigValueNode(validVersion1.toString()) },
+                    { "max_version", ConfigValueNode(validVersion2.toString()) },
+                    { "instances", std::move(instances.clone()->toObject()) }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("valid: version range") << configNode
-                                              << PluginConfig(validFilePath,
-                                                              validVersion1,
-                                                              validVersion2,
-                                                              validInstanceConfigs)
-                                              << true;
+        QTest::newRow("valid: version range")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig(validFilePath, validVersion1, validVersion2, validInstanceConfigs)
+                << true;
     }
 
     // Invalid: file path missing
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("version", ConfigValueNode(validVersion1.toString()));
-        plugin.setMember("instances", instances);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "version", ConfigValueNode(validVersion1.toString()) },
+                    { "instances", std::move(instances.clone()->toObject()) }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("invalid: file path missing") << configNode << PluginConfig() << false;
+        QTest::newRow("invalid: file path missing")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig()
+                << false;
     }
 
     // Invalid: exact version
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("file_path", ConfigValueNode(validFilePath));
-        plugin.setMember("version", ConfigValueNode(123));
-        plugin.setMember("instances", instances);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "file_path", ConfigValueNode(validFilePath) },
+                    { "version", ConfigValueNode(123) },
+                    { "instances", std::move(instances.clone()->toObject()) }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("invalid: exact version") << configNode << PluginConfig() << false;
+        QTest::newRow("invalid: exact version")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig()
+                << false;
     }
 
     // Invalid: min version
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("file_path", ConfigValueNode(validFilePath));
-        plugin.setMember("min_version", ConfigValueNode(123));
-        plugin.setMember("max_version", ConfigValueNode(validVersion2.toString()));
-        plugin.setMember("instances", instances);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "file_path", ConfigValueNode(validFilePath) },
+                    { "min_version", ConfigValueNode(123) },
+                    { "max_version", ConfigValueNode(validVersion2.toString()) },
+                    { "instances", std::move(instances.clone()->toObject()) }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("invalid: min version") << configNode << PluginConfig() << false;
+        QTest::newRow("invalid: min version")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig()
+                << false;
     }
 
     // Invalid: max version
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("file_path", ConfigValueNode(validFilePath));
-        plugin.setMember("min_version", ConfigValueNode(validVersion1.toString()));
-        plugin.setMember("max_version", ConfigValueNode(123));
-        plugin.setMember("instances", instances);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "file_path", ConfigValueNode(validFilePath) },
+                    { "min_version", ConfigValueNode(validVersion1.toString()) },
+                    { "max_version", ConfigValueNode(123) },
+                    { "instances", std::move(instances.clone()->toObject()) }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("invalid: max version") << configNode << PluginConfig() << false;
+        QTest::newRow("invalid: max version")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig()
+                << false;
     }
 
     // Invalid: instances
     {
-        ConfigObjectNode plugin;
-        plugin.setMember("file_path", ConfigValueNode(validFilePath));
-        plugin.setMember("min_version", ConfigValueNode(validVersion1.toString()));
-        plugin.setMember("max_version", ConfigValueNode(validVersion2.toString()));
-        plugin.setMember("instances", ConfigValueNode());
+        ConfigObjectNode configNode
+        {
+            {
+                "plugin", ConfigObjectNode
+                {
+                    { "file_path", ConfigValueNode(validFilePath) },
+                    { "min_version", ConfigValueNode(validVersion1.toString()) },
+                    { "max_version", ConfigValueNode(validVersion2.toString()) },
+                    { "instances", ConfigValueNode() }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin", plugin);
-
-        QTest::newRow("invalid: instances") << configNode << PluginConfig() << false;
+        QTest::newRow("invalid: instances")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginConfig()
+                << false;
     }
 }
 

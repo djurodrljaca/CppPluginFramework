@@ -18,17 +18,17 @@
  * Contains a class that holds version information
  */
 
-#ifndef CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
-#define CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
 
 // C++ Config Framework includes
-#include <CppConfigFramework/ConfigParameterLoader.hpp>
+
+// Cedar Framework includes
+#include <CedarFramework/Deserialization.hpp>
 
 // Qt includes
-#include <QtCore/QVariant>
 
 // System includes
 
@@ -191,6 +191,8 @@ private:
 
 } // namespace CppPluginFramework
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "equal to" operator for CppPluginFramework::VersionInfo
  *
@@ -204,6 +206,8 @@ private:
  */
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::VersionInfo &left,
                                                   const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "not equal to" operator for CppPluginFramework::VersionInfo
@@ -219,6 +223,8 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::Vers
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::VersionInfo &left,
                                                   const CppPluginFramework::VersionInfo &right);
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "less than" operator for CppPluginFramework::VersionInfo
  *
@@ -232,6 +238,8 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::Vers
  */
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const CppPluginFramework::VersionInfo &left,
                                                  const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "less than or equal to" operator for CppPluginFramework::VersionInfo
@@ -247,6 +255,8 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const CppPluginFramework::Versi
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const CppPluginFramework::VersionInfo &left,
                                                   const CppPluginFramework::VersionInfo &right);
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "greater than" operator for CppPluginFramework::VersionInfo
  *
@@ -260,6 +270,8 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const CppPluginFramework::Vers
  */
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const CppPluginFramework::VersionInfo &left,
                                                  const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "greater than or equal to" operator for CppPluginFramework::VersionInfo
@@ -275,9 +287,14 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const CppPluginFramework::Versi
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>=(const CppPluginFramework::VersionInfo &left,
                                                   const CppPluginFramework::VersionInfo &right);
 
-//! \copydoc    CppConfigFramework::ConfigParameterLoader::load()
-template<>
-bool CppConfigFramework::ConfigParameterLoader::load(
-        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue);
+// -------------------------------------------------------------------------------------------------
 
-#endif // CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
+namespace CedarFramework
+{
+
+//! \copydoc    CedarFramework::serialize()
+template<>
+CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool deserialize(const QJsonValue &json,
+                                                   CppPluginFramework::VersionInfo *value);
+
+}

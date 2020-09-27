@@ -18,8 +18,7 @@
  * Contains macros needed for building C++ Plugin Framework library
  */
 
-#ifndef CPPPLUGINFRAMEWORK_LIBRARYEXPORT_HPP
-#define CPPPLUGINFRAMEWORK_LIBRARYEXPORT_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 
@@ -49,5 +48,3 @@
 #else
 #  define CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Q_DECL_IMPORT
 #endif
-
-#endif // CPPPLUGINFRAMEWORK_LIBRARYEXPORT_HPP

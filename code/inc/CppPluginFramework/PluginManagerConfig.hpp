@@ -18,8 +18,7 @@
  * Contains a config class for the Plugin Manager
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINMANAGERCONFIG_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINMANAGERCONFIG_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginConfig.hpp>
@@ -161,5 +160,3 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(
         const CppPluginFramework::PluginManagerConfig &left,
         const CppPluginFramework::PluginManagerConfig &right);
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINMANAGERCONFIG_HPP

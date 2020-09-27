@@ -18,8 +18,7 @@
  * Contains a plugin management class
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
@@ -133,5 +132,3 @@ private:
 };
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP

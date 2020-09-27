@@ -18,8 +18,7 @@
  * Contains validation methods
  */
 
-#ifndef CPPPLUGINFRAMEWORK_VALIDATION_HPP
-#define CPPPLUGINFRAMEWORK_VALIDATION_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
@@ -97,5 +96,3 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateFilePath(const QString &filePath)
 } // namespace Validation
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_VALIDATION_HPP
