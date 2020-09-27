@@ -18,8 +18,7 @@
  * Contains a config class for a Plugin
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginInstanceConfig.hpp>
@@ -248,5 +247,3 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::Plug
  */
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::PluginConfig &left,
                                                   const CppPluginFramework::PluginConfig &right);
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP

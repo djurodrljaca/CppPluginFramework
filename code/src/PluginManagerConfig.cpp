@@ -84,6 +84,8 @@ bool PluginManagerConfig::loadConfigParameters(const CppConfigFramework::ConfigO
     }
 
     // Load plugin startup priorities
+    m_pluginStartupPriorities.clear();
+
     if (!loadOptionalConfigParameter(&m_pluginStartupPriorities,
                                      QStringLiteral("plugin_startup_priorities"),
                                      config))

@@ -18,8 +18,7 @@
  * Contains logging categories
  */
 
-#ifndef CPPPLUGINFRAMEWORK_LOGGINGCATEGORIES_HPP
-#define CPPPLUGINFRAMEWORK_LOGGINGCATEGORIES_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
@@ -53,5 +52,3 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT extern const QLoggingCategory PluginManager;
 } // namespace LoggingCategory
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_LOGGINGCATEGORIES_HPP

@@ -18,8 +18,7 @@
  * Contains a base class for all plugins
  */
 
-#ifndef CPPPLUGINFRAMEWORK_IPLUGIN_HPP
-#define CPPPLUGINFRAMEWORK_IPLUGIN_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
@@ -95,7 +94,7 @@ public:
      * \retval  true    Success
      * \retval  false   Failure
      */
-    virtual bool loadConfig(const CppConfigFramework::ConfigObjectNode &config) = 0;
+    virtual bool loadConfig(const QJsonObject &config) = 0;
 
     /*!
      * Injects all dependencies (interfaces) that can be taken out of the specified plugin instance
@@ -143,5 +142,3 @@ public:
 };
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_IPLUGIN_HPP

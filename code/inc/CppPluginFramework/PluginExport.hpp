@@ -18,8 +18,7 @@
  * Contains macros and declarations needed for creation and loading of plugins
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINEXPORT_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINEXPORT_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 
@@ -79,5 +78,3 @@ CPPPLUGINFRAMEWORK_PLUGIN_EXPORT
 CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName);
 
 }
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINEXPORT_HPP

@@ -21,6 +21,12 @@
 // C++ Plugin Framework includes
 #include "TestPlugin1.hpp"
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
+// Cedar Framework includes
+#include <CedarFramework/Deserialization.hpp>
+
 // Qt includes
 
 // System includes
@@ -56,22 +62,9 @@ TestPlugin1::TestPlugin1(const QString &name)
 
 // -------------------------------------------------------------------------------------------------
 
-bool TestPlugin1::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
+bool TestPlugin1::loadConfig(const QJsonObject &config)
 {
-    bool success = false;
-
-    if (config.contains("value"))
-    {
-        auto node = config.member("value");
-
-        if (node->isValue())
-        {
-            m_configuredValue = node->toValue().value().toString();
-            success = true;
-        }
-    }
-
-    return success;
+    return CedarFramework::deserializeNode(config, "value", &m_configuredValue);
 }
 
 // -------------------------------------------------------------------------------------------------

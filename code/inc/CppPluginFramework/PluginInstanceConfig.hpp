@@ -18,8 +18,7 @@
  * Contains a config class for a Plugin Instance
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
-#define CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/LibraryExport.hpp>
@@ -57,7 +56,7 @@ public:
      * \param   dependencies    List of plugin's dependencies
      */
     PluginInstanceConfig(const QString &name,
-                         const CppConfigFramework::ConfigObjectNode &config = {},
+                         const QJsonObject &config = {},
                          const QSet<QString> &dependencies = QSet<QString>());
 
     /*!
@@ -122,14 +121,14 @@ public:
      *
      * \return  Plugin instance's config
      */
-    const CppConfigFramework::ConfigObjectNode &config() const;
+    QJsonObject config() const;
 
     /*!
      * Sets the plugin instance's config
      *
      * \param   config  Plugin instance's config
      */
-    void setConfig(const CppConfigFramework::ConfigObjectNode &config);
+    void setConfig(const QJsonObject &config);
 
     /*!
      * Returns list of plugin instance's dependencies
@@ -157,13 +156,15 @@ private:
     QString m_name;
 
     //! Holds the (optional) plugin instance's config node
-    CppConfigFramework::ConfigObjectNode m_config;
+    QJsonObject m_config;
 
     //! Holds the list of plugin instance's dependencies
     QSet<QString> m_dependencies;
 };
 
 } // namespace CppPluginFramework
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "equal to" operator for CppPluginFramework::PluginInstanceConfig
@@ -178,6 +179,8 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
         const CppPluginFramework::PluginInstanceConfig &left,
         const CppPluginFramework::PluginInstanceConfig &right);
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "not equal to" operator for CppPluginFramework::PluginInstanceConfig
  *
@@ -190,5 +193,3 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
 CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(
         const CppPluginFramework::PluginInstanceConfig &left,
         const CppPluginFramework::PluginInstanceConfig &right);
-
-#endif // CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP

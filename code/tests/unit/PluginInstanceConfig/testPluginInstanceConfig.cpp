@@ -21,6 +21,9 @@
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginInstanceConfig.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtTest/QTest>
@@ -107,13 +110,11 @@ void TestPluginInstanceConfig::testIsValid_data()
     QTest::newRow("valid: only name") << PluginInstanceConfig("instance1") << true;
 
     QTest::newRow("valid: name and single dependency")
-            << PluginInstanceConfig("instance2", ConfigObjectNode(), QSet<QString> { "instance3" } )
+            << PluginInstanceConfig("instance2", {}, { "instance3" } )
             << true;
 
     QTest::newRow("valid: name and multiple dependencies")
-            << PluginInstanceConfig("instance2",
-                                    ConfigObjectNode(),
-                                    QSet<QString> { "instance3", "instance4"} )
+            << PluginInstanceConfig("instance2", {}, { "instance3", "instance4"} )
             << true;
 
     // Invalid results
@@ -121,17 +122,15 @@ void TestPluginInstanceConfig::testIsValid_data()
     QTest::newRow("invalid: only invalid name") << PluginInstanceConfig("1instance") << false;
 
     QTest::newRow("invalid: valid name and invalid single dependency")
-            << PluginInstanceConfig("instance2", ConfigObjectNode(), QSet<QString> { "3instance" } )
+            << PluginInstanceConfig("instance2", {}, { "3instance" } )
             << false;
 
     QTest::newRow("invalid: valid name and invalid multiple dependencies")
-            << PluginInstanceConfig("instance2",
-                                    ConfigObjectNode(),
-                                    QSet<QString> { "3instance", "instance4" } )
+            << PluginInstanceConfig("instance2", {}, { "3instance", "instance4" } )
             << false;
 
     QTest::newRow("invalid: valid name and dependency to itself")
-            << PluginInstanceConfig("instance2", ConfigObjectNode(), QSet<QString> { "instance2" } )
+            << PluginInstanceConfig("instance2", {}, { "instance2" } )
             << false;
 }
 
@@ -167,9 +166,11 @@ void TestPluginInstanceConfig::testConfig()
         PluginInstanceConfig instanceConfig;
         QCOMPARE(instanceConfig.config().count(), 0);
 
-        ConfigObjectNode config;
-        config.setMember("aaa", std::make_unique<ConfigValueNode>(1));
-        config.setMember("bbb", std::make_unique<ConfigValueNode>("str"));
+        QJsonObject config
+        {
+            { "aaa", 1 },
+            { "bbb", "str" }
+        };
 
         instanceConfig.setConfig(config);
         QCOMPARE(instanceConfig.config(), config);
@@ -177,13 +178,15 @@ void TestPluginInstanceConfig::testConfig()
 
     // Constructed with initial config
     {
-        ConfigObjectNode config;
-        config.setMember("aaa", std::make_unique<ConfigValueNode>(1));
+        QJsonObject config
+        {
+            { "aaa", 1 }
+        };
 
         PluginInstanceConfig instanceConfig("aaa", config);
         QCOMPARE(instanceConfig.config(), config);
 
-        config.setMember("bbb", std::make_unique<ConfigValueNode>("str"));
+        config.insert("bbb", "str");
         instanceConfig.setConfig(config);
         QCOMPARE(instanceConfig.config(), config);
     }
@@ -242,123 +245,209 @@ void TestPluginInstanceConfig::testLoadConfig_data()
 
     // Valid: just name
     {
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("test1"));
-
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("instance", instance);
+        ConfigObjectNode configNode
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test1") }
+                }
+            }
+        };
 
         auto instanceConfig = PluginInstanceConfig("test1");
 
-        QTest::newRow("valid: only name") << configNode << instanceConfig << true;
+        QTest::newRow("valid: only name")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << instanceConfig
+                << true;
     }
 
     // Valid: name and config
     {
-        ConfigObjectNode config;
-        config.setMember("param", ConfigValueNode("value"));
+        QJsonObject config
+        {
+            { "param", "value" }
+        };
 
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("test2"));
-        instance.setMember("config", config);
-
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("instance", instance);
+        ConfigObjectNode configNode
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test2") },
+                    { "config", ConfigValueNode(config) }
+                }
+            }
+        };
 
         auto instanceConfig = PluginInstanceConfig("test2", config);
 
-        QTest::newRow("valid: name and config") << configNode << instanceConfig << true;
+        QTest::newRow("valid: name and config")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << instanceConfig
+                << true;
     }
 
     // Valid: name and dependencies
     {
         const QSet<QString> dependencies = {"aaa", "bbb"};
 
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("test3"));
-        instance.setMember("dependencies", ConfigValueNode(QVariant(dependencies.values())));
+        ConfigObjectNode configNode
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test3") },
+                    {
+                        "dependencies",
+                        ConfigValueNode(QJsonArray::fromStringList(dependencies.values()))
+                    }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("instance", instance);
+        auto instanceConfig = PluginInstanceConfig("test3", {}, dependencies);
 
-        auto instanceConfig = PluginInstanceConfig("test3", ConfigObjectNode(), dependencies);
-
-        QTest::newRow("valid: name and dependencies") << configNode << instanceConfig << true;
+        QTest::newRow("valid: name and dependencies")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << instanceConfig
+                << true;
     }
 
     // Valid: all params
     {
         const QSet<QString> dependencies = {"aaa", "bbb"};
 
-        ConfigObjectNode config;
-        config.setMember("param", ConfigValueNode("value"));
+        QJsonObject config
+        {
+            { "param", "value" }
+        };
 
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("test4"));
-        instance.setMember("config", config);
-        instance.setMember("dependencies", ConfigValueNode(QVariant(dependencies.values())));
-
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("instance", instance);
+        ConfigObjectNode configNode
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test4") },
+                    { "config", ConfigValueNode(config) },
+                    {
+                        "dependencies",
+                        ConfigValueNode(QJsonArray::fromStringList(dependencies.values()))
+                    }
+                }
+            }
+        };
 
         auto instanceConfig = PluginInstanceConfig("test4", config, dependencies);
 
-        QTest::newRow("valid: all params") << configNode << instanceConfig << true;
+        QTest::newRow("valid: all params")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << instanceConfig
+                << true;
     }
 
     // Invalid: name
     {
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("0test"));
+        ConfigObjectNode configNode1
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("0test") }
+                }
+            }
+        };
 
-        auto configNode1 = std::make_shared<ConfigObjectNode>();
-        configNode1->setMember("instance", instance);
+        QTest::newRow("invalid: name 1")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode1))
+                << PluginInstanceConfig()
+                << false;
 
-        QTest::newRow("invalid: name 1") << configNode1 << PluginInstanceConfig() << false;
+        ConfigObjectNode configNode2
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("") }
+                }
+            }
+        };
 
-        auto configNode2 =
-                std::make_shared<ConfigObjectNode>(std::move(configNode1->clone()->toObject()));
-        configNode2->nodeAtPath("/instance/name")->toValue().setValue(QVariant());
-
-        QTest::newRow("invalid: name 2") << configNode2 << PluginInstanceConfig() << false;
+        QTest::newRow("invalid: name 2")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode2))
+                << PluginInstanceConfig()
+                << false;
     }
 
     // Invalid: config
     {
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("test"));
-        instance.setMember("config", ConfigValueNode());
+        ConfigObjectNode configNode
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test") },
+                    { "config", ConfigValueNode() }
+                }
+            }
+        };
 
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("instance", instance);
-
-        QTest::newRow("invalid: config") << configNode << PluginInstanceConfig() << false;
+        QTest::newRow("invalid: config")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginInstanceConfig()
+                << false;
     }
 
     // Invalid: dependencies
     {
-        ConfigObjectNode instance;
-        instance.setMember("name", ConfigValueNode("test"));
-        instance.setMember("dependencies",
-                           ConfigValueNode(QVariantList {"test1", "test2", "test1"}));
+        ConfigObjectNode configNode1
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test") },
+                    { "dependencies", ConfigValueNode(QJsonArray { "test1", "test2", "test1" }) }
+                }
+            }
+        };
 
-        auto configNode1 = std::make_shared<ConfigObjectNode>();
-        configNode1->setMember("instance", instance);
+        QTest::newRow("invalid: dependencies 1")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode1))
+                << PluginInstanceConfig()
+                << false;
 
-        QTest::newRow("invalid: dependencies 1") << configNode1 << PluginInstanceConfig() << false;
+        ConfigObjectNode configNode2
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test") },
+                    { "dependencies", ConfigValueNode(QJsonArray { "test1", "test" }) }
+                }
+            }
+        };
 
-        auto configNode2 =
-                std::make_shared<ConfigObjectNode>(std::move(configNode1->clone()->toObject()));
-        configNode2->nodeAtPath("/instance/dependencies")->toValue().setValue(
-                    QVariantList {"test1", "test"});
+        QTest::newRow("invalid: dependencies 2")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode2))
+                << PluginInstanceConfig()
+                << false;
 
-        QTest::newRow("invalid: dependencies 2") << configNode2 << PluginInstanceConfig() << false;
+        ConfigObjectNode configNode3
+        {
+            {
+                "instance", ConfigObjectNode
+                {
+                    { "name", ConfigValueNode("test") },
+                    { "dependencies", ConfigValueNode(QJsonArray { "0ab" }) }
+                }
+            }
+        };
 
-        auto configNode3 =
-                std::make_shared<ConfigObjectNode>(std::move(configNode1->clone()->toObject()));
-        configNode3->nodeAtPath("/instance/dependencies")->toValue().setValue(QVariantList {"0ab"});
-
-        QTest::newRow("invalid: dependencies 3") << configNode3 << PluginInstanceConfig() << false;
+        QTest::newRow("invalid: dependencies 3")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode3))
+                << PluginInstanceConfig()
+                << false;
     }
 
 }

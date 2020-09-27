@@ -18,8 +18,7 @@
  * Contains a class that is able to load a plugin from a library
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGIN_HPP
-#define CPPPLUGINFRAMEWORK_PLUGIN_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
@@ -79,5 +78,3 @@ private:
 };
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_PLUGIN_HPP

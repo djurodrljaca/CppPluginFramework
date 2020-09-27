@@ -11,14 +11,39 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.5.0)
 
 project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
+find_package(CedarFramework REQUIRED)
 find_package(CppConfigFramework REQUIRED)
+
+# --------------------------------------------------------------------------------------------------
+# Code Coverage
+# --------------------------------------------------------------------------------------------------
+option(CppPluginFramework_CodeCoverage "C++ Plugin Framework Code Coverage" OFF)
+
+if (CppPluginFramework_CodeCoverage MATCHES ON)
+    include(cmake/CodeCoverage.cmake)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+
+    set(excludes_cmake_prefix_path)
+    foreach(item ${CMAKE_PREFIX_PATH})
+        get_filename_component(item ${item} ABSOLUTE)
+        list(APPEND excludes_cmake_prefix_path "'${item}/*'")
+    endforeach()
+
+    set(CppPluginFramework_CodeCoverage_EXCLUDES
+            "'/opt/*'"
+            "'/usr/*'"
+            ${excludes_cmake_prefix_path}
+            "'${CMAKE_SOURCE_DIR}/tests/*'"
+            "'${CMAKE_BINARY_DIR}/*'"
+        )
+endif()
 
 # --------------------------------------------------------------------------------------------------
 # CppPluginFramework library
@@ -49,6 +74,10 @@ add_library(CppPluginFramework SHARED
         src/Validation.cpp
         src/VersionInfo.cpp
     )
+
+set_target_properties(CppPluginFramework PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 
 target_include_directories(CppPluginFramework PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
@@ -120,30 +149,6 @@ install(
         DESTINATION ${ConfigPackageLocation}
         COMPONENT   Devel
     )
-
-# --------------------------------------------------------------------------------------------------
-# Code Coverage
-# --------------------------------------------------------------------------------------------------
-option(CppPluginFramework_CodeCoverage "C++ Plugin Framework Code Coverage" OFF)
-
-if (CppPluginFramework_CodeCoverage MATCHES ON)
-    include(cmake/CodeCoverage.cmake)
-    APPEND_COVERAGE_COMPILER_FLAGS()
-
-    set(excludes_cmake_prefix_path)
-    foreach(item ${CMAKE_PREFIX_PATH})
-        get_filename_component(item ${item} ABSOLUTE)
-        list(APPEND excludes_cmake_prefix_path "'${item}/*'")
-    endforeach()
-
-    set(CppPluginFramework_CodeCoverage_EXCLUDES
-            "'/opt/*'"
-            "'/usr/*'"
-            ${excludes_cmake_prefix_path}
-            "'${CMAKE_SOURCE_DIR}/tests/*'"
-            "'${CMAKE_BINARY_DIR}/*'"
-        )
-endif()
 
 # --------------------------------------------------------------------------------------------------
 # Tests

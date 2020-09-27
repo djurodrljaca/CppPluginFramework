@@ -18,8 +18,7 @@
  * Contains a convenience base class for creating plugins
  */
 
-#ifndef CPPPLUGINFRAMEWORK_ABSTRACTPLUGIN_HPP
-#define CPPPLUGINFRAMEWORK_ABSTRACTPLUGIN_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
@@ -134,5 +133,3 @@ private:
 };
 
 }
-
-#endif // CPPPLUGINFRAMEWORK_ABSTRACTPLUGIN_HPP

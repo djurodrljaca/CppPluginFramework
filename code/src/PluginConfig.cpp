@@ -168,48 +168,33 @@ bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNo
     }
 
     // Load version
-    bool loaded = false;
+    m_version = VersionInfo();
 
-    if (!loadOptionalConfigParameter(&m_version, QStringLiteral("version"), config, &loaded))
+    if (!loadOptionalConfigParameter(&m_version, QStringLiteral("version"), config))
     {
         qCWarning(CppPluginFramework::LoggingCategory::Config)
                 << "Failed to load plugin's version!";
         return false;
     }
 
-    if (!loaded)
-    {
-        m_version = VersionInfo();
-    }
-
     // Load min version
-    loaded = false;
+    m_minVersion = VersionInfo();
 
-    if (!loadOptionalConfigParameter(&m_minVersion, QStringLiteral("min_version"), config, &loaded))
+    if (!loadOptionalConfigParameter(&m_minVersion, QStringLiteral("min_version"), config))
     {
         qCWarning(CppPluginFramework::LoggingCategory::Config)
                 << "Failed to load plugin's min version!";
         return false;
     }
 
-    if (!loaded)
-    {
-        m_minVersion = VersionInfo();
-    }
-
     // Load max version
-    loaded = false;
+    m_maxVersion = VersionInfo();
 
-    if (!loadOptionalConfigParameter(&m_maxVersion, QStringLiteral("max_version"), config, &loaded))
+    if (!loadOptionalConfigParameter(&m_maxVersion, QStringLiteral("max_version"), config))
     {
         qCWarning(CppPluginFramework::LoggingCategory::Config)
                 << "Failed to load plugin's max version";
         return false;
-    }
-
-    if (!loaded)
-    {
-        m_maxVersion = VersionInfo();
     }
 
     // Load instance configs

@@ -18,8 +18,7 @@
  * Contains a template class for a factory that shall be able to create instances of a plugin
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINFACTORYTEMPLATE_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINFACTORYTEMPLATE_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPluginFactory.hpp>
@@ -81,5 +80,3 @@ public:
 };
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINFACTORYTEMPLATE_HPP

@@ -21,6 +21,9 @@
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginManagerConfig.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtTest/QTest>
@@ -229,77 +232,111 @@ void TestPluginManagerConfig::testLoadConfig_data()
         PluginConfig(validFilePath, validVersion, validInstanceConfigs)
     };
 
-    ConfigObjectNode instance1;
-    instance1.setMember("name", ConfigValueNode("instance1"));
-
-    ConfigObjectNode instance2;
-    instance2.setMember("name", ConfigValueNode("instance2"));
-
-    ConfigObjectNode instances;
-    instances.setMember("instance1", instance1);
-    instances.setMember("instance2", instance2);
-
-    ConfigObjectNode plugin;
-    plugin.setMember("file_path", ConfigValueNode(validFilePath));
-    plugin.setMember("version", ConfigValueNode(validVersion.toString()));
-    plugin.setMember("instances", instances);
+    ConfigObjectNode plugin
+    {
+        { "file_path", ConfigValueNode(validFilePath) },
+        { "version", ConfigValueNode(validVersion.toString()) },
+        {
+            "instances", ConfigObjectNode
+            {
+                {
+                    "instance1", ConfigObjectNode
+                    {
+                        { "name", ConfigValueNode("instance1") }
+                    }
+                },
+                {
+                    "instance2", ConfigObjectNode
+                    {
+                        { "name", ConfigValueNode("instance2") }
+                    }
+                }
+            }
+        }
+    };
 
     // Valid: empty
     {
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugins", ConfigObjectNode());
+        ConfigObjectNode configNode
+        {
+            { "plugins", ConfigObjectNode() }
+        };
 
-        QTest::newRow("valid: empty") << configNode << PluginManagerConfig() << true;
+        QTest::newRow("valid: empty")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginManagerConfig()
+                << true;
     }
 
     // Valid: non-empty
     {
-        ConfigObjectNode plugins;
-        plugins.setMember("plugin1", plugin);
-
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugins", plugins);
+        ConfigObjectNode configNode
+        {
+            {
+                "plugins", ConfigObjectNode
+                {
+                    { "plugin1", std::move(plugin.clone()->toObject()) }
+                }
+            }
+        };
 
         PluginManagerConfig managerConfig;
         managerConfig.setPluginConfigs(validPluginConfigs);
 
-        QTest::newRow("valid: non-empty") << configNode << managerConfig << true;
+        QTest::newRow("valid: non-empty")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << managerConfig
+                << true;
     }
 
     // Valid: non-empty with startup priorities
     {
-        ConfigObjectNode plugins;
-        plugins.setMember("plugin1", plugin);
-
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugin_startup_priorities",
-                              ConfigValueNode(QVariantList { "instance1" }));
-        configNode->setMember("plugins", plugins);
+        ConfigObjectNode configNode
+        {
+            { "plugin_startup_priorities", ConfigValueNode(QJsonArray { "instance1" } ) },
+            {
+                "plugins", ConfigObjectNode
+                {
+                    { "plugin1", std::move(plugin.clone()->toObject()) }
+                }
+            }
+        };
 
         PluginManagerConfig managerConfig;
         managerConfig.setPluginConfigs(validPluginConfigs);
         managerConfig.setPluginStartupPriorities({ "instance1" });
 
-        QTest::newRow("valid: non-empty with startup priorities") << configNode
-                                                                  << managerConfig
-                                                                  << true;
-    }
-
-    // Invalid: plugin startup priorities node
-    {
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugins", ConfigValueNode());
-
-        QTest::newRow("invalid: plugins node") << configNode << PluginManagerConfig() << false;
+        QTest::newRow("valid: non-empty with startup priorities")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << managerConfig
+                << true;
     }
 
     // Invalid: plugins node
     {
-        auto configNode = std::make_shared<ConfigObjectNode>();
-        configNode->setMember("plugins", ConfigObjectNode());
-        configNode->setMember("plugin_startup_priorities", ConfigValueNode(true));
+        ConfigObjectNode configNode
+        {
+            { "plugins", ConfigValueNode() }
+        };
 
-        QTest::newRow("invalid: plugins node") << configNode << PluginManagerConfig() << false;
+        QTest::newRow("invalid: plugins node")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginManagerConfig()
+                << false;
+    }
+
+    // Invalid: plugin startup priorities node
+    {
+        ConfigObjectNode configNode
+        {
+            { "plugin_startup_priorities", ConfigValueNode(true) },
+            { "plugins", ConfigObjectNode() }
+        };
+
+        QTest::newRow("invalid: plugins node")
+                << std::make_shared<ConfigObjectNode>(std::move(configNode))
+                << PluginManagerConfig()
+                << false;
     }
 }
 
