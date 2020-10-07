@@ -17,8 +17,6 @@ project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5 COMPONENTS Core REQUIRED)
-find_package(CedarFramework REQUIRED)
 find_package(CppConfigFramework REQUIRED)
 
 # --------------------------------------------------------------------------------------------------
