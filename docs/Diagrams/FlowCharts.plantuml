@@ -1,0 +1,37 @@
+@startuml StartupWorkflow
+start
+
+:Load plugin manager configuration;
+-> Iterate over plugin configurations;
+
+repeat
+     :Load plugin library;
+     :Get plugin factory;
+     -> Iterate over plugin instance configurations;
+
+     repeat
+          :Create plugin instance;
+          :Configure plugin instance;
+          :Check plugin instance version;
+          :Store plugin instance;
+     repeat while (All plugin instances loaded?) is (No)
+     -> Yes;
+repeat while (All plugins loaded?) is (No)
+-> Yes;
+:Inject all dependencies;
+:Prepare startup order;
+:Start all plugin instances;
+stop
+
+@enduml
+
+@startuml ShutdownWorkflow
+start
+
+:Stop all plugin instances;
+:Eject all dependencies;
+:Destroy plugin instances;
+
+stop
+
+@enduml
