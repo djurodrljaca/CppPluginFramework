@@ -203,7 +203,7 @@ void TestPluginManagerConfig::testLoadConfig()
     QFETCH(bool, expectedResult);
 
     PluginManagerConfig managerConfig;
-    const bool result = managerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *configNode);
+    const bool result = managerConfig.loadConfig(*configNode);
 
     QCOMPARE(result, expectedResult);
 

@@ -53,7 +53,7 @@ public:
 
 private:
     //! Construction of this class is disabled
-    Plugin();
+    Plugin() = delete;
 
     /*!
      * Loads the plugin instance from the specified library and configures it

@@ -40,11 +40,11 @@ namespace CppPluginFramework
 {
 
 PluginInstanceConfig::PluginInstanceConfig(const QString &name,
-                                           const QJsonObject &config,
+                                           const CppConfigFramework::ConfigObjectNode &config,
                                            const QSet<QString> &dependencies)
     : CppConfigFramework::ConfigLoader(),
       m_name(name),
-      m_config(config),
+      m_config(std::move(config.clone()->toObject())),
       m_dependencies(dependencies)
 {
 }
@@ -54,7 +54,7 @@ PluginInstanceConfig::PluginInstanceConfig(const QString &name,
 PluginInstanceConfig::PluginInstanceConfig(const PluginInstanceConfig &other)
     : CppConfigFramework::ConfigLoader(),
       m_name(other.m_name),
-      m_config(other.m_config),
+      m_config(std::move(other.m_config.clone()->toObject())),
       m_dependencies(other.m_dependencies)
 {
 }
@@ -69,7 +69,7 @@ PluginInstanceConfig &PluginInstanceConfig::operator=(const PluginInstanceConfig
     }
 
     m_name = other.m_name;
-    m_config = other.m_config;
+    m_config = std::move(other.m_config.clone()->toObject());
     m_dependencies = other.m_dependencies;
     return *this;
 }
@@ -97,16 +97,16 @@ void PluginInstanceConfig::setName(const QString &name)
 
 // -------------------------------------------------------------------------------------------------
 
-QJsonObject PluginInstanceConfig::config() const
+const CppConfigFramework::ConfigObjectNode &PluginInstanceConfig::config() const
 {
     return m_config;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void PluginInstanceConfig::setConfig(const QJsonObject &config)
+void PluginInstanceConfig::setConfig(const CppConfigFramework::ConfigObjectNode &config)
 {
-    m_config = config;
+    m_config = std::move(config.clone()->toObject());
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -136,13 +136,23 @@ bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::Config
     }
 
     // Load config
-    m_config = QJsonObject();
+    const auto *configMember = config.member(QStringLiteral("config"));
 
-    if (!loadOptionalConfigParameter(&m_config, QStringLiteral("config"), config))
+    if (configMember == nullptr)
     {
-        qCWarning(CppPluginFramework::LoggingCategory::Config)
-                << "Failed to load plugin instance's config!";
-        return false;
+        m_config = CppConfigFramework::ConfigObjectNode();
+    }
+    else
+    {
+        if (!configMember->isObject())
+        {
+            qCWarning(CppPluginFramework::LoggingCategory::Config)
+                    << "Plugin instance's config is not an Object! Type:"
+                    << CppConfigFramework::ConfigNode::typeToString(configMember->type());
+            return false;
+        }
+
+        m_config = std::move(configMember->clone()->toObject());
     }
 
     // Load dependencies

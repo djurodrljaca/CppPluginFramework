@@ -135,14 +135,14 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of test plugin 1
     {
-        QJsonObject instance1Config
+        ConfigObjectNode instance1Config
         {
-            { "value", "value1" }
+            { "value", ConfigValueNode("value1") }
         };
 
-        QJsonObject instance2Config
+        ConfigObjectNode instance2Config
         {
-            { "value", "value2" }
+            { "value", ConfigValueNode("value2") }
         };
 
         QList<PluginInstanceConfig> instanceConfigs;
@@ -164,9 +164,9 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of test plugin 2
     {
-        QJsonObject instance3Config
+        ConfigObjectNode instance3Config
         {
-            { "delimiter", ";" }
+            { "delimiter", ConfigValueNode(";") }
         };
 
         QList<PluginInstanceConfig> instanceConfigs;
@@ -190,9 +190,9 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of plugin with invalid config
     {
-        QJsonObject instance1Config
+        ConfigObjectNode instance1Config
         {
-            { "invalid", "x" }
+            { "invalid", ConfigValueNode("x") }
         };
 
         QList<PluginInstanceConfig> instanceConfigs;
@@ -222,9 +222,9 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of plugin with invalid version
     {
-        QJsonObject instance1Config
+        ConfigObjectNode instance1Config
         {
-            { "value", "value1" }
+            { "value", ConfigValueNode("value1") }
         };
 
         QList<PluginInstanceConfig> instanceConfigs;

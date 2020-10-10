@@ -56,7 +56,7 @@ public:
      * \param   dependencies    List of plugin's dependencies
      */
     PluginInstanceConfig(const QString &name,
-                         const QJsonObject &config = {},
+                         const CppConfigFramework::ConfigObjectNode &config = {},
                          const QSet<QString> &dependencies = QSet<QString>());
 
     /*!
@@ -121,14 +121,14 @@ public:
      *
      * \return  Plugin instance's config
      */
-    QJsonObject config() const;
+    const CppConfigFramework::ConfigObjectNode &config() const;
 
     /*!
      * Sets the plugin instance's config
      *
      * \param   config  Plugin instance's config
      */
-    void setConfig(const QJsonObject &config);
+    void setConfig(const CppConfigFramework::ConfigObjectNode &config);
 
     /*!
      * Returns list of plugin instance's dependencies
@@ -156,7 +156,7 @@ private:
     QString m_name;
 
     //! Holds the (optional) plugin instance's config node
-    QJsonObject m_config;
+    CppConfigFramework::ConfigObjectNode m_config;
 
     //! Holds the list of plugin instance's dependencies
     QSet<QString> m_dependencies;

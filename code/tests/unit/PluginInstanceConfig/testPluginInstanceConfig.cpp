@@ -166,10 +166,10 @@ void TestPluginInstanceConfig::testConfig()
         PluginInstanceConfig instanceConfig;
         QCOMPARE(instanceConfig.config().count(), 0);
 
-        QJsonObject config
+        ConfigObjectNode config
         {
-            { "aaa", 1 },
-            { "bbb", "str" }
+            { "aaa", ConfigValueNode(1) },
+            { "bbb", ConfigValueNode("str") }
         };
 
         instanceConfig.setConfig(config);
@@ -178,15 +178,15 @@ void TestPluginInstanceConfig::testConfig()
 
     // Constructed with initial config
     {
-        QJsonObject config
+        ConfigObjectNode config
         {
-            { "aaa", 1 }
+            { "aaa", ConfigValueNode(1) }
         };
 
         PluginInstanceConfig instanceConfig("aaa", config);
         QCOMPARE(instanceConfig.config(), config);
 
-        config.insert("bbb", "str");
+        config.setMember("bbb", ConfigValueNode("str"));
         instanceConfig.setConfig(config);
         QCOMPARE(instanceConfig.config(), config);
     }
@@ -265,9 +265,9 @@ void TestPluginInstanceConfig::testLoadConfig_data()
 
     // Valid: name and config
     {
-        QJsonObject config
+        ConfigObjectNode config
         {
-            { "param", "value" }
+            { "param", ConfigValueNode("value") }
         };
 
         ConfigObjectNode configNode
@@ -276,7 +276,7 @@ void TestPluginInstanceConfig::testLoadConfig_data()
                 "instance", ConfigObjectNode
                 {
                     { "name", ConfigValueNode("test2") },
-                    { "config", ConfigValueNode(config) }
+                    { "config", std::move(config.clone()->toObject()) }
                 }
             }
         };
@@ -319,9 +319,9 @@ void TestPluginInstanceConfig::testLoadConfig_data()
     {
         const QSet<QString> dependencies = {"aaa", "bbb"};
 
-        QJsonObject config
+        ConfigObjectNode config
         {
-            { "param", "value" }
+            { "param", ConfigValueNode("value") }
         };
 
         ConfigObjectNode configNode
@@ -330,7 +330,7 @@ void TestPluginInstanceConfig::testLoadConfig_data()
                 "instance", ConfigObjectNode
                 {
                     { "name", ConfigValueNode("test4") },
-                    { "config", ConfigValueNode(config) },
+                    { "config", std::move(config.clone()->toObject()) },
                     {
                         "dependencies",
                         ConfigValueNode(QJsonArray::fromStringList(dependencies.values()))
