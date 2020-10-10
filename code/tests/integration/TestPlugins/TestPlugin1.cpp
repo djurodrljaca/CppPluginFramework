@@ -22,7 +22,7 @@
 #include "TestPlugin1.hpp"
 
 // C++ Config Framework includes
-#include <CppConfigFramework/ConfigValueNode.hpp>
+#include <CppConfigFramework/ConfigWriter.hpp>
 
 // Cedar Framework includes
 #include <CedarFramework/Deserialization.hpp>
@@ -62,9 +62,16 @@ TestPlugin1::TestPlugin1(const QString &name)
 
 // -------------------------------------------------------------------------------------------------
 
-bool TestPlugin1::loadConfig(const QJsonObject &config)
+bool TestPlugin1::loadConfig(const CppConfigFramework::ConfigObjectNode &config)
 {
-    return CedarFramework::deserializeNode(config, "value", &m_configuredValue);
+    const auto jsonValue = CppConfigFramework::ConfigWriter::convertToJsonValue(config);
+
+    if (!jsonValue.isObject())
+    {
+        return false;
+    }
+
+    return CedarFramework::deserializeNode(jsonValue, "value", &m_configuredValue);
 }
 
 // -------------------------------------------------------------------------------------------------

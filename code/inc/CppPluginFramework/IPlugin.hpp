@@ -94,7 +94,7 @@ public:
      * \retval  true    Success
      * \retval  false   Failure
      */
-    virtual bool loadConfig(const QJsonObject &config) = 0;
+    virtual bool loadConfig(const CppConfigFramework::ConfigObjectNode &config) = 0;
 
     /*!
      * Injects all dependencies (interfaces) that can be taken out of the specified plugin instance

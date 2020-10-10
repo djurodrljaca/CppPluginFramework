@@ -49,7 +49,7 @@ public:
     TestPlugin1(const QString &name);
     ~TestPlugin1() = default;
 
-    bool loadConfig(const QJsonObject &config) override;
+    bool loadConfig(const CppConfigFramework::ConfigObjectNode &config) override;
     bool injectDependency(IPlugin *plugin) override;
     void ejectDependencies() override;
 
