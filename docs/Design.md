@@ -8,14 +8,14 @@ The plugin framework has two main uses:
 
 ## Plugins
 
-Each plugin provides the following metadata:
+Each plugin shall provide the following metadata:
 
 * Instance Name
-* Description
 * Version
+* Description
 * Exported Interfaces
 
-Each plugin also provides some management possibilities:
+Each plugin shall also provide some management features:
 
 * Configuration of the plugin
 * Injection and ejection of its dependencies
@@ -23,34 +23,28 @@ Each plugin also provides some management possibilities:
 
 The main purpose of the plugin is to export an interface to a specific functionality. Each exposed interface can be accessed by using the `interface()` method.
 
-![Plugin class diagram](ClassDiagrams/PluginClassDiagram.png  "Plugin class diagram")
+![Class diagram for the Plugin class](Diagrams/ClassDiagrams/Plugin.svg "Class diagram for the Plugin class")
 
 
 ### Plugin Implementation
 
-All plugins must inherit from the `IPlugin` interface.
+All plugins shall inherit from the `IPlugin` interface.
 
-Most plugins should be able to use `AbstractPlugin` base class. This class provides implemention of the "boilerplate" part of a plugin. If it is used then only the following needs to be implemented:
+For most plugins it should be sufficient to use the `AbstractPlugin` base class. This class shall provide implementation of the *boilerplate* part of a plugin. The plugins that shall use it shall only need to implement the following:
 
 * Loading the plugin's configuration (optional feature)
 * Management of plugin's dependencies (optional feature)
-* Handling of plugin startup and shutdown procedures (for some plugins the default implementation might be good enough)
+* Handling of plugin startup and shutdown procedures (for some plugins the default implementation should be good enough)
 * Exported interfaces (one or more)
 
-For more advanced uses `IPlugin` interface should be used directly.
+For more advanced uses it shall be necessary to use the `IPlugin` interface directly.
 
 
 ### Dynamically Linked Library
 
-A dynamically linked library must be created for each plugin. This library must provide functions for:
+A dynamically linked library shall be created for each plugin. This library shall provide a plugin factory with which individual plugin instances can be created.
 
-* Reading the plugin version
-* Creating an instance of the plugin
-
-```cpp
-const char *readPluginVersion();
-CppPluginFramework::IPlugin *createPluginInstance(const QString &instanceName);
-```
+![Class diagram for the PluginFactory class](Diagrams/ClassDiagrams/PluginFactory.svg "Class diagram for the PluginFactory class")
 
 
 ## Plugin Management
@@ -66,56 +60,46 @@ Applications that want to use plugins need to use `PluginManager` class. Its pur
 * Eject dependencies from plugin instances
 * Unload the plugins
 
-![Plugin management class diagram](ClassDiagrams/PluginManagementClassDiagram.png  "Plugin management class diagram")
+![Class diagram for the PluginManagement class](Diagrams/ClassDiagrams/PluginManager.svg "Class diagram for the PluginManagement class")
 
 
 ### Configuration
 
-The configuration must be represented in a JSON object (stored either in a file or a string) and it needs to provide:
+The configuration must be represented in *CppConfigFramework* format.
 
-* Environment variables (optional)
-* Plugin configuration
+![Class diagram for the PluginManagerConfig class](Diagrams/ClassDiagrams/PluginManagerConfig.svg "Class diagram for the PluginManagerConfig class")
 
-![Configuration class diagram](ClassDiagrams/ConfigurationClassDiagram.png  "Configuration class diagram")
+Plugin management configuration shall be represented in a three level hierarchy: plugin manager, plugins, and plugin instances.
 
+The plugin manager shall provide the following information:
 
-#### Environment Variables
+* Plugin configurations
+* Plugin startup priorities (optional)
 
-Initially all the system environment variables are loaded. The variables can be access by name, new environment variables can be created, and existing ones can be updated.
-
-The environment variables can also be reset which removes all of the current environment variables and all the system environment variables are loaded again.
-
-A convenience method `expandText()` is provided which can be used to replace all references of environment variables in the specified input text.
-
-
-#### Plugin Configuration
-
-Plugin configuration is represented in a two level hiearchy: plugins and plugin instances
-
-Each plugin needs to provide the following information:
+Each plugin shall provide the following information:
 
 * Plugin file path
-* Version requirements
+* Version requirements (exact version or version range)
 * List of plugin instances (at least one)
 
 Each plugin instance needs to provide the following information:
 
 * Plugin instance name
-* Configuration
-* List of plugin dependencies
+* Configuration (optional)
+* List of plugin dependencies (optional)
 
 
 ### Plugin Startup Workflow
 
-First the configuration must be loaded (from a JSON file or string) with the help of `ConfigFile` class, then the configured plugins can be loaded and initialized (plugin instances are created and configured and dependencies are injected to all plugin instances). The application then just needs to start the plugins.
+The application shall first load the configuration (from a *CppConfigFramework* file or equivalent *JSON Object*) and then the configured plugins shall be loaded with the plugin manager. Finally the application shall start the plugins.
 
-The plugins get started in the same order as defined in the configuration (from first plugin instance in the first plugin to the last plugin instance in the last plugin).
+The plugins shall be started in the same order as defined in the configuration. First all the plugins from the *plugin startup priorities* shall be started (in the defined order) and then all the others (in no particular order).
 
-![Plugin startup workflow](ClassDiagrams/PluginStartupWorkflow.png  "Plugin startup workflow")
+![Plugin startup workflow](Diagrams/FlowCharts/StartupWorkflow.svg "Plugin startup workflow")
 
 
 ### Plugin Shutdown Workflow
 
-When the application no longer needs the plugins it should first stop the plugins and then unload them.
+When the application no longer needs the plugins it shall first stop the plugins and then unload them.
 
-![Plugin shutdown workflow](ClassDiagrams/PluginShutdownWorkflow.png  "Plugin shutdown workflow")
+![Plugin shutdown workflow](Diagrams/FlowCharts/ShutdownWorkflow.svg "Plugin shutdown workflow")
