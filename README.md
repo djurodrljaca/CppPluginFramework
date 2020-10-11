@@ -23,7 +23,7 @@ For building the following requirements are needed:
 
 * CMake v3.5 or later
 * C++14 compliant compiler
-* Qt5 framework (only Core and Test modules)
+* Qt v5.9 or later (only Core and Test modules)
 * [Cedar Framework](https://github.com/djurodrljaca/CedarFramework)
 * [C++ Config Framework](https://github.com/djurodrljaca/CppConfigFramework)
 

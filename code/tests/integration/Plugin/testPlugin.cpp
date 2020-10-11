@@ -111,13 +111,21 @@ void TestPlugin::testLoadPlugin()
 
             QCOMPARE(instance->version(), version);
             QCOMPARE(instance->description(), description);
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+            QCOMPARE(instance->exportedInterfaces(), QSet<QString>::fromList(exportedInterfaces));
+#else
             QCOMPARE(instance->exportedInterfaces(), QSet<QString>(exportedInterfaces.begin(),
                                                                    exportedInterfaces.end()));
+#endif
         }
 
         QCOMPARE(checkedInstances.size(), instanceNames.size());
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+        QCOMPARE(QSet<QString>::fromList(checkedInstances), QSet<QString>::fromList(instanceNames));
+#else
         QCOMPARE(QSet<QString>(checkedInstances.begin(), checkedInstances.end()),
                  QSet<QString>(instanceNames.begin(), instanceNames.end()));
+#endif
     }
 }
 
