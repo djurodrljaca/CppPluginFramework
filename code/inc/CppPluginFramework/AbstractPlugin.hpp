@@ -49,7 +49,7 @@ namespace CppPluginFramework
  * - Starting plugin
  * - Stopping plugin
  */
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT AbstractPlugin : public IPlugin
+class CPPPLUGINFRAMEWORK_EXPORT AbstractPlugin : public IPlugin
 {
 public:
     /*!

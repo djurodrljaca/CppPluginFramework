@@ -18,8 +18,7 @@
  * Contains the "test plugin 2"
  */
 
-#ifndef CPPPLUGINFRAMEWORK_TESTPLUGINS_TESTPLUGIN2_HPP
-#define CPPPLUGINFRAMEWORK_TESTPLUGINS_TESTPLUGIN2_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/AbstractPlugin.hpp>
@@ -42,9 +41,7 @@ namespace CppPluginFramework
 namespace TestPlugins
 {
 
-class CPPPLUGINFRAMEWORK_PLUGIN_EXPORT TestPlugin2 :
-        public CppPluginFramework::AbstractPlugin,
-        public ITestPlugin2
+class TestPlugin2 : public CppPluginFramework::AbstractPlugin, public ITestPlugin2
 {
 public:
     TestPlugin2(const QString &name);
@@ -66,9 +63,7 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class CPPPLUGINFRAMEWORK_PLUGIN_EXPORT PluginFactory :
-        public QObject,
-        public PluginFactoryTemplate<TestPlugin2>
+class Q_DECL_EXPORT PluginFactory : public QObject, public PluginFactoryTemplate<TestPlugin2>
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "CppPluginFramework::IPluginFactory")
@@ -81,5 +76,3 @@ public:
 
 } // namespace TestPlugins
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_TESTPLUGINS_TESTPLUGIN2_HPP

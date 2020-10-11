@@ -27,7 +27,6 @@
 // Qt includes
 
 // System includes
-#include <memory>
 
 // Forward declarations
 
@@ -39,7 +38,7 @@ namespace CppPluginFramework
 {
 
 //! This class manages plugins
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginManager
+class CPPPLUGINFRAMEWORK_EXPORT PluginManager
 {
 public:
     //! Destructor

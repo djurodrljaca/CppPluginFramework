@@ -21,7 +21,7 @@
 #pragma once
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/LibraryExport.hpp>
+#include <CppPluginFramework/CppPluginFrameworkExport.hpp>
 
 // Qt includes
 #include <QtCore/QSet>
@@ -48,7 +48,7 @@ namespace Validation
  * \retval  true    Plugin's instance name is valid
  * \retval  false   Plugin's instance name is not valid
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validatePluginInstanceName(const QString &name);
+CPPPLUGINFRAMEWORK_EXPORT bool validatePluginInstanceName(const QString &name);
 
 /*!
  * Validates plugin's interface name
@@ -58,7 +58,7 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validatePluginInstanceName(const QString 
  * \retval  true    Plugin's interface name is valid
  * \retval  false   Plugin's interface name is not valid
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateInterfaceName(const QString &name);
+CPPPLUGINFRAMEWORK_EXPORT bool validateInterfaceName(const QString &name);
 
 /*!
  * Validates plugin's exported interfaces
@@ -70,8 +70,7 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateInterfaceName(const QString &name
  *
  * This method checks if at least one interface is exported and if the interface names are valid.
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT
-bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces);
+CPPPLUGINFRAMEWORK_EXPORT bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces);
 
 /*!
  * Validates the environment variable name
@@ -81,7 +80,7 @@ bool validateExportedInterfaces(const QSet<QString> &exportedInterfaces);
  * \retval  true    Valid
  * \retval  false   Invalid
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateEnvironmentVariableName(const QString &name);
+CPPPLUGINFRAMEWORK_EXPORT bool validateEnvironmentVariableName(const QString &name);
 
 /*!
  * Validates file path
@@ -91,7 +90,7 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateEnvironmentVariableName(const QSt
  * \retval  true    Valid
  * \retval  false   Invalid
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool validateFilePath(const QString &filePath);
+CPPPLUGINFRAMEWORK_EXPORT bool validateFilePath(const QString &filePath);
 
 } // namespace Validation
 

@@ -18,13 +18,10 @@
  * Contains the interface for the "test plugin 2"
  */
 
-#ifndef CPPPLUGINFRAMEWORK_TESTPLUGINS_ITESTPLUGIN2_HPP
-#define CPPPLUGINFRAMEWORK_TESTPLUGINS_ITESTPLUGIN2_HPP
-
-// C++ Plugin Framework includes
-#include <CppPluginFramework/PluginExport.hpp>
+#pragma once
 
 // Qt includes
+#include <QtCore/QString>
 
 // System includes
 
@@ -39,7 +36,7 @@ namespace CppPluginFramework
 namespace TestPlugins
 {
 
-class CPPPLUGINFRAMEWORK_PLUGIN_EXPORT ITestPlugin2
+class ITestPlugin2
 {
 public:
     virtual ~ITestPlugin2() = default;
@@ -48,5 +45,3 @@ public:
 
 } // namespace TestPlugins
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_TESTPLUGINS_ITESTPLUGIN2_HPP
