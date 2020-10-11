@@ -47,7 +47,7 @@ namespace CppPluginFramework
  *
  * \code{.cpp}
  *
- *     class PLUGIN_CLASS_EXPORT PluginFactory :
+ *     class Q_DECL_EXPORT PluginFactory :
  *             public QObject,
  *             public CppPluginFramework::PluginFactoryTemplate<PLUGIN_CLASS>
  *     {
@@ -61,9 +61,7 @@ namespace CppPluginFramework
  *
  * \endcode
  *
- * The following placeholders need to be replaced:
- * - PLUGIN_CLASS_EXPORT: replace it with the "export macro" for that plugin
- * - PLUGIN_CLASS: replace it with the plugin class name
+ * \note    The PLUGIN_CLASS placeholders need to be replaced with the plugin class name
  */
 template<typename T, std::enable_if_t<std::is_base_of<IPlugin, T>::value, bool> = true>
 class PluginFactoryTemplate : public IPluginFactory

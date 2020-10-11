@@ -37,7 +37,7 @@ namespace CppPluginFramework
 {
 
 //! This is a base class for a factory that shall be able to create instances of a plugin
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT IPluginFactory
+class CPPPLUGINFRAMEWORK_EXPORT IPluginFactory
 {
 public:
     //! Destructor

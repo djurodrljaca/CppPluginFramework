@@ -21,7 +21,7 @@
 #pragma once
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/LibraryExport.hpp>
+#include <CppPluginFramework/CppPluginFrameworkExport.hpp>
 
 // Qt includes
 #include <QtCore/QLoggingCategory>
@@ -41,13 +41,13 @@ namespace LoggingCategory
 {
 
 //! Logging category for plugin config
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT extern const QLoggingCategory Config;
+CPPPLUGINFRAMEWORK_EXPORT extern const QLoggingCategory Config;
 
 //! Logging category for Plugin
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT extern const QLoggingCategory Plugin;
+CPPPLUGINFRAMEWORK_EXPORT extern const QLoggingCategory Plugin;
 
 //! Logging category for PluginManager
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT extern const QLoggingCategory PluginManager;
+CPPPLUGINFRAMEWORK_EXPORT extern const QLoggingCategory PluginManager;
 
 } // namespace LoggingCategory
 

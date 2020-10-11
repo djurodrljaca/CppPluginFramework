@@ -21,14 +21,12 @@
 #pragma once
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/LibraryExport.hpp>
 #include <CppPluginFramework/VersionInfo.hpp>
 
 // C++ Config Framework includes
 #include <CppConfigFramework/ConfigObjectNode.hpp>
 
 // Qt includes
-#include <QtCore/QSet>
 
 // System includes
 
@@ -42,7 +40,7 @@ namespace CppPluginFramework
 {
 
 //! This is a base class for all plugins
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT IPlugin
+class CPPPLUGINFRAMEWORK_EXPORT IPlugin
 {
 public:
     //! Destructor

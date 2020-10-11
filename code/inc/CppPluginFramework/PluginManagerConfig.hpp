@@ -24,10 +24,8 @@
 #include <CppPluginFramework/PluginConfig.hpp>
 
 // Qt includes
-#include <QtCore/QJsonObject>
 
 // System includes
-#include <memory>
 
 // Forward declarations
 
@@ -39,8 +37,7 @@ namespace CppPluginFramework
 {
 
 //! Config class for the Plugin Manager
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginManagerConfig
-        : public CppConfigFramework::ConfigLoader
+class CPPPLUGINFRAMEWORK_EXPORT PluginManagerConfig : public CppConfigFramework::ConfigLoader
 {
 public:
     //! Constructor
@@ -135,6 +132,8 @@ private:
 
 } // namespace CppPluginFramework
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "equal to" operator for CppPluginFramework::PluginManagerConfig
  *
@@ -144,9 +143,10 @@ private:
  * \retval  true    Plugin configs are equal
  * \retval  false   Plugin configs are not equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
-        const CppPluginFramework::PluginManagerConfig &left,
-        const CppPluginFramework::PluginManagerConfig &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator==(const CppPluginFramework::PluginManagerConfig &left,
+                                          const CppPluginFramework::PluginManagerConfig &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "not equal to" operator for CppPluginFramework::PluginManagerConfig
@@ -157,6 +157,5 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
  * \retval  true    Plugin configs are not equal
  * \retval  false   Plugin configs are equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(
-        const CppPluginFramework::PluginManagerConfig &left,
-        const CppPluginFramework::PluginManagerConfig &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator!=(const CppPluginFramework::PluginManagerConfig &left,
+                                          const CppPluginFramework::PluginManagerConfig &right);
