@@ -144,16 +144,16 @@ void TestPluginInstanceConfig::testName()
         QVERIFY(instanceConfig.name().isEmpty());
 
         instanceConfig.setName("asd");
-        QCOMPARE(instanceConfig.name(), "asd");
+        QCOMPARE(instanceConfig.name(), QString("asd"));
     }
 
     // Constructed with initial name
     {
         PluginInstanceConfig instanceConfig("aaa");
-        QCOMPARE(instanceConfig.name(), "aaa");
+        QCOMPARE(instanceConfig.name(), QString("aaa"));
 
         instanceConfig.setName("bbb");
-        QCOMPARE(instanceConfig.name(), "bbb");
+        QCOMPARE(instanceConfig.name(), QString("bbb"));
     }
 }
 
