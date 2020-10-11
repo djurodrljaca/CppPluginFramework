@@ -29,10 +29,6 @@ target_link_libraries(TestPlugin1
         PUBLIC Qt5::Core
     )
 
-target_compile_definitions(TestPlugin1
-        PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
-    )
-
 set_target_properties(TestPlugin1 PROPERTIES
         PREFIX ""
         SUFFIX ".plugin"
@@ -54,10 +50,6 @@ target_include_directories(TestPlugin2
 target_link_libraries(TestPlugin2
         PUBLIC CppPluginFramework
         PUBLIC Qt5::Core
-    )
-
-target_compile_definitions(TestPlugin2
-        PRIVATE CPPPLUGINFRAMEWORK_BUILD_PLUGIN
     )
 
 set_target_properties(TestPlugin2 PROPERTIES

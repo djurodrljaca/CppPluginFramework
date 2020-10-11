@@ -1,0 +1,124 @@
+@startuml Plugin
+IPlugin <|-- AbstractPlugin
+AbstractPlugin <|-- ExamplePlugin
+ExampleInterfaceA <|-- ExamplePlugin
+ExampleInterfaceB <|-- ExamplePlugin
+
+abstract class IPlugin {
+    {abstract} +name()
+    {abstract} +version()
+    {abstract} +description()
+    {abstract} +isInterfaceExported(interface)
+    {abstract} +exportedInterfaces()
+    {abstract} +loadConfig(config)
+    {abstract} +injectDependency(plugin)
+    {abstract} +ejectDependencies()
+    {abstract} +isStarted()
+    {abstract} +start()
+    {abstract} +stop()
+    +interface()
+}
+
+abstract class AbstractPlugin {
+    +name()
+    +version()
+    +description()
+    +isInterfaceExported(interface)
+    +exportedInterfaces()
+    +loadConfig(config)
+    +injectDependency(plugin)
+    +ejectDependencies()
+    +isStarted()
+    +start()
+    +stop()
+    +interface()
+    {abstract} -onStart()
+    {abstract} -onStop()
+}
+
+class ExampleInterfaceA {
+    {abstract} +exampleMethodA()
+}
+
+class ExampleInterfaceB {
+    {abstract} +exampleMethodB()
+}
+
+class ExamplePlugin {
+    +injectDependency()
+    +ejectDependencies()
+    +exampleMethodA()
+    +exampleMethodB()
+    -onStart()
+    -onStop()
+}
+@enduml
+
+@startuml PluginFactory
+IPluginFactory <|-- PluginFactory
+
+abstract class IPluginFactory {
+    {abstract} +createInstance(instanceName)
+}
+
+class PluginFactory {
+    +createInstance(instanceName)
+}
+@enduml
+
+@startuml PluginManager
+PluginManager -- Plugin
+
+class PluginManager {
+    +load()
+    +unload()
+    +start()
+    +stop()
+    +pluginInstance(instanceName)
+    +pluginInstanceNames()
+}
+
+class Plugin {
+    +loadInstances(pluginConfig)
+    -loadInstance(pluginFactory, instanceConfig)
+    -checkVersion(pluginVersion, pluginConfig)
+}
+
+@startuml PluginManagerConfig
+PluginManagerConfig o-- PluginConfig
+PluginConfig o-- PluginInstanceConfig
+
+class PluginManagerConfig {
+    +isValid()
+    +pluginConfigs()
+    +setPluginConfigs(pluginConfigs)
+    +pluginStartupPriorities()
+    +setPluginStartupPriorities(startupPriorities)
+}
+
+class PluginConfig {
+    +isValid()
+    +isExactVersion()
+    +isVersionRange()
+    +filePath()
+    +setFilePath(filePath)
+    +version()
+    +setVersion(version)
+    +minVersion()
+    +setMinVersion(minVersion)
+    +maxVersion()
+    +setMaxVersion(maxVersion)
+    +instanceConfigs()
+    +setInstanceConfigs(instanceConfigs)
+}
+
+class PluginInstanceConfig {
+    +isValid()
+    +name()
+    +setName(name)
+    +config()
+    +setConfig(config)
+    +dependencies()
+    +setDependencies(dependencies)
+}
+@enduml

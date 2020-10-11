@@ -18,27 +18,23 @@
  * Contains a class that holds version information
  */
 
-#ifndef CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
-#define CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
+#pragma once
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/LibraryExport.hpp>
+#include <CppPluginFramework/CppPluginFrameworkExport.hpp>
 
 // C++ Config Framework includes
-#include <CppConfigFramework/ConfigParameterLoader.hpp>
+
+// Cedar Framework includes
+#include <CedarFramework/Deserialization.hpp>
 
 // Qt includes
-#include <QtCore/QVariant>
 
 // System includes
 
 // Forward declarations
 
 // Macros
-
-// These two symbols need to be undefined to avoid conflict with macros from <sys/sysmacros.h>
-#undef major
-#undef minor
 
 // -------------------------------------------------------------------------------------------------
 
@@ -48,7 +44,7 @@ namespace CppPluginFramework
 /*!
  * This class holds version information
  */
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT VersionInfo
+class CPPPLUGINFRAMEWORK_EXPORT VersionInfo
 {
 public:
     //! Constructor
@@ -62,7 +58,7 @@ public:
      * \param   patch   Patch version number
      * \param   dev     Optional development version string
      */
-    VersionInfo(const int major, const int minor, const int patch, const QString &dev = QString());
+    VersionInfo(const int major, const int minor, const int patch, const QString &dev = {});
 
     /*!
      * Constructor
@@ -191,6 +187,8 @@ private:
 
 } // namespace CppPluginFramework
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "equal to" operator for CppPluginFramework::VersionInfo
  *
@@ -202,8 +200,10 @@ private:
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::VersionInfo &left,
-                                                  const CppPluginFramework::VersionInfo &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator==(const CppPluginFramework::VersionInfo &left,
+                                          const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "not equal to" operator for CppPluginFramework::VersionInfo
@@ -216,8 +216,10 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::Vers
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::VersionInfo &left,
-                                                  const CppPluginFramework::VersionInfo &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator!=(const CppPluginFramework::VersionInfo &left,
+                                          const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "less than" operator for CppPluginFramework::VersionInfo
@@ -230,8 +232,10 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::Vers
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const CppPluginFramework::VersionInfo &left,
-                                                 const CppPluginFramework::VersionInfo &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator<(const CppPluginFramework::VersionInfo &left,
+                                         const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "less than or equal to" operator for CppPluginFramework::VersionInfo
@@ -244,8 +248,10 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<(const CppPluginFramework::Versi
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const CppPluginFramework::VersionInfo &left,
-                                                  const CppPluginFramework::VersionInfo &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator<=(const CppPluginFramework::VersionInfo &left,
+                                          const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "greater than" operator for CppPluginFramework::VersionInfo
@@ -258,8 +264,10 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator<=(const CppPluginFramework::Vers
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const CppPluginFramework::VersionInfo &left,
-                                                 const CppPluginFramework::VersionInfo &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator>(const CppPluginFramework::VersionInfo &left,
+                                         const CppPluginFramework::VersionInfo &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "greater than or equal to" operator for CppPluginFramework::VersionInfo
@@ -272,12 +280,17 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>(const CppPluginFramework::Versi
  *
  * \note    Result of the comparison is valid only if both versions are valid!
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator>=(const CppPluginFramework::VersionInfo &left,
-                                                  const CppPluginFramework::VersionInfo &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator>=(const CppPluginFramework::VersionInfo &left,
+                                          const CppPluginFramework::VersionInfo &right);
 
-//! \copydoc    CppConfigFramework::ConfigParameterLoader::load()
+// -------------------------------------------------------------------------------------------------
+
+namespace CedarFramework
+{
+
+//! \copydoc    CedarFramework::serialize()
 template<>
-bool CppConfigFramework::ConfigParameterLoader::load(
-        const QVariant &nodeValue, CppPluginFramework::VersionInfo *parameterValue);
+CPPPLUGINFRAMEWORK_EXPORT bool deserialize(const QJsonValue &json,
+                                           CppPluginFramework::VersionInfo *value);
 
-#endif // CPPPLUGINFRAMEWORK_VERSIONINFO_HPP
+}

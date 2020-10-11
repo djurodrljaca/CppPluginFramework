@@ -11,14 +11,37 @@
 # You should have received a copy of the GNU Lesser General Public License along with C++ Plugin
 # Framework. If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.5.0)
 
 project(CppPluginFramework VERSION 1.0.0)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(CppConfigFramework REQUIRED)
+
+# --------------------------------------------------------------------------------------------------
+# Code Coverage
+# --------------------------------------------------------------------------------------------------
+option(CppPluginFramework_CodeCoverage "C++ Plugin Framework Code Coverage" OFF)
+
+if (CppPluginFramework_CodeCoverage MATCHES ON)
+    include(cmake/CodeCoverage.cmake)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+
+    set(excludes_cmake_prefix_path)
+    foreach(item ${CMAKE_PREFIX_PATH})
+        get_filename_component(item ${item} ABSOLUTE)
+        list(APPEND excludes_cmake_prefix_path "'${item}/*'")
+    endforeach()
+
+    set(CppPluginFramework_CodeCoverage_EXCLUDES
+            "'/opt/*'"
+            "'/usr/*'"
+            ${excludes_cmake_prefix_path}
+            "'${CMAKE_SOURCE_DIR}/tests/*'"
+            "'${CMAKE_BINARY_DIR}/*'"
+        )
+endif()
 
 # --------------------------------------------------------------------------------------------------
 # CppPluginFramework library
@@ -27,11 +50,9 @@ add_library(CppPluginFramework SHARED
         inc/CppPluginFramework/AbstractPlugin.hpp
         inc/CppPluginFramework/IPlugin.hpp
         inc/CppPluginFramework/IPluginFactory.hpp
-        inc/CppPluginFramework/LibraryExport.hpp
         inc/CppPluginFramework/LoggingCategories.hpp
         inc/CppPluginFramework/Plugin.hpp
         inc/CppPluginFramework/PluginConfig.hpp
-        inc/CppPluginFramework/PluginExport.hpp
         inc/CppPluginFramework/PluginFactoryTemplate.hpp
         inc/CppPluginFramework/PluginInstanceConfig.hpp
         inc/CppPluginFramework/PluginManager.hpp
@@ -50,17 +71,22 @@ add_library(CppPluginFramework SHARED
         src/VersionInfo.cpp
     )
 
+set_target_properties(CppPluginFramework PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+
+include(GenerateExportHeader)
+generate_export_header(CppPluginFramework
+    EXPORT_FILE_NAME exports/CppPluginFramework/CppPluginFrameworkExport.hpp)
+
 target_include_directories(CppPluginFramework PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/exports>
         $<INSTALL_INTERFACE:include>
     )
 
 target_link_libraries(CppPluginFramework PUBLIC
         CppConfigFramework::CppConfigFramework
-    )
-
-target_compile_definitions(CppPluginFramework PRIVATE
-        CPPPLUGINFRAMEWORK_BUILD_LIBRARY
     )
 
 set_target_properties(CppPluginFramework PROPERTIES
@@ -83,6 +109,12 @@ install(TARGETS CppPluginFramework EXPORT CppPluginFrameworkTargets DESTINATION
 
 install(
         DIRECTORY   ${CMAKE_CURRENT_SOURCE_DIR}/inc/CppPluginFramework
+        DESTINATION include
+        COMPONENT   Devel
+    )
+
+install(
+        DIRECTORY   ${PROJECT_BINARY_DIR}/exports/CppPluginFramework
         DESTINATION include
         COMPONENT   Devel
     )
@@ -120,30 +152,6 @@ install(
         DESTINATION ${ConfigPackageLocation}
         COMPONENT   Devel
     )
-
-# --------------------------------------------------------------------------------------------------
-# Code Coverage
-# --------------------------------------------------------------------------------------------------
-option(CppPluginFramework_CodeCoverage "C++ Plugin Framework Code Coverage" OFF)
-
-if (CppPluginFramework_CodeCoverage MATCHES ON)
-    include(cmake/CodeCoverage.cmake)
-    APPEND_COVERAGE_COMPILER_FLAGS()
-
-    set(excludes_cmake_prefix_path)
-    foreach(item ${CMAKE_PREFIX_PATH})
-        get_filename_component(item ${item} ABSOLUTE)
-        list(APPEND excludes_cmake_prefix_path "'${item}/*'")
-    endforeach()
-
-    set(CppPluginFramework_CodeCoverage_EXCLUDES
-            "'/opt/*'"
-            "'/usr/*'"
-            ${excludes_cmake_prefix_path}
-            "'${CMAKE_SOURCE_DIR}/tests/*'"
-            "'${CMAKE_BINARY_DIR}/*'"
-        )
-endif()
 
 # --------------------------------------------------------------------------------------------------
 # Tests

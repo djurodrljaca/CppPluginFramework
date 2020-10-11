@@ -136,33 +136,29 @@ bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::Config
     }
 
     // Load config
-    if (config.contains(QStringLiteral("config")))
+    const auto *configMember = config.member(QStringLiteral("config"));
+
+    if (configMember == nullptr)
     {
-        // Extract the config
-        const auto *node = config.member(QStringLiteral("config"));
-
-        if (!node->isObject())
-        {
-            qCWarning(CppPluginFramework::LoggingCategory::Config)
-                    << "Plugin instance's config is not an Object node!";
-            return false;
-        }
-
-        m_config = std::move(node->clone()->toObject());
+        m_config = CppConfigFramework::ConfigObjectNode();
     }
     else
     {
-        // No config
-        m_config = CppConfigFramework::ConfigObjectNode();
+        if (!configMember->isObject())
+        {
+            qCWarning(CppPluginFramework::LoggingCategory::Config)
+                    << "Plugin instance's config is not an Object! Type:"
+                    << CppConfigFramework::ConfigNode::typeToString(configMember->type());
+            return false;
+        }
+
+        m_config = std::move(configMember->clone()->toObject());
     }
 
     // Load dependencies
-    bool loaded = false;
+    m_dependencies.clear();
 
-    if (!loadOptionalConfigParameter(&m_dependencies,
-                                     QStringLiteral("dependencies"),
-                                     config,
-                                     &loaded))
+    if (!loadOptionalConfigParameter(&m_dependencies, QStringLiteral("dependencies"), config))
     {
         qCWarning(CppPluginFramework::LoggingCategory::Config)
                 << "Failed to load plugin instance's dependencies!";

@@ -18,17 +18,15 @@
  * Contains a config class for a Plugin Instance
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
-#define CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
+#pragma once
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/LibraryExport.hpp>
+#include <CppPluginFramework/CppPluginFrameworkExport.hpp>
 
 // C++ Config Framework includes
 #include <CppConfigFramework/ConfigLoader.hpp>
 
 // Qt includes
-#include <QtCore/QSet>
 
 // System includes
 
@@ -42,8 +40,7 @@ namespace CppPluginFramework
 {
 
 //! Config class for a Plugin Instance
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginInstanceConfig
-        : public CppConfigFramework::ConfigLoader
+class CPPPLUGINFRAMEWORK_EXPORT PluginInstanceConfig : public CppConfigFramework::ConfigLoader
 {
 public:
     //! Constructor
@@ -58,7 +55,7 @@ public:
      */
     PluginInstanceConfig(const QString &name,
                          const CppConfigFramework::ConfigObjectNode &config = {},
-                         const QSet<QString> &dependencies = QSet<QString>());
+                         const QSet<QString> &dependencies = {});
 
     /*!
      * Copy constructor
@@ -165,6 +162,8 @@ private:
 
 } // namespace CppPluginFramework
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "equal to" operator for CppPluginFramework::PluginInstanceConfig
  *
@@ -174,9 +173,10 @@ private:
  * \retval  true    Instance configs are equal
  * \retval  false   Instance configs are not equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
-        const CppPluginFramework::PluginInstanceConfig &left,
-        const CppPluginFramework::PluginInstanceConfig &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator==(const CppPluginFramework::PluginInstanceConfig &left,
+                                          const CppPluginFramework::PluginInstanceConfig &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "not equal to" operator for CppPluginFramework::PluginInstanceConfig
@@ -187,8 +187,5 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(
  * \retval  true    Instance configs are not equal
  * \retval  false   Instance configs are equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(
-        const CppPluginFramework::PluginInstanceConfig &left,
-        const CppPluginFramework::PluginInstanceConfig &right);
-
-#endif // CPPPLUGINFRAMEWORK_PLUGININSTANCECONFIG_HPP
+CPPPLUGINFRAMEWORK_EXPORT bool operator!=(const CppPluginFramework::PluginInstanceConfig &left,
+                                          const CppPluginFramework::PluginInstanceConfig &right);

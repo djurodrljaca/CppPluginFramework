@@ -18,11 +18,9 @@
  * Contains a class that is able to load a plugin from a library
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGIN_HPP
-#define CPPPLUGINFRAMEWORK_PLUGIN_HPP
+#pragma once
 
 // C++ Plugin Framework includes
-#include <CppPluginFramework/IPlugin.hpp>
 #include <CppPluginFramework/IPluginFactory.hpp>
 #include <CppPluginFramework/PluginConfig.hpp>
 
@@ -40,7 +38,7 @@ namespace CppPluginFramework
 {
 
 //! This class enables loading of plugin instances from a library
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT Plugin
+class CPPPLUGINFRAMEWORK_EXPORT Plugin
 {
 public:
     /*!
@@ -54,7 +52,7 @@ public:
 
 private:
     //! Construction of this class is disabled
-    Plugin();
+    Plugin() = delete;
 
     /*!
      * Loads the plugin instance from the specified library and configures it
@@ -79,5 +77,3 @@ private:
 };
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_PLUGIN_HPP

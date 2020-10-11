@@ -22,6 +22,9 @@
 #include <CppPluginFramework/IPluginFactory.hpp>
 #include <CppPluginFramework/Plugin.hpp>
 
+// C++ Config Framework includes
+#include <CppConfigFramework/ConfigValueNode.hpp>
+
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtTest/QTest>
@@ -108,13 +111,21 @@ void TestPlugin::testLoadPlugin()
 
             QCOMPARE(instance->version(), version);
             QCOMPARE(instance->description(), description);
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+            QCOMPARE(instance->exportedInterfaces(), QSet<QString>::fromList(exportedInterfaces));
+#else
             QCOMPARE(instance->exportedInterfaces(), QSet<QString>(exportedInterfaces.begin(),
                                                                    exportedInterfaces.end()));
+#endif
         }
 
         QCOMPARE(checkedInstances.size(), instanceNames.size());
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+        QCOMPARE(QSet<QString>::fromList(checkedInstances), QSet<QString>::fromList(instanceNames));
+#else
         QCOMPARE(QSet<QString>(checkedInstances.begin(), checkedInstances.end()),
                  QSet<QString>(instanceNames.begin(), instanceNames.end()));
+#endif
     }
 }
 
@@ -132,11 +143,15 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of test plugin 1
     {
-        ConfigObjectNode instance1Config;
-        instance1Config.setMember("value", ConfigValueNode("value1"));
+        ConfigObjectNode instance1Config
+        {
+            { "value", ConfigValueNode("value1") }
+        };
 
-        ConfigObjectNode instance2Config;
-        instance2Config.setMember("value", ConfigValueNode("value2"));
+        ConfigObjectNode instance2Config
+        {
+            { "value", ConfigValueNode("value2") }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config)
@@ -157,8 +172,10 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of test plugin 2
     {
-        ConfigObjectNode instance3Config;
-        instance3Config.setMember("delimiter", ConfigValueNode(";"));
+        ConfigObjectNode instance3Config
+        {
+            { "delimiter", ConfigValueNode(";") }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance3",
@@ -181,8 +198,10 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of plugin with invalid config
     {
-        ConfigObjectNode instance1Config;
-        instance1Config.setMember("invalid", ConfigValueNode("x"));
+        ConfigObjectNode instance1Config
+        {
+            { "invalid", ConfigValueNode("x") }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config);
@@ -211,8 +230,10 @@ void TestPlugin::testLoadPlugin_data()
 
     // Loading of plugin with invalid version
     {
-        ConfigObjectNode instance1Config;
-        instance1Config.setMember("value", ConfigValueNode("value1"));
+        ConfigObjectNode instance1Config
+        {
+            { "value", ConfigValueNode("value1") }
+        };
 
         QList<PluginInstanceConfig> instanceConfigs;
         instanceConfigs << PluginInstanceConfig("instance1", instance1Config);

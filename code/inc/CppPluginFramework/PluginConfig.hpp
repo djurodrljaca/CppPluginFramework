@@ -18,8 +18,7 @@
  * Contains a config class for a Plugin
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/PluginInstanceConfig.hpp>
@@ -39,8 +38,7 @@ namespace CppPluginFramework
 {
 
 //! Config class for a Plugin
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginConfig
-        : public CppConfigFramework::ConfigLoader
+class CPPPLUGINFRAMEWORK_EXPORT PluginConfig : public CppConfigFramework::ConfigLoader
 {
 public:
     //! Constructor
@@ -225,6 +223,8 @@ private:
 
 } // namespace CppPluginFramework
 
+// -------------------------------------------------------------------------------------------------
+
 /*!
  * Global "equal to" operator for CppPluginFramework::PluginConfig
  *
@@ -234,8 +234,10 @@ private:
  * \retval  true    Plugin configs are equal
  * \retval  false   Plugin configs are not equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::PluginConfig &left,
-                                                  const CppPluginFramework::PluginConfig &right);
+CPPPLUGINFRAMEWORK_EXPORT bool operator==(const CppPluginFramework::PluginConfig &left,
+                                          const CppPluginFramework::PluginConfig &right);
+
+// -------------------------------------------------------------------------------------------------
 
 /*!
  * Global "not equal to" operator for CppPluginFramework::PluginConfig
@@ -246,7 +248,5 @@ CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator==(const CppPluginFramework::Plug
  * \retval  true    Plugin configs are not equal
  * \retval  false   Plugin configs are equal
  */
-CPPPLUGINFRAMEWORK_LIBRARY_EXPORT bool operator!=(const CppPluginFramework::PluginConfig &left,
-                                                  const CppPluginFramework::PluginConfig &right);
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINCONFIG_HPP
+CPPPLUGINFRAMEWORK_EXPORT bool operator!=(const CppPluginFramework::PluginConfig &left,
+                                          const CppPluginFramework::PluginConfig &right);

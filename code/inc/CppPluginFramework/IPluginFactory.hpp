@@ -18,8 +18,7 @@
  * Contains a base class for a factory that shall be able to create instances of a plugin
  */
 
-#ifndef CPPPLUGINFRAMEWORK_IPLUGINFACTORY_HPP
-#define CPPPLUGINFRAMEWORK_IPLUGINFACTORY_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
@@ -38,7 +37,7 @@ namespace CppPluginFramework
 {
 
 //! This is a base class for a factory that shall be able to create instances of a plugin
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT IPluginFactory
+class CPPPLUGINFRAMEWORK_EXPORT IPluginFactory
 {
 public:
     //! Destructor
@@ -58,5 +57,3 @@ public:
 
 //! Maps the class name to its string equivalent
 Q_DECLARE_INTERFACE(CppPluginFramework::IPluginFactory, "CppPluginFramework::IPluginFactory")
-
-#endif // CPPPLUGINFRAMEWORK_IPLUGINFACTORY_HPP

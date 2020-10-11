@@ -18,8 +18,7 @@
  * Contains a plugin management class
  */
 
-#ifndef CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP
-#define CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP
+#pragma once
 
 // C++ Plugin Framework includes
 #include <CppPluginFramework/IPlugin.hpp>
@@ -28,7 +27,6 @@
 // Qt includes
 
 // System includes
-#include <memory>
 
 // Forward declarations
 
@@ -40,7 +38,7 @@ namespace CppPluginFramework
 {
 
 //! This class manages plugins
-class CPPPLUGINFRAMEWORK_LIBRARY_EXPORT PluginManager
+class CPPPLUGINFRAMEWORK_EXPORT PluginManager
 {
 public:
     //! Destructor
@@ -133,5 +131,3 @@ private:
 };
 
 } // namespace CppPluginFramework
-
-#endif // CPPPLUGINFRAMEWORK_PLUGINMANAGER_HPP

@@ -95,12 +95,12 @@ void TestPluginManager::testLoad()
                                     QDir(QCoreApplication::applicationDirPath()),
                                     ConfigNodePath::ROOT_PATH,
                                     ConfigNodePath::ROOT_PATH,
-                                    std::vector<const ConfigObjectNode *>(),
+                                    {},
                                     &environmentVariables);
     QVERIFY(config);
 
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
+    QVERIFY(pluginManagerConfig.loadConfig(*config));
 
     // Load plugins
     PluginManager pluginManager;
@@ -155,7 +155,7 @@ void TestPluginManager::testLoadAfterStart()
     QVERIFY(config);
 
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
+    QVERIFY(pluginManagerConfig.loadConfig(*config));
 
     // Load plugins
     PluginManager pluginManager;
@@ -203,7 +203,7 @@ void TestPluginManager::testLoadPluginsWithUnsupportedDependency()
     QVERIFY(config);
 
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
+    QVERIFY(pluginManagerConfig.loadConfig(*config));
 
     PluginManager pluginManager;
     QVERIFY(!pluginManager.load(pluginManagerConfig));
@@ -226,7 +226,7 @@ void TestPluginManager::testLoadPluginsWithInvalidStartupOrder()
     QVERIFY(config);
 
     PluginManagerConfig pluginManagerConfig;
-    QVERIFY(pluginManagerConfig.loadConfigAtPath(ConfigNodePath::ROOT_PATH, *config));
+    QVERIFY(pluginManagerConfig.loadConfig(*config));
 
     // Load plugins
     PluginManager pluginManager;

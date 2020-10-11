@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="309px" preserveAspectRatio="none" style="width:273px;height:309px;" version="1.1" viewBox="0 0 273 309" width="273px" zoomAndPan="magnify"><defs><filter height="300%" id="fgmlqdfaelmph" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[380509a56071d282256482e7a3da0547]
+class PluginManager--><rect fill="#FEFECE" filter="url(#fgmlqdfaelmph)" height="137.8913" id="PluginManager" style="stroke: #A80036; stroke-width: 1.5;" width="183" x="42.5" y="8"/><ellipse cx="87.25" cy="24" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M86.7188,30.9219 Q84.9688,30.9219 83.8281,30.1875 Q82.7031,29.4375 82.1406,28.0938 Q81.5938,26.7344 81.5938,24.9375 Q81.5938,22.9063 82.25,21.4531 Q82.9063,20 84.1875,19.2188 Q85.4688,18.4375 87.3438,18.4375 Q88.2344,18.4375 88.9063,18.625 Q89.5781,18.7969 90.2656,19.1406 L89.4531,21.1563 Q88.8281,20.8438 88.2813,20.7188 Q87.75,20.5938 87.2656,20.5938 Q86.0938,20.5938 85.3906,21.125 Q84.6875,21.6563 84.3906,22.6094 Q84.0938,23.5625 84.0938,24.8281 Q84.0938,26.8438 84.8125,27.8125 Q85.5313,28.7656 87.125,28.7656 Q87.7188,28.7656 88.3438,28.6094 Q88.9688,28.4531 89.7969,28.0781 L89.7969,30.2969 Q89.0625,30.6094 88.2656,30.7656 Q87.4844,30.9219 86.7188,30.9219 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="85" x="107.75" y="28.656">PluginManager</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="43.5" x2="224.5" y1="40" y2="40"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="43.5" x2="224.5" y1="48" y2="48"/><ellipse cx="53.5" cy="59" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="29" x="62.5" y="63.7589">load()</text><ellipse cx="53.5" cy="73.9819" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="43" x="62.5" y="78.7408">unload()</text><ellipse cx="53.5" cy="88.9638" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="30" x="62.5" y="93.7227">start()</text><ellipse cx="53.5" cy="103.9457" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="29" x="62.5" y="108.7046">stop()</text><ellipse cx="53.5" cy="118.9276" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="157" x="62.5" y="123.6865">pluginInstance(instanceName)</text><ellipse cx="53.5" cy="133.9094" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="119" x="62.5" y="138.6684">pluginInstanceNames()</text><!--MD5=[b628511dd50102041730ee0512f882c8]
+class Plugin--><rect fill="#FEFECE" filter="url(#fgmlqdfaelmph)" height="92.9457" id="Plugin" style="stroke: #A80036; stroke-width: 1.5;" width="256" x="6" y="206"/><ellipse cx="112.75" cy="222" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M112.2188,228.9219 Q110.4688,228.9219 109.3281,228.1875 Q108.2031,227.4375 107.6406,226.0938 Q107.0938,224.7344 107.0938,222.9375 Q107.0938,220.9063 107.75,219.4531 Q108.4063,218 109.6875,217.2188 Q110.9688,216.4375 112.8438,216.4375 Q113.7344,216.4375 114.4063,216.625 Q115.0781,216.7969 115.7656,217.1406 L114.9531,219.1563 Q114.3281,218.8438 113.7813,218.7188 Q113.25,218.5938 112.7656,218.5938 Q111.5938,218.5938 110.8906,219.125 Q110.1875,219.6563 109.8906,220.6094 Q109.5938,221.5625 109.5938,222.8281 Q109.5938,224.8438 110.3125,225.8125 Q111.0313,226.7656 112.625,226.7656 Q113.2188,226.7656 113.8438,226.6094 Q114.4688,226.4531 115.2969,226.0781 L115.2969,228.2969 Q114.5625,228.6094 113.7656,228.7656 Q112.9844,228.9219 112.2188,228.9219 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="34" x="133.25" y="226.656">Plugin</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="261" y1="238" y2="238"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="261" y1="246" y2="246"/><ellipse cx="17" cy="257" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="147" x="26" y="261.7589">loadInstances(pluginConfig)</text><rect fill="#F24D5C" height="6" style="stroke: #C82930; stroke-width: 1.0;" width="6" x="14" y="268.9819"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="230" x="26" y="276.7408">loadInstance(pluginFactory, instanceConfig)</text><rect fill="#F24D5C" height="6" style="stroke: #C82930; stroke-width: 1.0;" width="6" x="14" y="283.9638"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="224" x="26" y="291.7227">checkVersion(pluginVersion, pluginConfig)</text><!--MD5=[218bb048f5444e962cde9d7734334ddc]
+link PluginManager to Plugin--><path d="M134,146.07 C134,166.11 134,187.53 134,205.8 " fill="none" id="PluginManager-Plugin" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[a63e189979e21c11ac2ce704b7d1048d]
+@startuml PluginManager
+PluginManager - - Plugin
+
+class PluginManager {
+    +load()
+    +unload()
+    +start()
+    +stop()
+    +pluginInstance(instanceName)
+    +pluginInstanceNames()
+}
+
+class Plugin {
+    +loadInstances(pluginConfig)
+    -loadInstance(pluginFactory, instanceConfig)
+    -checkVersion(pluginVersion, pluginConfig)
+}
+@enduml
+
+PlantUML version 1.2020.10(Sun May 17 11:35:57 CEST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.8+10-post-Ubuntu-0ubuntu120.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
