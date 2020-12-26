@@ -44,8 +44,6 @@ PluginConfig::PluginConfig(const QString &filePath,
                            const QList<PluginInstanceConfig> &instanceConfigs)
     : m_filePath(filePath),
       m_version(version),
-      m_minVersion(),
-      m_maxVersion(),
       m_instanceConfigs(instanceConfigs)
 {
 }
@@ -57,7 +55,6 @@ PluginConfig::PluginConfig(const QString &filePath,
                            const VersionInfo &maxVersion,
                            const QList<PluginInstanceConfig> &instanceConfigs)
     : m_filePath(filePath),
-      m_version(),
       m_minVersion(minVersion),
       m_maxVersion(maxVersion),
       m_instanceConfigs(instanceConfigs)

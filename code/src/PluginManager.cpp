@@ -144,7 +144,7 @@ bool PluginManager::unload()
 bool PluginManager::start()
 {
     // Start plugin instances in the defined startup order
-    for (const QString &instanceName : m_pluginStartupOrder)
+    for (const QString &instanceName : qAsConst(m_pluginStartupOrder))
     {
         auto *instance = pluginInstance(instanceName);
 

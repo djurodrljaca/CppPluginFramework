@@ -42,8 +42,7 @@ namespace CppPluginFramework
 PluginInstanceConfig::PluginInstanceConfig(const QString &name,
                                            const CppConfigFramework::ConfigObjectNode &config,
                                            const QSet<QString> &dependencies)
-    : CppConfigFramework::ConfigLoader(),
-      m_name(name),
+    : m_name(name),
       m_config(std::move(config.clone()->toObject())),
       m_dependencies(dependencies)
 {
@@ -52,8 +51,7 @@ PluginInstanceConfig::PluginInstanceConfig(const QString &name,
 // -------------------------------------------------------------------------------------------------
 
 PluginInstanceConfig::PluginInstanceConfig(const PluginInstanceConfig &other)
-    : CppConfigFramework::ConfigLoader(),
-      m_name(other.m_name),
+    : m_name(other.m_name),
       m_config(std::move(other.m_config.clone()->toObject())),
       m_dependencies(other.m_dependencies)
 {

@@ -54,9 +54,7 @@ static const QSet<QString> s_exportedInterfaces
 // -------------------------------------------------------------------------------------------------
 
 TestPlugin1::TestPlugin1(const QString &name)
-    : CppPluginFramework::AbstractPlugin(name, s_version, s_description, s_exportedInterfaces),
-      ITestPlugin1(),
-      m_configuredValue()
+    : CppPluginFramework::AbstractPlugin(name, s_version, s_description, s_exportedInterfaces)
 {
 }
 

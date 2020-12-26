@@ -54,10 +54,7 @@ static const QSet<QString> s_exportedInterfaces
 // -------------------------------------------------------------------------------------------------
 
 TestPlugin2::TestPlugin2(const QString &name)
-    : CppPluginFramework::AbstractPlugin(name, s_version, s_description, s_exportedInterfaces),
-      ITestPlugin2(),
-      m_configuredDelimiter(),
-      m_dependencies()
+    : CppPluginFramework::AbstractPlugin(name, s_version, s_description, s_exportedInterfaces)
 {
 }
 
@@ -136,7 +133,7 @@ bool TestPlugin2::onStart()
         return false;
     }
 
-    for (auto *dependency : m_dependencies)
+    for (auto *dependency : qAsConst(m_dependencies))
     {
         if (!dependency->isStarted())
         {
