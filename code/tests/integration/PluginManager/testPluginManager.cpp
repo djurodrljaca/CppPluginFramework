@@ -114,6 +114,10 @@ void TestPluginManager::testLoad()
     QVERIFY(instanceNames.contains("instance2"));
     QVERIFY(instanceNames.contains("instance3"));
 
+    QVERIFY(pluginManager.hasPluginInstance("instance1"));
+    QVERIFY(pluginManager.hasPluginInstance("instance2"));
+    QVERIFY(pluginManager.hasPluginInstance("instance3"));
+
     auto instance1 = pluginManager.pluginInstance("instance1");
     auto instance2 = pluginManager.pluginInstance("instance2");
     auto instance3 = pluginManager.pluginInstance("instance3");

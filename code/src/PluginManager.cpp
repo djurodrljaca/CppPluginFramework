@@ -194,6 +194,15 @@ void PluginManager::stop()
 
 // -------------------------------------------------------------------------------------------------
 
+bool PluginManager::hasPluginInstance(const QString &instanceName) const
+{
+    auto it = m_pluginInstances.find(instanceName);
+
+    return (it != m_pluginInstances.end());
+}
+
+// -------------------------------------------------------------------------------------------------
+
 IPlugin *PluginManager::pluginInstance(const QString &instanceName)
 {
     auto it = m_pluginInstances.find(instanceName);

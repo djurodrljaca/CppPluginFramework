@@ -77,6 +77,16 @@ public:
     void stop();
 
     /*!
+     * Checks if a plugin instance with the specified name was loaded
+     *
+     * \param   instanceName    Plugin instance name
+     *
+     * \retval  true    Plugin was loaded
+     * \retval  false   Plugin was not loaded
+     */
+    bool hasPluginInstance(const QString &instanceName) const;
+
+    /*!
      * Gets the specified plugin instance
      *
      * \param   instanceName    Plugin instance name
