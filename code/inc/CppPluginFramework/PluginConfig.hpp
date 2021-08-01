@@ -38,7 +38,7 @@ namespace CppPluginFramework
 {
 
 //! Config class for a Plugin
-class CPPPLUGINFRAMEWORK_EXPORT PluginConfig : public CppConfigFramework::ConfigLoader
+class CPPPLUGINFRAMEWORK_EXPORT PluginConfig : public CppConfigFramework::ConfigItem
 {
 public:
     //! Constructor
@@ -198,10 +198,13 @@ public:
     void setInstanceConfigs(const QList<PluginInstanceConfig> &instanceConfigs);
 
 private:
-    //! \copydoc    CppConfigFramework::ConfigLoader::loadConfigParameters()
+    //! \copydoc    CppConfigFramework::ConfigItem::loadConfigParameters()
     bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config) override;
 
-    //! \copydoc    CppConfigFramework::ConfigLoader::validateConfig()
+    //! \copydoc    CppConfigFramework::ConfigItem::storeConfigParameters()
+    bool storeConfigParameters(CppConfigFramework::ConfigObjectNode *config) override;
+
+    //! \copydoc    CppConfigFramework::ConfigItem::validateConfig()
     QString validateConfig() const override;
 
 private:

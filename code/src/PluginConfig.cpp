@@ -207,6 +207,15 @@ bool PluginConfig::loadConfigParameters(const CppConfigFramework::ConfigObjectNo
 
 // -------------------------------------------------------------------------------------------------
 
+bool PluginConfig::storeConfigParameters(CppConfigFramework::ConfigObjectNode *config)
+{
+    // Storing config parameters is currently not supported
+    Q_UNUSED(config)
+    return false;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 QString PluginConfig::validateConfig() const
 {
     // Check file path

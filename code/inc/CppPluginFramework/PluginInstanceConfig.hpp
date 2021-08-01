@@ -24,7 +24,7 @@
 #include <CppPluginFramework/CppPluginFrameworkExport.hpp>
 
 // C++ Config Framework includes
-#include <CppConfigFramework/ConfigLoader.hpp>
+#include <CppConfigFramework/ConfigItem.hpp>
 
 // Qt includes
 
@@ -40,7 +40,7 @@ namespace CppPluginFramework
 {
 
 //! Config class for a Plugin Instance
-class CPPPLUGINFRAMEWORK_EXPORT PluginInstanceConfig : public CppConfigFramework::ConfigLoader
+class CPPPLUGINFRAMEWORK_EXPORT PluginInstanceConfig : public CppConfigFramework::ConfigItem
 {
 public:
     //! Constructor
@@ -143,10 +143,13 @@ public:
     void setDependencies(const QSet<QString> &dependencies);
 
 private:
-    //! \copydoc    CppConfigFramework::ConfigLoader::loadConfigParameters()
+    //! \copydoc    CppConfigFramework::ConfigItem::loadConfigParameters()
     bool loadConfigParameters(const CppConfigFramework::ConfigObjectNode &config) override;
 
-    //! \copydoc    CppConfigFramework::ConfigLoader::validateConfig()
+    //! \copydoc    CppConfigFramework::ConfigItem::storeConfigParameters()
+    bool storeConfigParameters(CppConfigFramework::ConfigObjectNode *config) override;
+
+    //! \copydoc    CppConfigFramework::ConfigItem::validateConfig()
     QString validateConfig() const override;
 
 private:

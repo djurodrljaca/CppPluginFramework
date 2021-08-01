@@ -100,6 +100,15 @@ bool PluginManagerConfig::loadConfigParameters(const CppConfigFramework::ConfigO
 
 // -------------------------------------------------------------------------------------------------
 
+bool PluginManagerConfig::storeConfigParameters(CppConfigFramework::ConfigObjectNode *config)
+{
+    // Storing config parameters is currently not supported
+    Q_UNUSED(config)
+    return false;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 QString PluginManagerConfig::validateConfig() const
 {
     // Check individual plugins are valid and extract all instance names

@@ -168,6 +168,15 @@ bool PluginInstanceConfig::loadConfigParameters(const CppConfigFramework::Config
 
 // -------------------------------------------------------------------------------------------------
 
+bool PluginInstanceConfig::storeConfigParameters(CppConfigFramework::ConfigObjectNode *config)
+{
+    // Storing config parameters is currently not supported
+    Q_UNUSED(config)
+    return false;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 QString PluginInstanceConfig::validateConfig() const
 {
     // Check name
